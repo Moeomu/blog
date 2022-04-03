@@ -10,7 +10,7 @@ tags:
     - VSCode
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/VSCode-Python-遇到的问题/)
+本文来源：[Moeomu的博客](/zh-cn/posts/vscode-python-遇到的问题/)
 
 ## VSCode-Python-Venv-PowerShell未签名环境无法激活
 

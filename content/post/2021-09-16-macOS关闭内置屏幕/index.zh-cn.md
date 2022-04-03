@@ -8,7 +8,7 @@ tags:
     - macOS
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macOS关闭内置屏幕/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macos关闭内置屏幕/)
 
 ## 磁铁大法
 

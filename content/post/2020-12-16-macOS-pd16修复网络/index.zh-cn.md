@@ -10,7 +10,7 @@ tags:
 ---
 
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macOS-pd16修复网络/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macos-pd16修复网络/)
 
 ## 前奏
 

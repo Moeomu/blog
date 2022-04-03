@@ -10,7 +10,7 @@ tags:
     - GPG
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macOS-GitGPG密钥配置/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macos-gitgpg密钥配置/)
 
 ## 关于GitHub GPG密钥验证
 

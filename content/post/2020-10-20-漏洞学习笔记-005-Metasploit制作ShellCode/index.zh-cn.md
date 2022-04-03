@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-005-Metasploit制作ShellCode/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-005-metasploit制作shellcode/)
 
 ...未完待续(Metasploit旧版本真难找)...
 

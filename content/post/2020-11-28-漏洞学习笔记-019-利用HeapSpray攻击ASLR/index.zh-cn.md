@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-019-利用HeapSpray攻击ASLR/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-019-利用heapspray攻击aslr/)
 
 ## 原理
 

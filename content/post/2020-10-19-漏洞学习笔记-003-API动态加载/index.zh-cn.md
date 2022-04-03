@@ -11,7 +11,7 @@ tags:
 
 > [点击此处下载本文附可执行程序，shellcode文件](/assets/ExpStd/ExpStd03.zip)
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-003-API动态加载/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-003-api动态加载/)
 
 ## 通过TEB定位API地址
 

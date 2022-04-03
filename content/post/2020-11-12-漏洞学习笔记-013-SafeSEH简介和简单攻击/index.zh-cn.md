@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-013-SafeSEH简介和简单攻击/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-013-safeseh简介和简单攻击/)
 
 ## SafeSEH简介
 

@@ -11,7 +11,7 @@ tags:
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-008-Windows异常的利用/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-008-windows异常的利用/)
 
 ## SEH概述
 

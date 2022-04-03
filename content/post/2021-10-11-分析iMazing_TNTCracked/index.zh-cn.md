@@ -10,7 +10,7 @@ tags:
     - Windows
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/分析iMazing_TNTCracked/)
+本文来源：[Moeomu的博客](/zh-cn/posts/分析imazing_tntcracked/)
 
 ## 缘起
 

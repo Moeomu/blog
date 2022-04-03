@@ -9,7 +9,7 @@ tags:
     - Tools
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/逆向工具-Radare2和Cutter/)
+本文来源：[Moeomu的博客](/zh-cn/posts/逆向工具-radare2和cutter/)
 
 ## 介绍
 

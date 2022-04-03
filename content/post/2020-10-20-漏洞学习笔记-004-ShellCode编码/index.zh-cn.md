@@ -11,7 +11,7 @@ tags:
 
 > [点击此处下载本文附可执行程序，shellcode文件](/assets/ExpStd/ExpStd04.zip)
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-004-ShellCode编码/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-004-shellcode编码/)
 
 ## 异或编码
 

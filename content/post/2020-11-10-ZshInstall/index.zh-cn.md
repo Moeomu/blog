@@ -13,7 +13,7 @@ tags:
  
 zsh install and config
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Zsh-Install/)
+本文来源：[Moeomu的博客](/zh-cn/posts/zsh-install/)
 
 ## 安装zsh(install zsh)
 

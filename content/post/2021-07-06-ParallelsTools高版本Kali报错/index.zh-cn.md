@@ -9,7 +9,7 @@ tags:
     - parallels
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/ParallelsTools高版本Kali报错/)
+本文来源：[Moeomu的博客](/zh-cn/posts/parallelstools高版本kali报错/)
 
 ## 首先更新kali源
 

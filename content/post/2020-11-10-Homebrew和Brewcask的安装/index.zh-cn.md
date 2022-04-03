@@ -11,7 +11,7 @@ tags:
 
 大家请注意时效性：**本文写于2020/11/10**&&**本文更新于2021/07/02**
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Homebrew和Brewcask的安装/)
+本文来源：[Moeomu的博客](/zh-cn/posts/homebrew和brewcask的安装/)
 
 ## 安装git
 

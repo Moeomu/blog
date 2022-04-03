@@ -9,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Linux内核学习笔记-001-编译和启动内核/)
+本文来源：[Moeomu的博客](/zh-cn/posts/linux内核学习笔记-001-编译和启动内核/)
 
 ## 准备环境
 

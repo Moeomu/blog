@@ -11,7 +11,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核调试学习笔记-001-环境搭建/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows内核调试学习笔记-001-环境搭建/)
 
 ## 下载工具
 

@@ -9,7 +9,7 @@ tags:
     - Homebrew
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Homebrew常用软件/)
+本文来源：[Moeomu的博客](/zh-cn/posts/homebrew常用软件/)
 
 ## List
 

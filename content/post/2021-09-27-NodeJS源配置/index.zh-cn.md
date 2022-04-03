@@ -9,7 +9,7 @@ tags:
     - NodeJS
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/NodeJS源配置/)
+本文来源：[Moeomu的博客](/zh-cn/posts/nodejs源配置/)
 
 ## 安装
 

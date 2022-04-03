@@ -11,7 +11,7 @@ tags:
 
 > [点击此处下载本文附可执行程序，shellcode文件](/assets/ExpStd/ExpStd02.zip)
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-002-ESP跳板/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-002-esp跳板/)
 
 ## 栈空间移位
 

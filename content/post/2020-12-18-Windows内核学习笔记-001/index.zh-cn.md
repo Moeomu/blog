@@ -9,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核学习笔记-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows内核学习笔记-001/)
 
 ## Windows内核开发环境配置
 

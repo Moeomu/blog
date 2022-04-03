@@ -9,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核调试学习笔记-002-结构体/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows内核调试学习笔记-002-结构体/)
 
 ## 非公开内核结构
 

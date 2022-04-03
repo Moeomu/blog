@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-014-DEP的介绍/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-014-dep的介绍/)
 
 ## DEP的介绍
 

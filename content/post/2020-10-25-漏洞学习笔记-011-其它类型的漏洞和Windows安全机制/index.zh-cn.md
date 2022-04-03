@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-011-其它类型的漏洞和Windows安全机制/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-011-其它类型的漏洞和windows安全机制/)
 
 ## 格式化串漏洞
 

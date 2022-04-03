@@ -11,7 +11,7 @@ tags:
  
 声明：实验环境为 Windows XP SP3
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-009-Windows异常的深入/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-009-windows异常的深入/)
 
 ## 不同级别的SEH
 

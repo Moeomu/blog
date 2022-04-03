@@ -10,7 +10,7 @@ tags:
     - parallels
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/虚拟机硬件加速导致的Electron应用白屏的问题/)
+本文来源：[Moeomu的博客](/zh-cn/posts/虚拟机硬件加速导致的electron应用白屏的问题/)
 
 ## 问题再现
 

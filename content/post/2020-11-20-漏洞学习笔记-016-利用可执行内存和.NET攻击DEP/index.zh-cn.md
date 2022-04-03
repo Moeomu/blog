@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-016-利用可执行内存和.net攻击dep/)
 
 ## 利用可执行内存攻击DEP
 

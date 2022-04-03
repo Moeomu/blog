@@ -11,7 +11,7 @@ tags:
     - Driver
 ---
 
-Source of this article: [MoeomuBlog](/zh-cn/posts/ProblemsEncounteredInInstallingArchonROGLaptop/)
+Source of this article: [MoeomuBlog](/posts/problems-encountered-in-installing-arch-on-roglaptop/)
 
 ## No display after installing NVIDIA graphics card
 

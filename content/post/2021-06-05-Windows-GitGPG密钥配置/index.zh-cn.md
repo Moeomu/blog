@@ -10,7 +10,7 @@ tags:
     - GPG
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/Windows-GitGPG密钥配置/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows-gitgpg密钥配置/)
 
 ## 下载GPG4WIN
 

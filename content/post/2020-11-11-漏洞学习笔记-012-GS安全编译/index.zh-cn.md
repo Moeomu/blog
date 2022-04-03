@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-012-GS安全编译/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-012-gs安全编译/)
 
 ## GS安全编译的保护原理
 

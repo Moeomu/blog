@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-020-SEHOP简介/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-020-sehop简介/)
 
 ## 简介
 

@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-015-利用virtualrrotect和virtualalloc攻击dep/)
 
 ## 利用VirtualProtect攻击DEP
 

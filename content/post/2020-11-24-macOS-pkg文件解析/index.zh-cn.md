@@ -8,7 +8,7 @@ tags:
     - macOS
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macOS-pkg文件解析/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macos-pkg文件解析/)
 
 ## 起因
 

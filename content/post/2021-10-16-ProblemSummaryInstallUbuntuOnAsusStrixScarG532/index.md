@@ -11,7 +11,7 @@ tags:
     - Driver
 ---
 
-Source of this article: [MoeomuBlog](/zh-cn/posts/ProblemsummaryofinstallingUbuntuonAsusStrixScarG532/)
+Source of this article: [MoeomuBlog](/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/)
 
 ## Install Nvidia driver on Ubuntu with SecurityBoot
 
