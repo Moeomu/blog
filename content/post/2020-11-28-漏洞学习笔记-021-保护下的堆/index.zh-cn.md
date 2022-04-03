@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-021-保护下的堆
 description: 堆的保护和攻击
-slug: exploit-021
 date: 2020-11-28 16:15:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-021/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-021-保护下的堆/)
 
 ## 简介
 

@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-002-ESP跳板
 description: ShellCode的动态定位法-ESP跳板法
-slug: exploit-002
 date: 2020-10-19 18:20:00+0800
 categories:
     - Exploit
@@ -12,7 +11,7 @@ tags:
 
 > [点击此处下载本文附可执行程序，shellcode文件](/assets/ExpStd/ExpStd02.zip)
 
-本文来源：[Moeomu的博客](/p/exploit-002/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-002-ESP跳板/)
 
 ## 栈空间移位
 

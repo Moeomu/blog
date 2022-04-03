@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-017-ASLR简介
 description: ASLR技术的介绍和简单攻击思路
-slug: exploit-017
 date: 2020-11-24 21:12:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-017/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-017-ASLR简介/)
 
 ## ASLR技术简介
 

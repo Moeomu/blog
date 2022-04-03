@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-010-HeapSpray
 description: Heap Spray - 堆与栈的协同攻击
-slug: exploit-010
 date: 2020-10-25 17:56:00+0800
 categories:
     - Exploit
@@ -12,7 +11,7 @@ tags:
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/p/exploit-010/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-010-HeapSpray/)
 
 ## 简介
 

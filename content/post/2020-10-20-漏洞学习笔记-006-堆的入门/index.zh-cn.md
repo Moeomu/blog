@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-006-堆的入门
 description: Windows的堆，从来都是一个乱糟糟的地方，管理方法也非常奇怪
-slug: exploit-006
 date: 2020-10-20 23:10:00+0800
 categories:
     - Exploit
@@ -12,7 +11,7 @@ tags:
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/p/exploit-006/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-006-堆的入门/)
 
 ## 堆的介绍
 

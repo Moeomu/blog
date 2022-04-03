@@ -1,7 +1,6 @@
 ---
 title: macOS关闭内置屏幕
 description: macOS关闭内置屏幕
-slug: macos-close-inner-screen
 date: 2021-09-16 17:00:00+0800
 categories:
     - Config
@@ -9,7 +8,7 @@ tags:
     - macOS
 ---
 
-本文来源：[Moeomu的博客](/p/macos-close-inner-screen/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macOS关闭内置屏幕/)
 
 ## 磁铁大法
 

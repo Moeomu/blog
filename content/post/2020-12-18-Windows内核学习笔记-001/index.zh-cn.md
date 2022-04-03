@@ -1,7 +1,6 @@
 ---
 title: Windows内核学习笔记-001
 description: 这波啊，这波是又从头学起了，之前学的内核有些不系统，这次一定系统地整理一遍Windows内核编程的内容
-slug: windows-kernel-study-001
 date: 2020-12-18 18:52:00+0800
 categories:
     - Kernel
@@ -10,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/posts/Windows内核学习笔记-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核学习笔记-001/)
 
 ## Windows内核开发环境配置
 

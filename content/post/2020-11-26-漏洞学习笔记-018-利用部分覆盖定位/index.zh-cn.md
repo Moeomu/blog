@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-018-利用部分覆盖定位
 description: 利用部分覆盖定位shellcode
-slug: exploit-018
 date: 2020-11-26 17:54:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-018/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-018-利用部分覆盖定位/)
 
 ## 原理
 

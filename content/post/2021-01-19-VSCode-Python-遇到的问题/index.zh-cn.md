@@ -1,7 +1,6 @@
 ---
 title: VSCode-Python-遇到的问题
 description: 记录一下在Windows写Python代码遇到的问题，当然是很简单的一些小问题，算是本地备份一下笔记
-slug: vscode-python-problems
 date: 2021-01-19 17:48:00+0800
 categories:
     - Solution
@@ -11,7 +10,7 @@ tags:
     - VSCode
 ---
 
-本文来源：[Moeomu的博客](/p/vscode-python-problems/)
+本文来源：[Moeomu的博客](/zh-cn/posts/VSCode-Python-遇到的问题/)
 
 ## VSCode-Python-Venv-PowerShell未签名环境无法激活
 

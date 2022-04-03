@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-012-GS安全编译
 description: GS安全编译的原理和突破
-slug: exploit-012
 date: 2020-11-11 16:45:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-012/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-012-GS安全编译/)
 
 ## GS安全编译的保护原理
 

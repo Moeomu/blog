@@ -1,7 +1,6 @@
 ---
 title: Linux内核学习笔记-001-编译和启动内核
 description: Linux内核学习笔记-001-编译和启动内核
-slug: linux-kernel-study-001
 date: 2021-07-07 11:20:00+0800
 categories:
     - Kernel
@@ -10,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/p/linux-kernel-study-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Linux内核学习笔记-001-编译和启动内核/)
 
 ## 准备环境
 

@@ -1,7 +1,6 @@
 ---
 title: Windows内核调试学习笔记-002-结构体
 description: Windows内核的相关的一些学习笔记，这一篇主要是描述EPROCESS，PEB的结构
-slug: windows-kernel-debug-002
 date: 2020-10-17 20:23:00+0800
 categories:
     - Kernel
@@ -10,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/p/windows-kernel-debug-002/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核调试学习笔记-002-结构体/)
 
 ## 非公开内核结构
 

@@ -1,7 +1,6 @@
 ---
 title: Homebrew和Brewcask的安装
 description: HomeBrew的安装，真是历经了多次失败，在此总结一下成功之谈
-slug: homebrew-install
 date: 2020-11-10 19:43:00+0800
 categories:
     - InstallationGuide
@@ -12,7 +11,7 @@ tags:
 
 大家请注意时效性：**本文写于2020/11/10**&&**本文更新于2021/07/02**
 
-本文来源：[Moeomu的博客](/p/homebrew-install/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Homebrew和Brewcask的安装/)
 
 ## 安装git
 

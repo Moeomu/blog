@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP
 description: Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP
-slug: exploit-015
 date: 2020-11-19 17:43:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-015/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP/)
 
 ## 利用VirtualProtect攻击DEP
 

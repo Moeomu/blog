@@ -1,7 +1,6 @@
 ---
 title: Windows内核学习笔记-002
 description: 这一节依旧是基础内容的复习
-slug: windows-kernel-study-002
 date: 2020-12-18 20:52:00+0800
 categories:
     - Kernel
@@ -10,7 +9,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/p/windows-kernel-study-002/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核学习笔记-002/)
 
 ## 字符串操作
 

@@ -1,7 +1,6 @@
 ---
 title: 分析iMazing_TNTCracked
 description: 分析iMazing_TNTCracked
-slug: analyze-iMazing-TNTCracked
 date: 2021-09-27 13:56:01+0800
 categories:
     - Analyze
@@ -11,7 +10,7 @@ tags:
     - Windows
 ---
 
-本文来源：[Moeomu的博客](/p/analyze-iMazing-TNTCracked/)
+本文来源：[Moeomu的博客](/zh-cn/posts/分析iMazing_TNTCracked/)
 
 ## 缘起
 

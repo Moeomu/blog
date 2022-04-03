@@ -1,7 +1,6 @@
 ---
 title: Homebrew常用软件
 description: Homebrew中的一些常用软件的记录，已经弃更了
-slug: homebrew-software-recommendations
 date: 2021-06-01 09:31:00+0800
 categories:
     - Config
@@ -10,7 +9,7 @@ tags:
     - Homebrew
 ---
 
-本文来源：[Moeomu的博客](/p/homebrew-software-recommendations/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Homebrew常用软件/)
 
 ## List
 

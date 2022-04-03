@@ -1,7 +1,6 @@
 ---
-title: ProblemsEncounteredInInstallingArchonROGLaptop
+title: Problems Encountered In Installing Arch on ROGLaptop
 description: Problems encountered in installing Arch on ROG Laptop
-slug: installing-arch-on-ROGLaptop
 date: 2021-11-09 09:22:01+0800
 categories:
     - Linux
@@ -12,7 +11,7 @@ tags:
     - Driver
 ---
 
-Source of this article: [MoeomuBlog](/p/installing-arch-on-ROGLaptop/)
+Source of this article: [MoeomuBlog](/zh-cn/posts/ProblemsEncounteredInInstallingArchonROGLaptop/)
 
 ## No display after installing NVIDIA graphics card
 

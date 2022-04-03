@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-005-Metasploit制作ShellCode
 description: Metasploit制作ShellCode
-slug: exploit-005
 date: 2020-10-20 22:20:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-005/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-005-Metasploit制作ShellCode/)
 
 ...未完待续(Metasploit旧版本真难找)...
 

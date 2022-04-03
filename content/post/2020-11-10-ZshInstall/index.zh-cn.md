@@ -1,7 +1,6 @@
 ---
 title: Zsh Install
 description: 关于zsh的安装和配置
-slug: zsh-install
 date: 2020-11-10 19:43:00+0800
 categories:
     - InstallationGuide
@@ -14,7 +13,7 @@ tags:
  
 zsh install and config
 
-本文来源：[Moeomu的博客](/p/zsh-install/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Zsh-Install/)
 
 ## 安装zsh(install zsh)
 

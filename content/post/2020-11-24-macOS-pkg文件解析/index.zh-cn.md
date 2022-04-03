@@ -1,7 +1,6 @@
 ---
 title: macOS-pkg文件解析
 description: macOS-pkg文件解析&PD16无法联网解决办法&ls的@符号问题
-slug: macos-pkg-file-parsing
 date: 2020-11-24 12:56:00+0800
 categories:
     - Analyze
@@ -9,7 +8,7 @@ tags:
     - macOS
 ---
 
-本文来源：[Moeomu的博客](/p/macos-pkg-file-parsing/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macOS-pkg文件解析/)
 
 ## 起因
 

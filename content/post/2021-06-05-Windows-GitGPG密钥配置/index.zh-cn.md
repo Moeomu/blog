@@ -1,7 +1,6 @@
 ---
 title: Windows-GitGPG密钥配置
 description: Windodws下的GitGPG密钥配置和开启签名验证
-slug: windows-gitpgp-config
 date: 2021-06-05 08:50:00+0800
 categories:
     - Config
@@ -11,7 +10,7 @@ tags:
     - GPG
 ---
 
-本文来源：[Moeomu的博客](/p/windows-gitpgp-config/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Windows-GitGPG密钥配置/)
 
 ## 下载GPG4WIN
 

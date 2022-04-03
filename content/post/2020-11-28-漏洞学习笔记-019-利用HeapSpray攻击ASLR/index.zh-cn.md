@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-019-利用HeapSpray攻击ASLR
 description: 利用Heap Spray(堆喷射)技术来攻击ASLR并定位shellcode
-slug: exploit-019
 date: 2020-11-28 12:38:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-019/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-019-利用HeapSpray攻击ASLR/)
 
 ## 原理
 

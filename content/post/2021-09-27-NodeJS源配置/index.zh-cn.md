@@ -1,7 +1,6 @@
 ---
 title: NodeJS源配置
 description: NodeJS源配置
-slug: nodejs-source-config
 date: 2021-09-27 13:56:01+0800
 categories:
     - Config
@@ -10,7 +9,7 @@ tags:
     - NodeJS
 ---
 
-本文来源：[Moeomu的博客](/p/nodejs-source-config/)
+本文来源：[Moeomu的博客](/zh-cn/posts/NodeJS源配置/)
 
 ## 安装
 

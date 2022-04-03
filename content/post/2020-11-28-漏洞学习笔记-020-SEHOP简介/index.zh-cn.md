@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-020-SEHOP简介
 description: SEHOP的介绍和一点简单攻击
-slug: exploit-020
 date: 2020-11-28 15:38:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-020/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-020-SEHOP简介/)
 
 ## 简介
 

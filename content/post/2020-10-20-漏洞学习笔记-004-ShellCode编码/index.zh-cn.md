@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-004-ShellCode编码
 description: ShellCode编码和减少体积
-slug: exploit-004
 date: 2020-10-20 9:20:00+0800
 categories:
     - Exploit
@@ -12,7 +11,7 @@ tags:
 
 > [点击此处下载本文附可执行程序，shellcode文件](/assets/ExpStd/ExpStd04.zip)
 
-本文来源：[Moeomu的博客](/p/slug: exploit-003/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-004-ShellCode编码/)
 
 ## 异或编码
 

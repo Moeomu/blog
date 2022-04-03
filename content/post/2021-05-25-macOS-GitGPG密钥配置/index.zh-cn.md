@@ -1,7 +1,6 @@
 ---
 title: macOS-GitGPG密钥配置
 description: macOS下的GitGPG密钥配置和开启签名验证
-slug: macos-gitpgp-config
 date: 2021-05-25 07:55:00 +0800
 categories:
     - Config
@@ -11,7 +10,7 @@ tags:
     - GPG
 ---
 
-本文来源：[Moeomu的博客](/p/macos-gitpgp-config/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macOS-GitGPG密钥配置/)
 
 ## 关于GitHub GPG密钥验证
 

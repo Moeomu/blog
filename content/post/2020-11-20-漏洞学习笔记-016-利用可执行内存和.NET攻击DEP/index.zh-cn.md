@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-016-利用可执行内存和.NET攻击DEP
 description: Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP
-slug: exploit-016
 date: 2020-11-20 14:13:00+0800
 categories:
     - Exploit
@@ -10,7 +9,7 @@ tags:
     - Exploit
 ---
 
-本文来源：[Moeomu的博客](/p/exploit-016/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP/)
 
 ## 利用可执行内存攻击DEP
 

@@ -1,7 +1,6 @@
 ---
 title: Problem summary of installing Ubuntu on AsusStrixScarG532
 description: Problem summary of installing Ubuntu on AsusStrixScarG532
-slug: installing-ubuntu-on-AsusStrixScarG532
 date: 2021-10-16 11:22:01+0800
 categories:
     - Linux
@@ -12,7 +11,7 @@ tags:
     - Driver
 ---
 
-Source of this article: [MoeomuBlog](/p/installing-ubuntu-on-AsusStrixScarG532/)
+Source of this article: [MoeomuBlog](/zh-cn/posts/ProblemsummaryofinstallingUbuntuonAsusStrixScarG532/)
 
 ## Install Nvidia driver on Ubuntu with SecurityBoot
 

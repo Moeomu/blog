@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-001-缓冲区溢出
 description: 能够引起软件做一些超出涉及范围的事情的bug叫做漏洞，本篇写了一些简单的缓冲区溢出漏洞的利用浅析
-slug: exploit-001
 date: 2020-10-18 10:00:00+0800
 categories:
     - Exploit
@@ -15,7 +14,7 @@ tags:
 >
 > [点击此处下载本文附代码，可执行程序，shellcode文件](/assets/ExpStd/ExpStd01.zip)
 
-本文来源：[Moeomu的博客](/p/exploit-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-001-缓冲区溢出/)
 
 ## PE概念
 

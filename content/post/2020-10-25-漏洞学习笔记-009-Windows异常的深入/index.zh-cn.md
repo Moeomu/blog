@@ -1,7 +1,6 @@
 ---
 title: 漏洞学习笔记-009-Windows异常的深入
 description: 深入挖掘Windows异常处理，附带一些其它的利用方法 
-slug: exploit-009
 date: 2020-10-25 15:09:00+0800
 categories:
     - Exploit
@@ -12,7 +11,7 @@ tags:
  
 声明：实验环境为 Windows XP SP3
 
-本文来源：[Moeomu的博客](/p/exploit-009/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-009-Windows异常的深入/)
 
 ## 不同级别的SEH
 

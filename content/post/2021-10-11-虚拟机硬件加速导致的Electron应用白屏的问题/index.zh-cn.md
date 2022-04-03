@@ -1,7 +1,6 @@
 ---
 title: 虚拟机硬件加速导致的Electron应用白屏的问题
 description: 虚拟机硬件加速导致的Electron应用白屏的问题
-slug: vm-hardware-acceleration-causes-electron-app-white-screen
 date: 2021-10-12 19:22:01+0800
 categories:
     - VM
@@ -11,7 +10,7 @@ tags:
     - parallels
 ---
 
-本文来源：[Moeomu的博客](/p/vm-hardware-acceleration-causes-electron-app-white-screen/)
+本文来源：[Moeomu的博客](/zh-cn/posts/虚拟机硬件加速导致的Electron应用白屏的问题/)
 
 ## 问题再现
 

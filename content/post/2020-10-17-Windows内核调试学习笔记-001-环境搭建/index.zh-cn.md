@@ -11,7 +11,7 @@ tags:
     - Kernel
 ---
 
-本文来源：[Moeomu的博客](/p/windows-kernel-debug-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/Windows内核调试学习笔记-001-环境搭建/)
 
 ## 下载工具
 

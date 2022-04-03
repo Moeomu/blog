@@ -1,7 +1,6 @@
 ---
 title: 逆向工具-Radare2和Cutter
 description: 开源逆向神器-Radare2和Cutter
-slug: reverse-tools-cutter
 date: 2020-11-21 19:04:00+0800
 categories:
     - Reverse
@@ -10,7 +9,7 @@ tags:
     - Tools
 ---
 
-本文来源：[Moeomu的博客](/p/reverse-tools-cutter/)
+本文来源：[Moeomu的博客](/zh-cn/posts/逆向工具-Radare2和Cutter/)
 
 ## 介绍
 
