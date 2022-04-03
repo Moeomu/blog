@@ -13,7 +13,7 @@ lastUpdated = "Jan 02, 2006 15:04 MST"
 
 [sidebar]
 emoji = "🍥"
-subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+subtitle = "Misaka Study Notes."
 
 [sidebar.avatar]
 enabled = true
@@ -75,7 +75,7 @@ enabled = true
 ## Comments
 [comments]
 enabled = true
-provider = "disqus"
+provider = "waline"
 
 [comments.disqusjs]
 shortname = ""
@@ -103,7 +103,7 @@ clientSecret = ""
 autoCreateIssue = false
 
 [comments.waline]
-serverURL = ""
+serverURL = "https://messageboard.moeomu.com"
 lang = ""
 visitor = ""
 avatar = ""
@@ -112,7 +112,7 @@ requiredMeta = ["name", "email", "url"]
 placeholder = ""
 
 [comments.waline.locale]
-admin = "Admin"
+admin = "Misaka"
 
 [comments.twikoo]
 envId = ""
