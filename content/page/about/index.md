@@ -29,3 +29,7 @@ menu:
 
 - Mail: <feedback@moeomu.com>
 - [GPG Key](/assets/Misaka_0x9A630CD2_public.asc)
+
+## Build Status
+
+[![Deploy to Github Pages](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml/badge.svg)](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml)[![pages-build-deployment](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment)
