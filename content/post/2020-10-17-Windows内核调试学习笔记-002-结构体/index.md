@@ -9,7 +9,7 @@ tags:
     - Kernel
 ---
 
-Source: [Moeomu's Blog](/posts/windows内核调试学习笔记-002-结构体/)
+Source: [Moeomu's Blog](/posts/windows-kernel-debugging-learning-notes-002-structures/)
 
 ## Non-public kernel structures
 

@@ -11,7 +11,7 @@ tags:
     - Kernel
 ---
 
-Source: [Moeomu's blog](/posts/windows内核调试学习笔记-001-环境搭建/)
+Source: [Moeomu's blog](/posts/windows-kernel-debugging-learning-notes-001-environment-building/)
 
 ## Download Tools
 

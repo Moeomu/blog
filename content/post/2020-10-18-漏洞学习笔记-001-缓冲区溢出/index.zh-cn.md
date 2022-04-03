@@ -34,7 +34,7 @@ tags:
 
 > SectionOffset = RVA - FileOffset  
 > FileOffset = VA - ImageBase - SectionOffset = RVA - SectionOffset  
-
+>
 > 例如.text节RVA=0x1000，FileOffset=0x400，则SectionOffset=0xC00  
 > 0x00404141处指令文件偏移为0x00404141-0x00400000-(0x1000-0x400)=0x3541
 
