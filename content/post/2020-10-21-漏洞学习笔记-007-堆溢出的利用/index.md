@@ -11,7 +11,7 @@ tags:
 
 Disclaimer: The experimental environment is Windows 2000
 
-Source: [Moeomu's blog](/zh-cn/posts/exploit-learning-notes-007-heap-overflow-exploit/)
+Source: [Moeomu's blog](/posts/exploit-learning-notes-007-heap-overflow-exploit/)
 
 ## Disassembly of linked tables
 

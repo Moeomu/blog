@@ -1,5 +1,5 @@
 ---
-title: macOS-pkg file parsing
+title: macOS-pkg file analysis
 description: macOS-pkg file parsing & PD16 can't network solution & @ symbol problem of ls
 date: 2020-11-24 12:56:00+0800
 categories:

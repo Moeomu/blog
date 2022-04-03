@@ -11,7 +11,7 @@ tags:
 
 > [Click here to download this article with executable program, shellcode file](/assets/ExpStd/ExpStd03.zip)
 
-Source: [Moeomu's blog](/zh-cn/posts/exploit-learning-notes-003-api-dynamic-loading/)
+Source: [Moeomu's blog](/posts/exploit-learning-notes-003-api-dynamic-loading/)
 
 ## Locate the API address via TEB
 

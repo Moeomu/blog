@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-Source: [Moeomu's blog](/posts/exploit-learning-notes-013-safeseh-introduction-and-simple-attack/)
+Source: [Moeomu's blog](/posts/exploit-learning-notes-013-safeseh-introduction-and-simple-attacks/)
 
 ## SafeSEH Introduction
 

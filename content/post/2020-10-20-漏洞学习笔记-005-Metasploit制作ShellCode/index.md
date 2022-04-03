@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-Source: [Moeomu's blog](/zh-cn/posts/exploit-learning-notes-005-metasploit-make-shellcode/)
+Source: [Moeomu's blog](/posts/exploit-learning-notes-005-metasploit-make-shellcode/)
 
 ... Unfinished business (Metasploit old version is really hard to find) ...
 
