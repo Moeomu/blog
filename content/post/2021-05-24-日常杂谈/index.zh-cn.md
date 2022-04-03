@@ -1,5 +1,5 @@
 ---
-title: 日常杂谈
+title: 日常杂谈-001
 description: 一些杂谈
 date: 2021-05-24 10:36:00+0800
 categories:
@@ -8,7 +8,7 @@ tags:
     - Dairy
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/日常杂谈/)
+本文来源：[Moeomu的博客](/zh-cn/posts/日常杂谈-001/)
 
 ## Mention
 

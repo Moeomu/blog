@@ -68,7 +68,6 @@ ed2k链接没法用motrix下载，准备去下载一个迅雷的精简版，突�
 ![man-ls](https://s3.ax1x.com/2020/11/24/Dto2bn.png)
 
 ```s
--@      Display extended attribute keys and sizes in long (-l) output.
 -@      在long(-l)输出中显示扩展的属性键和大小。
 ```
 

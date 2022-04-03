@@ -35,7 +35,7 @@ tags:
 给每一个Electron应用添加启动时参数`--disable-gpu`
 
 > 补充：可以在桌面建立一个快捷方式实现，以vscode为例，内容如下
-> 
+>
 > code.desktop
 
 ```shell
