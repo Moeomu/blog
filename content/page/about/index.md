@@ -6,7 +6,7 @@ date: 2020-10-10 16:27:00+0800
 license: CC BY-NC-ND 4.0
 menu:
     main: 
-        weight: 5
+        weight: 6
         params:
             icon: user
 ---
