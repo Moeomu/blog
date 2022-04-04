@@ -28,7 +28,7 @@ menu:
 ## Contact me
 
 - Mail: <feedback@moeomu.com>
-- [GPG Key](/file/Misaka_0x9A630CD2_public.asc)
+- [GPG Key](./Misaka_0x9A630CD2_public.asc)
 
 ## Build Status
 
