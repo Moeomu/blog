@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-> [Click here to download this article with executable program, shellcode file](/assets/ExpStd/ExpStd03.zip)
+> [Click here to download this article with executable program, shellcode file](./exploit-study-03.zip)
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-003-api-dynamic-loading/)
 

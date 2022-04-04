@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-> [Click here to download this article with executable program, shellcode file](/assets/ExpStd/ExpStd04.zip)
+> [Click here to download this article with executable program, shellcode file](./exploit-study-04.zip)
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-004-shellcode-coding/)
 

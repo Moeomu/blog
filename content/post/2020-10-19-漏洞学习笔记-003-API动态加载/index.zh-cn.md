@@ -9,7 +9,7 @@ tags:
     - Exploit
 ---
 
-> [点击此处下载本文附可执行程序，shellcode文件](/assets/ExpStd/ExpStd03.zip)
+> [点击此处下载本文附可执行程序，shellcode文件](./exploit-study-03.zip)
 
 本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-003-api动态加载/)
 
