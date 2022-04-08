@@ -28,4 +28,5 @@ menu:
 
 ## 构建状态
 
-[![Deploy to Github Pages](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml/badge.svg)](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml)[![pages-build-deployment](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment)
+![Deploy to Github Pages](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml/badge.svg)
+![pages-build-deployment](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment/badge.svg)
