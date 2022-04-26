@@ -114,7 +114,7 @@ emoji = [
 lang = "en"
 placeholder = ""
 requiredMeta = ["nick", "mail"]
-serverURL = "https://messageboard.moeomu.com"
+serverURL = "https://waline.moeomu.com"
 visitor = "true"
 
 [comments.waline.locale]
