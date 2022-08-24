@@ -14,7 +14,7 @@ tags:
 
 稍微提及一下，山西校企通的自动打卡项目经过思考之后将它决定将它开源，这只是一段赶工出来的不成熟的代码，因此可能会有些阅读困难，但是使用不会有问题，也已经稳定运行了半年多，Readme中我写了所有的使用方法和注意事项，以下是开源地址
 
-[[Github]-XQT-Auto-Clockin](https://github.com/BloveDawn/XQT-Clockin)
+[[Github]-XQT-Auto-Clockin](https://github.com/Misakaou/XQT-Clockin)
 
 - 特性
   - 全自动打卡

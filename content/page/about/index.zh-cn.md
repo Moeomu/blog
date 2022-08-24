@@ -7,7 +7,7 @@ menu:
             icon: user
 ---
 
-> 首先欢迎您的到访，[本项目](https://github.com/BloveDawn/blog)的`main`分支是<https://blog.moeomu.com>站点的构建源文件，使用[Vercel](http://vercel.com/)构建。再次欢迎您到访此站点。
+> 首先欢迎您的到访，[本项目](https://github.com/Misakaou/blog)的`main`分支是<https://blog.moeomu.com>站点的构建源文件，使用[Vercel](http://vercel.com/)构建。再次欢迎您到访此站点。
 
 ## 站点介绍
 
@@ -28,5 +28,5 @@ menu:
 
 ## 构建状态
 
-![Deploy to Github Pages](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml/badge.svg)
-![pages-build-deployment](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment/badge.svg)
+![Deploy to Github Pages](https://github.com/Misakaou/blog/actions/workflows/deploy.yml/badge.svg)
+![pages-build-deployment](hhttps://github.com/Misakaou/blog/actions/workflows/pages/pages-build-deployment/badge.svg)

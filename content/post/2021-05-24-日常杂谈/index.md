@@ -14,7 +14,7 @@ Source: [Moeomu's blog](/posts/daily-miscellaneous-001/)
 
 A little mention, Shanxi school enterprise pass the automatic clocking project after thinking about it will it decided to open source it, this is just a rush out of immature code, so there may be some reading difficulties, but the use will not have problems, but also has been stable operation for more than half a year, Readme I wrote all the use of methods and notes, the following is the open source address
 
-[[Github]-XQT-Auto-Clockin](https://github.com/BloveDawn/XQT-Clockin)
+[[Github]-XQT-Auto-Clockin](https://github.com/Misakaou/XQT-Clockin)
 
 - Features
   - Automatic clocking

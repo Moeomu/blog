@@ -2,8 +2,8 @@
 title: Links
 links:
   - title: GitHub
-    description: Blovedawn's Github.
-    website: https://github.com/BloveDawn
+    description: Misakaou's Github.
+    website: https://github.com/Misakaou
     image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
 menu:
     main: 

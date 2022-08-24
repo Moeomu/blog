@@ -11,7 +11,7 @@ menu:
             icon: user
 ---
 
-> First of all, welcome to the project. The `master brance` of [this project](https://github.com/BloveDawn/blog) is a build source file for the <https://blog.moeomu.com> site, built using [Vercel](https://vercel.com/). Again, welcome to this site.
+> First of all, welcome to the project. The `master brance` of [this project](https://github.com/Misakaou/blog) is a build source file for the <https://blog.moeomu.com> site, built using [Vercel](https://vercel.com/). Again, welcome to this site.
 
 ## Site Introduction
 
@@ -32,5 +32,5 @@ menu:
 
 ## Build Status
 
-![Deploy to Github Pages](https://github.com/BloveDawn/blog/actions/workflows/deploy.yml/badge.svg)
-![pages-build-deployment](https://github.com/BloveDawn/blog/actions/workflows/pages/pages-build-deployment/badge.svg)
+![Deploy to Github Pages](https://github.com/Misakaou/blog/actions/workflows/deploy.yml/badge.svg)
+![pages-build-deployment](https://github.com/Misakaou/blog/actions/workflows/pages/pages-build-deployment/badge.svg)
