@@ -118,7 +118,7 @@ serverURL = "https://waline.moeomu.com"
 visitor = "true"
 
 [comments.waline.locale]
-admin = "Misaka"
+admin = "Admin"
 
 [comments.twikoo]
 envId = ""
