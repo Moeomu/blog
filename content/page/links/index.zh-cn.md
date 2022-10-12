@@ -14,6 +14,4 @@ menu:
         weight: 4
         params:
             icon: link
-
-comments: false
 ---
