@@ -75,7 +75,7 @@ enabled = true
 ## Comments
 [comments]
 enabled = true
-provider = "waline"
+provider = "utterances"
 
 [comments.disqusjs]
 admin = ""
@@ -86,8 +86,8 @@ shortname = ""
 
 [comments.utterances]
 issueTerm = "pathname"
-label = ""
-repo = ""
+label = "✨💬✨"
+repo = "Moeomu/blog"
 
 [comments.remark42]
 host = ""
@@ -114,7 +114,7 @@ emoji = [
 lang = "en"
 placeholder = ""
 requiredMeta = ["nick", "mail"]
-serverURL = "https://waline.moeomu.com"
+serverURL = ""
 visitor = "true"
 
 [comments.waline.locale]

@@ -27,8 +27,8 @@ menu:
 
 ## Contact me
 
-- Personal Email (recommended): <misakaou@outlook.com> [GPG Key](./Misaka_m_0xED260593_Public.asc)
-- Feedback Email: <feedback@moeomu.com> [GPG Key](./Misaka_0x9A630CD2_public.asc)
+- Personal Email (recommended): <misakaou@outlook.com> [(GPG Key)](./Misaka_m_0xED260593_Public.asc)
+- Feedback Email: <feedback@moeomu.com> [(GPG Key)](./Misaka_0x9A630CD2_public.asc)
 
 ## Build Status
 
