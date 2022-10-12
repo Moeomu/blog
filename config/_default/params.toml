@@ -75,7 +75,7 @@ enabled = true
 ## Comments
 [comments]
 enabled = true
-provider = "utterances"
+provider = "giscus"
 
 [comments.disqusjs]
 admin = ""
@@ -132,15 +132,17 @@ serverName = "cactus.chat"
 siteName = ""
 
 [comments.giscus]
-category = ""
-categoryID = ""
+category = "Announcements"
+categoryID = "DIC_kwDOHHJl4M4CR7uM"
 darkTheme = ""
 emitMetadata = 0
 lightTheme = ""
-mapping = ""
+mapping = "pathname"
 reactionsEnabled = 1
-repo = ""
-repoID = ""
+repo = "Moeomu/blog"
+repoID = "R_kgDOHHJl4A"
+inputPosition = "top"
+loading = "lazy"
 
 [comments.gitalk]
 admin = ""
