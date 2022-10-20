@@ -28,8 +28,8 @@ comments: false
 
 ## Contact me
 
-- Personal Email (recommended): <misakaou@outlook.com> [(GPG Key)](./Misaka_m_0xED260593_Public.asc)
-- Feedback Email: <feedback@moeomu.com> [(GPG Key)](./Misaka_0x9A630CD2_public.asc)
+- Personal Email (recommended): <misakaou@outlook.com> [(PGP Key)](https://keybase.io/misakao/pgp_keys.asc?fingerprint=17f9e5a64dd787fd54a1d8b63772b611ed260593)
+- Feedback Email: <feedback@moeomu.com> [(PGP Key)](https://keybase.io/misakao/pgp_keys.asc?fingerprint=3a4c42edbf0dccac73b9b4644bf809a49a630cd2)
 
 ## Build Status
 
