@@ -36,6 +36,8 @@ Source of this article: [MoeomuBlog](/posts/problem-summary-of-installing-ubuntu
 
 3. Kill pulse audio daemon and it will automatically restart: `sudo pulseaudio -k`
 
+> Note: Do not run pulseaudio as root, otherwise the daemon will not close properly.
+
 ## Suspend problems
 
 ### Can't wake up again after locking the screen

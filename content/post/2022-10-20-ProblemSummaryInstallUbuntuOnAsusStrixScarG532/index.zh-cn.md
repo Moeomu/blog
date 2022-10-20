@@ -34,7 +34,9 @@ image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221020/188088
   volume = ignore
   ```
 
-3. 关闭pulse音频守护进程，它将被systemd自动重新启动：`sudo pulseaudio -k`
+3. 关闭pulse音频守护进程，它将被systemd自动重新启动：`pulseaudio -k`
+
+> 注意：请勿以root身份运行pulseaudio，否则将无法正常关闭守护进程。
 
 ## 睡眠问题
 
