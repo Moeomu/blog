@@ -8,6 +8,7 @@ categories:
 tags:
     - Ubuntu
     - Linux
+image: 1880882405-install Problem, Ubuntu, webpage head image.png
 ---
 
 Source of this article: [MoeomuBlog](/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/)
