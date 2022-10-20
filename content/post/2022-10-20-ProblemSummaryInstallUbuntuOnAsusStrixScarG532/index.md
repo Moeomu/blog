@@ -23,7 +23,7 @@ Source of this article: [MoeomuBlog](/posts/problem-summary-of-installing-ubuntu
 
 ### Sound is not adjustable
 
-> Description: The sound is not adjustable, can only be 0 or maximum.
+> Description: The master volume is not adjustable, can only be mute or maximum.
 
 1. Edit `/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common`
 2. Add the following to the front of `[Element PCM]`
