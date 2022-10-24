@@ -25,8 +25,8 @@ image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221020/188088
 
 > 描述：主声音不可调整，只能是静音或者最大声音。
 
-1. 编辑文件：`/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common`
-2. 在`[Element PCM]`的前面添加以下内容
+- 编辑文件：`/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common`
+- 在`[Element PCM]`的前面添加以下内容
 
   ```text
   [Element Master]
@@ -34,7 +34,7 @@ image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221020/188088
   volume = ignore
   ```
 
-3. 关闭pulse音频守护进程，它将被systemd自动重新启动：`pulseaudio -k`
+- 关闭pulse音频守护进程，它将被systemd自动重新启动：`pulseaudio -k`
 
 > 注意：请勿以root身份运行pulseaudio，否则将无法正常关闭守护进程。
 

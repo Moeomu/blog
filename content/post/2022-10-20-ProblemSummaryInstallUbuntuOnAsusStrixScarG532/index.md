@@ -25,8 +25,8 @@ Source of this article: [MoeomuBlog](/posts/problem-summary-of-installing-ubuntu
 
 > Description: The master volume is not adjustable, can only be mute or maximum.
 
-1. Edit `/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common`
-2. Add the following to the front of `[Element PCM]`
+- Edit `/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common`
+- Add the following to the front of `[Element PCM]`
 
   ```text
   [Element Master]
@@ -34,7 +34,7 @@ Source of this article: [MoeomuBlog](/posts/problem-summary-of-installing-ubuntu
   volume = ignore
   ```
 
-3. Kill pulse audio daemon and it will automatically restart: `sudo pulseaudio -k`
+- Kill pulse audio daemon and it will automatically restart: `pulseaudio -k`
 
 > Note: Do not run pulseaudio as root, otherwise the daemon will not close properly.
 
