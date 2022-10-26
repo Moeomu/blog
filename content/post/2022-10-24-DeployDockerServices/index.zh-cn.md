@@ -9,7 +9,7 @@ tags:
     - Docker
     - Caddy
     - VPS
-#image: 
+image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-2908894140.26d7gclffj8g.webp
 ---
 
 本文来源: [MoeomuBlog](/zh-cn/posts/在一台vps上部署docker服务/)

@@ -9,7 +9,7 @@ tags:
     - Docker
     - Caddy
     - VPS
-#image: 
+image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-2908894140.26d7gclffj8g.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/deploying-docker-services-on-a-vps/)
@@ -118,7 +118,7 @@ search.example.com {
 - The deployment command is as follows, the details of the command are not explained, it is the same as above
 - The following special note is needed
   - `your_cloudflare_login_email@example.com` replaced with your cloudflare account email
-  - `your_cloudflare_api_token` is replaced with your cloudflare api token, you can follow [Create an API token - Cloudflare Docs](https://developers.cloudflare.com/) fundamentals/api/get-started/create-token/) guide to get your api token, note that when creating it here you must select `Zone / DNS / Edit` and `Zone / Zone / Read` permissions
+  - `your_cloudflare_api_token` is replaced with your cloudflare api token, you can follow [Create an API token - Cloudflare Docs](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/) guide to get your api token, note that when creating it here you must select `Zone / DNS / Edit` and `Zone / Zone / Read` permissions
 
 ```sh
 docker run -d --name="caddy" \
