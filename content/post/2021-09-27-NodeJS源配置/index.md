@@ -3,7 +3,7 @@ title: NodeJS mirror source configuration
 description: NodeJS source configuration
 date: 2021-09-27 13:56:01+0800
 categories:
-    - Programming
+    - SoftwareGuide
 tags:
     - NodeJS
     - MirrorSource

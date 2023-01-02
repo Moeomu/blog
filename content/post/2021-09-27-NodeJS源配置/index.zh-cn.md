@@ -3,7 +3,7 @@ title: NodeJS镜像源配置
 description: NodeJS源配置
 date: 2021-09-27 13:56:01+0800
 categories:
-    - 编程
+    - 软件指南
 tags:
     - NodeJS
     - 镜像源
