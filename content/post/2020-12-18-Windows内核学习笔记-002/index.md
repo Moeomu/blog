@@ -3,7 +3,7 @@ title:  Windows Kernel Programming Study Notes 002 Basic Structure
 description: This section is still a review of the basics
 date: 2020-12-18 20:52:00+0800
 categories:
-    - Kernel
+    - KernelProgramming
 tags:
     - Windows
     - Kernel
