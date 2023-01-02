@@ -12,7 +12,7 @@ tags:
 > - 功能性逻辑缺陷(Bug)
 > - 安全性逻辑缺陷(Vulnerability)
 >
-> [点击此处下载本文附代码，可执行程序，shellcode文件](./exploit-study-01.zip)
+> [点击此处下载本文附代码，可执行程序，shellcode文件](exploit-study-01.zip)
 
 本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-001-缓冲区溢出/)
 

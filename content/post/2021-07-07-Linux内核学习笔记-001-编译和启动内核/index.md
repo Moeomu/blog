@@ -113,4 +113,4 @@ Source: [Moeomu's Blog](/posts/linux-kernel-programming-study-notes-001-compilin
 
 - Previews are as follows
 
-  ![RHildI.png](./qemu.png)
+  ![RHildI.png](qemu.png)

@@ -12,7 +12,7 @@ tags:
 > - Functional logic bugs (Bugs)
 > - Security Logic Flaw (Vulnerability)
 >
-> [Click here to download this article with code, executable, shellcode file](./exploit-study-01.zip)
+> [Click here to download this article with code, executable, shellcode file](exploit-study-01.zip)
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-001-buffer-overflow/)
 

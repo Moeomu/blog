@@ -47,8 +47,8 @@ int main()
 }
 ```
 
-![Windows Vista](./Windows%20Vista.png)
-![Windows XP](./Windows%20XP.png)
+![Windows Vista](Windows%20Vista.png)
+![Windows XP](Windows%20XP.png)
 
 - 可以看出，Vista上堆地址相去甚远，而XP上完全相同
 
@@ -78,7 +78,7 @@ int main()
 
 - 在Vista上测试运行，结果如图
 
-![PEB/TEB-random-Vista](./PEB-TEB-random-Vista.png)
+![PEB/TEB-random-Vista](PEB-TEB-random-Vista.png)
 
 - 可以看出，效果非常差劲，PEB地址只随机化了一个字节，而且还是非常有规律，TEB基本没变过
 
@@ -99,7 +99,7 @@ int main()
 
 - 重启系统查看ASLR模块启用情况
 
-![ASLR未启用情况](./ASLR%20not%20enabled%20status.png)
+![ASLR未启用情况](ASLR%20not%20enabled%20status.png)
 
 - 实验控件未启用GS
 - 通过IE7加载POC页面和Flash9k.ocx
@@ -146,4 +146,4 @@ int main()
 
 - 如图，重启系统，shellcode运行正常，这意味着攻击ASLR成功
 
-![shellcode运行成功](./shellcode%20run%20successfully.png)
+![shellcode运行成功](shellcode%20run%20successfully.png)

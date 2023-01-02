@@ -41,8 +41,8 @@ Source: [Moeomu's blog](/posts/reverse-tools-radare2-and-cutter/)
 
 - Find out the reason why it doesn't work properly
 - Go to Cutter's folder: `cd /Applications/Cutter.app/Contents/MacOS/`
-![CD-Cutter-Folder](./CD-Cutter-Folder.png)
+![CD-Cutter-Folder](CD-Cutter-Folder.png)
 - Run Cutter directly to see the cause: `. /Cutter`
-![Cutter-Error-Message](./Cutter-Error-Message.png)
+![Cutter-Error-Message](Cutter-Error-Message.png)
 - Install `gettext` to solve the problem: `brew install gettext`
-![install-gettext](./install-gettext.png)
+![install-gettext](install-gettext.png)

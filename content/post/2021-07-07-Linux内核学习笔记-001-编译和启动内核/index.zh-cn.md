@@ -113,4 +113,4 @@ tags:
 
 - 预览如下
 
-  ![RHildI.png](./qemu.png)
+  ![RHildI.png](qemu.png)

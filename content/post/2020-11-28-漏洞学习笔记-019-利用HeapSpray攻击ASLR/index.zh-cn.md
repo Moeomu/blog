@@ -66,6 +66,6 @@ tags:
 
 - 成功攻击ASLR，如图
 
-![pic1](./p1.png)  
-![pic2](./p2.jpg)  
-![pic3](./p3.png)
+![pic1](p1.png)  
+![pic2](p2.jpg)  
+![pic3](p3.png)

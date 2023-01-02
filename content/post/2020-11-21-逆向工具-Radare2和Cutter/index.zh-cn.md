@@ -41,8 +41,8 @@ tags:
 
 - 找出无法正常运行的原因
 - 进入Cutter的文件夹：`cd /Applications/Cutter.app/Contents/MacOS/`
-![CD-Cutter-Folder](./CD-Cutter-Folder.png)
+![CD-Cutter-Folder](CD-Cutter-Folder.png)
 - 直接运行Cutter查看原因：`./Cutter`
-![Cutter-Error-Message](./CD-Cutter-Folder.png)
+![Cutter-Error-Message](CD-Cutter-Folder.png)
 - 安装`gettext`解决问题：`brew install gettext`
-![install-gettext](./install-gettext.png)
+![install-gettext](install-gettext.png)

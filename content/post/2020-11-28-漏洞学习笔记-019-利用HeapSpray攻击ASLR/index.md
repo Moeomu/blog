@@ -66,6 +66,6 @@ By requesting a large amount of memory, occupying the 0x0C0C0C0C locations in me
 
 - Successful attack on ASLR, as shown in the figure
 
-![pic1](./p1.png)  
-![pic2](./p2.jpg)  
-![pic3](./p3.png)
+![pic1](p1.png)  
+![pic2](p2.jpg)  
+![pic3](p3.png)

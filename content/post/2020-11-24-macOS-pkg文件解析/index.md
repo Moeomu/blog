@@ -38,19 +38,19 @@ I couldn't download the ed2k link with motrix, so I was going to download a lite
 
 - After updating the BigSur system, I found that there is such a thing as `iOS app installer` in the system, but it doesn't work, so I explored it
 
-I explored it![System](./System.png)
+I explored it![System](System.png)
 
 - Check the location of this software, and check the type, it's good, generic, means maybe Intel will be supported in the future?
 
-![Locate](./locate.png)
+![Locate](locate.png)
 
 - Open Terminal, go to this folder, run the software, error is reported, suggesting that dependency files are needed, as shown in the picture
 
-![2](./2.png)
+![2](2.png)
 
 - Find the location of the dependency file and find that there seems to be nothing, probably because only the ARM version of the dependency program is available
 
-![3](./3.png)
+![3](3.png)
 
 ### Parallels Desktop cannot be networked solution
 
@@ -65,7 +65,7 @@ I explored it![System](./System.png)
 - Since this phenomenon is caused by the ls program, I asked the system's documentation and commanded `man ls`.
 - It was quick, and it came out with a snap, as shown in the picture
 
-![man-ls](./man-ls.png)
+![man-ls](man-ls.png)
 
 ```s
 -@ Display extended attribute keys and sizes in long (-l) output.

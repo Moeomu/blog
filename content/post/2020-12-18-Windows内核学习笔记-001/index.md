@@ -95,8 +95,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
 - As shown
 
-![rYh5BF.png](./shown1.png)
-![rYhq91.png](./shown2.png)
+![rYh5BF.png](shown1.png)
+![rYhq91.png](shown2.png)
 
 ### Conclusion
 
@@ -123,7 +123,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 - Get the current IRQL by calling KeGetCurrentIrql function
 - As shown in the figure, the IRQL are 0, against the above table, the level is PASSIVE_LEVEL
 
-![rYHLIU.png](./shown3.png)
+![rYHLIU.png](shown3.png)
 
 ### Conclusion
 

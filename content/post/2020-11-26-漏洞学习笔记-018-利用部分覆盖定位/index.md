@@ -69,4 +69,4 @@ int main()
 
 - Compile the program, run it, the window pops up directly and succeeds, and restart the same, as shown in the picture
 
-![Success](./success.png)
+![Success](success.png)

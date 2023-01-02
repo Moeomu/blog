@@ -46,7 +46,7 @@ int safe_remove(ListNode * node)
 
 - heap cookie：栈中的`security cookie`类似，微软在堆中也引入了cookie，用于检测堆溢出的发生。cookie被布置在堆首部分原堆块的`segment table`的位置，占1个字节大小
 
-![heap struct](./heap%20struct.png)
+![heap struct](heap%20struct.png)
 
 - 元数据加密：微软在`Windows Vista`及后续版本的操作系统中开始使用该安全措施。块首中的一些重要数据在保存时会与一个4字节的随机数进行异或运算，在使用这些数据时候需要再进行一次异或运行来还原，这样我们就不能直接破坏这些数据了，以达到保护堆的目的。
 
