@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - SecurityMechanisms
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-011-other-types-of-exploits-and-windows-security-mechanisms/)

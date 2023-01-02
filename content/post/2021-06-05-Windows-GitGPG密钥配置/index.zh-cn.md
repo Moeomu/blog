@@ -1,16 +1,16 @@
 ---
-title: Windows-GitGPG密钥配置
+title: Windows下使用GPG为Git Commit签名
 description: Windodws下的GitGPG密钥配置和开启签名验证
 date: 2021-06-05 08:50:00+0800
 categories:
-    - Config
+    - 软件指南
 tags:
     - Windows
     - Git
     - GPG
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/windows-gitgpg密钥配置/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows下使用gpg为git-commit签名/)
 
 ## 下载GPG4WIN
 

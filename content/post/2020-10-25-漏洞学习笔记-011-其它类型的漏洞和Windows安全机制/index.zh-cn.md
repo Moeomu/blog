@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-011-其它类型的漏洞和Windows安全机制
+title: 漏洞利用学习笔记-011-其它类型的漏洞和Windows安全机制
 description: 其它类型的漏洞和Windows安全机制概述
 date: 2020-10-25 18:50:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 安全机制
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-011-其它类型的漏洞和windows安全机制/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-011-其它类型的漏洞和windows安全机制/)
 
 ## 格式化串漏洞
 

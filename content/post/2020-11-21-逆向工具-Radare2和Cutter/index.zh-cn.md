@@ -3,7 +3,7 @@ title: 逆向工具-Radare2和Cutter
 description: 开源逆向神器-Radare2和Cutter
 date: 2020-11-21 19:04:00+0800
 categories:
-    - Reverse
+    - 软件推荐
 tags:
     - Reverse
     - Tools

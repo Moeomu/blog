@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - HeapStructure
 ---
 
 Disclaimer: The experimental environment is Windows 2000

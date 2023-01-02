@@ -3,8 +3,7 @@ title: Deploying Docker services on a VPS
 description: All services are deployed in Docker, services communicate with each other using Docker Network, Caddy reverse proxy all services, and visitors access directly through Cloudflare CDN.
 date: 2022-10-24 22:03:01+0800
 categories:
-    - InstallationGuide
-    - Security
+    - SoftwareGuide
 tags:
     - Docker
     - Caddy

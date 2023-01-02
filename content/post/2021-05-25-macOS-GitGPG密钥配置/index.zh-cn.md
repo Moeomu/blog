@@ -1,16 +1,16 @@
 ---
-title: macOS-GitGPG密钥配置
+title: macOS下使用GPG为Git Commit签名
 description: macOS下的GitGPG密钥配置和开启签名验证
 date: 2021-05-25 07:55:00 +0800
 categories:
-    - Config
+    - 软件指南
 tags:
     - macOS
     - Git
     - GPG
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macos-gitgpg密钥配置/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macos下使用gpg为git-commit签名/)
 
 ## 关于GitHub GPG密钥验证
 

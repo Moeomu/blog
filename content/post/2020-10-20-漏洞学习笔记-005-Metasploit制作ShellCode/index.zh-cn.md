@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-005-Metasploit制作ShellCode
+title: 漏洞利用学习笔记-005-Metasploit制作ShellCode
 description: Metasploit制作ShellCode
 date: 2020-10-20 22:20:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - ShellCode
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-005-metasploit制作shellcode/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-005-metasploit制作shellcode/)
 
 ...未完待续(Metasploit旧版本真难找)...
 

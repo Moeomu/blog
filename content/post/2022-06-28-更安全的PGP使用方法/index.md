@@ -3,13 +3,11 @@ title: Safer use of PGP
 description: Separate master key and subkey
 date: 2022-06-28 08:58:01+0800
 categories:
-    - Security
+    - SoftwareGuide
 tags:
-    - GnuPG
     - GPG
-    - PGP
-    - Information Security
-    - End-to-end encryption
+    - SecurityGuide
+    - End-to-end Encryption
 ---
 
 Source of this article: [MoeomuBlog](/posts/safer-use-of-pgp/)

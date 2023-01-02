@@ -1,12 +1,13 @@
 ---
 title: Homebrew and Brewcask installation
-description: HomeBrew installation, really experienced a number of failures, here to summarize the success of the talk
+description: The installation of HomeBrew has gone through many failures, here is a summary of the success story
 date: 2020-11-10 19:43:00+0800
 categories:
-    - InstallationGuide
+    - SoftwareGuide
 tags:
     - macOS
     - Homebrew
+    - Brewcask
 ---
 
 Please note the timeliness:**This article was written on 2020/11/10**&&**This article was updated on 2021/07/02**

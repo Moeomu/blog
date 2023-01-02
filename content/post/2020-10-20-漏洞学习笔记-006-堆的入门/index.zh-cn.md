@@ -1,17 +1,17 @@
 ---
-title: 漏洞学习笔记-006-堆的入门
+title: 漏洞利用学习笔记-006-堆的入门
 description: Windows的堆，从来都是一个乱糟糟的地方，管理方法也非常奇怪
 date: 2020-10-20 23:10:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 堆结构
 ---
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-006-堆的入门/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-006-堆的入门/)
 
 ## 堆的介绍
 

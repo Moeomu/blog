@@ -1,17 +1,18 @@
 ---
-title: 漏洞学习笔记-010-HeapSpray
+title: 漏洞利用学习笔记-010-HeapSpray
 description: Heap Spray - 堆与栈的协同攻击
 date: 2020-10-25 17:56:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 堆溢出
+    - 栈溢出
 ---
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-010-heapspray/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-010-heapspray/)
 
 ## 简介
 

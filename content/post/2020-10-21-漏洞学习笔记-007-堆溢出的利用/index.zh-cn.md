@@ -1,17 +1,17 @@
 ---
-title: 漏洞学习笔记-007-堆溢出的利用
+title: 漏洞利用学习笔记-007-堆溢出的利用
 description: 堆溢出的利用
 date: 2020-10-22 16:56:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 堆溢出
 ---
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-007-堆溢出的利用/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-007-堆溢出的利用/)
 
 ## 链表的拆卸
 

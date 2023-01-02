@@ -1,14 +1,13 @@
 ---
-title: Windows Kernel Debugging Learning Notes -001- Environment Building
+title: Windows Kernel Debugging Learning Notes 001 Environment Building
 description: Some learning notes about Windows kernel, this one is mainly about environment building
 #slug: windows-kernel-debug-001
 date: 2020-10-17 19:27:00+0800
 #image: cover.jpg
 categories:
-    - Kernel
+    - KernelDebug
 tags:
     - Windows
-    - Kernel
 ---
 
 Source: [Moeomu's blog](/posts/windows-kernel-debugging-learning-notes-001-environment-building/)

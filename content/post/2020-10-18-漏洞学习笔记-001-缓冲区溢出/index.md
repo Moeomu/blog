@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - StackOverflow
 ---
 
 > - Functional logic bugs (Bugs)

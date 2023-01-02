@@ -3,10 +3,9 @@ title: Windows内核调试学习笔记-002-结构体
 description: Windows内核的相关的一些学习笔记，这一篇主要是描述EPROCESS，PEB的结构
 date: 2020-10-17 20:23:00+0800
 categories:
-    - Kernel
+    - 内核调试
 tags:
     - Windows
-    - Kernel
 ---
 
 本文来源：[Moeomu的博客](/zh-cn/posts/windows内核调试学习笔记-002-结构体/)

@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP
+title: 漏洞利用学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP
 description: Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP
 date: 2020-11-19 17:43:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 数据执行保护
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-015-利用virtualprotect和virtualalloc攻击dep/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-015-利用virtualprotect和virtualalloc攻击dep/)
 
 ## 利用VirtualProtect攻击DEP
 

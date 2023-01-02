@@ -1,14 +1,15 @@
 ---
-title: 日常杂谈-001
+title: 日记-2021-05-24
 description: 一些杂谈
 date: 2021-05-24 10:36:00+0800
 categories:
     - Dairy
 tags:
-    - Dairy
+    - 自动打卡
+    - 山西校企通
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/日常杂谈-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/日记-2021-05-24/)
 
 ## Mention
 

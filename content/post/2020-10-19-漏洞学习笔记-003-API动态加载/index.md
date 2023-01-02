@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - ShellCode
 ---
 
 > [Click here to download this article with executable program, shellcode file](./exploit-study-03.zip)

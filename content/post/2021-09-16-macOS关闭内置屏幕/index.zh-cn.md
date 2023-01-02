@@ -3,7 +3,7 @@ title: macOS关闭内置屏幕
 description: macOS关闭内置屏幕
 date: 2021-09-16 17:00:00+0800
 categories:
-    - Config
+    - 软件指南
 tags:
     - macOS
 ---

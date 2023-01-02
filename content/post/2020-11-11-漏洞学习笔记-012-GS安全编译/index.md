@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - BufferSecurityCheck
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-012-gs-security-compilation/)

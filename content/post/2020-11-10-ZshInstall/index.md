@@ -1,10 +1,9 @@
 ---
-title: Zsh Installation
+title: OhMyZsh Installation Guide
 description: about zsh installation and configuration
 date: 2020-11-10 19:43:00+0800
 categories:
-    - InstallationGuide
-    - Config
+    - SoftwareGuide
 tags:
     - macOS
     - Linux
@@ -13,7 +12,7 @@ tags:
 
 zsh install and config
 
-Source: [Moeomu's blog](/posts/zsh-installation/)
+Source: [Moeomu's blog](/posts/ohmyzsh-installation-guide/)
 
 ## Install zsh
 
@@ -37,6 +36,6 @@ Source: [Moeomu's blog](/posts/zsh-installation/)
 
 ### auto suggestions plugin
 
-- `git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions`
+- `git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions`
 - edit `~/.zshrc`:
   - `plugins=(git)`=>`plugins=(git zsh-autosuggestions)`

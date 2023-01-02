@@ -1,16 +1,16 @@
 ---
-title: VSCode Python encountered problems
+title: Summary of the problem of writing python with vscode under Windows
 description: Record the problems I encountered writing Python code in Windows, of course they are simple problems, it's a local backup for my notes.
 date: 2021-01-19 17:48:00+0800
 categories:
-    - Solution
+    - SoftwareGuide
 tags:
     - Windows
     - Python
-    - VSCode
+    - vscode
 ---
 
-Source: [Moeomu's blog](/posts/vscode-python-encountered-problems/)
+Source: [Moeomu's blog](/posts/summary-of-the-problem-of-writing-python-with-vscode-under-windows/)
 
 ## VSCode-Python-Venv-PowerShell unsigned environment can't be activated
 

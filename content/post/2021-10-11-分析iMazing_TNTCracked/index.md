@@ -3,9 +3,8 @@ title: Analyze iMazing_TNTCracked
 description: Analyze iMazing_TNTCracked
 date: 2021-09-27 13:56:01+0800
 categories:
-    - Analyze
+    - ReverseAnalyze
 tags:
-    - Analyze
     - Virus
     - Windows
 ---

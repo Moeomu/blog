@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - DataExecutionPrevention
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-014-dep-introduction/)

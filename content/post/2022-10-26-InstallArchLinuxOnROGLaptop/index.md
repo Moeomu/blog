@@ -3,16 +3,10 @@ title: Installing ArchLinux on ASUS ROG Strix Scar G532
 description: Install ArchLinux+Wayland+Gnome+systemd-boot(security boot)
 date: 2022-10-26 19:14:09+0800
 categories:
-    - InstallationGuide
-    - Linux
-    - Solution
+    - SoftwareGuide
 tags:
     - ArchLinux
-    - ROG
-    - Gnome
-    - systemd-boot
-    - NetworkManager
-    - Wayland
+    - Linux
 image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
 ---
 

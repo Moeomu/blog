@@ -3,8 +3,7 @@ title: Problem summary of installing Ubuntu on AsusStrixScarG532
 description: Problem summary of installing Ubuntu on AsusStrixScarG532
 date: 2022-10-20 13:22:01+0800
 categories:
-    - Linux
-    - Solution
+    - SoftwareGuide
 tags:
     - Ubuntu
     - Linux

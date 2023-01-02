@@ -3,7 +3,7 @@ title: macOS Turn off built-in screen
 description: macOS Turn off the built-in screen
 date: 2021-09-16 17:00:00+0800
 categories:
-    - Config
+    - SoftwareGuide
 tags:
     - macOS
 ---

@@ -1,15 +1,15 @@
 ---
-title: macOS pd16 repair network
+title: ParallelsDesktop16 repair network
 description: macOS-parallels desktop network initialization failure solution
 date: 2020-12-16 13:42:00+0800
 categories:
-    - Config
+    - SoftwareGuide
 tags:
     - macOS
-    - parallels
+    - ParallelsDesktop
 ---
 
-Source: [Moeomu's blog](/posts/macos-pd16-repair-network/)
+Source: [Moeomu's blog](/posts/parallelsdesktop16-repair-network/)
 
 ## Prelude
 

@@ -1,14 +1,14 @@
 ---
-title: macOS-pkg file analysis
+title: macOS-pkg file reverse analysis
 description: macOS-pkg file parsing & PD16 can't network solution & @ symbol problem of ls
 date: 2020-11-24 12:56:00+0800
 categories:
-    - Analyze
+    - ReverseAnalyze
 tags:
     - macOS
 ---
 
-Source: [Moeomu's blog](/posts/macos-pkg-file-analysis/)
+Source: [Moeomu's blog](/posts/macos-pkg-file-reverse-analysis/)
 
 ## Cause
 

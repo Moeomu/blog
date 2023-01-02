@@ -1,17 +1,17 @@
 ---
-title: 漏洞学习笔记-008-Windows异常的利用
+title: 漏洞利用学习笔记-008-Windows异常处理的利用
 description: SEH的栈利用和堆利用
 date: 2020-10-25 11:32:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 异常处理
 ---
 
 声明：实验环境为 Windows 2000
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-008-windows异常的利用/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-008-windows异常处理的利用/)
 
 ## SEH概述
 

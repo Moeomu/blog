@@ -3,8 +3,7 @@ title: 在一台VPS上部署Docker服务
 description: 所有服务部署在Docker中，服务与服务之间通讯使用Docker Network，Caddy反向代理所有服务，访客直接通过Cloudflare CDN访问。
 date: 2022-10-24 22:03:01+0800
 categories:
-    - InstallationGuide
-    - Security
+    - 软件指南
 tags:
     - Docker
     - Caddy

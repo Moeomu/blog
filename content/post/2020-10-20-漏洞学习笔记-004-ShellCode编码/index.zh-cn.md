@@ -1,17 +1,17 @@
 ---
-title: 漏洞学习笔记-004-ShellCode编码
+title: 漏洞利用学习笔记-004-ShellCode编码
 description: ShellCode编码和减少体积
 date: 2020-10-20 9:20:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - ShellCode
 ---
 
 > [点击此处下载本文附可执行程序，shellcode文件](./exploit-study-04.zip)
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-004-shellcode编码/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-004-shellcode编码/)
 
 ## 异或编码
 

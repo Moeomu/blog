@@ -3,12 +3,10 @@ title: Problems Encountered In Installing Arch on ROGLaptop
 description: Problems encountered in installing Arch on ROG Laptop
 date: 2021-11-09 09:22:01+0800
 categories:
-    - Linux
-    - Solution
+    - SoftwareGuide
 tags:
-    - Arch
+    - ArchLinux
     - Linux
-    - Driver
 ---
 
 Source of this article: [MoeomuBlog](/posts/problems-encountered-in-installing-arch-on-roglaptop/)

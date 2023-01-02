@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - ASLR
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-017-aslr-introduction/)

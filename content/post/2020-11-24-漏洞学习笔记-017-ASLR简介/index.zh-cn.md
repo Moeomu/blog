@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-017-ASLR简介
+title: 漏洞利用学习笔记-017-ASLR简介
 description: ASLR技术的介绍和简单攻击思路
 date: 2020-11-24 21:12:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 内存地址布局随机化
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-017-aslr简介/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-017-aslr简介/)
 
 ## ASLR技术简介
 

@@ -1,14 +1,14 @@
 ---
-title: macOS-pkg文件解析
+title: macOS-pkg文件逆向解析
 description: macOS-pkg文件解析&PD16无法联网解决办法&ls的@符号问题
 date: 2020-11-24 12:56:00+0800
 categories:
-    - Analyze
+    - 逆向分析
 tags:
     - macOS
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macos-pkg文件解析/)
+本文来源：[Moeomu的博客](/zh-cn/posts/macos-pkg文件逆向解析/)
 
 ## 起因
 

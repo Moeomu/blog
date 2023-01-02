@@ -3,13 +3,11 @@ title: 更安全的PGP使用方法
 description: 分离主密钥和子密钥
 date: 2022-06-28 08:58:01+0800
 categories:
-    - Security
+    - 软件指南
 tags:
-    - GnuPG
     - GPG
-    - PGP
-    - Information Security
-    - End-to-end encryption
+    - 安全性指南
+    - 端对端加密
 ---
 
 本文来源：[Moeomu的博客](/zh-cn/posts/更安全的PGP使用方法/)

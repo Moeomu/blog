@@ -1,12 +1,12 @@
 ---
-title: NodeJS源配置
+title: NodeJS镜像源配置
 description: NodeJS源配置
 date: 2021-09-27 13:56:01+0800
 categories:
-    - Config
+    - 编程
 tags:
-    - Programming
     - NodeJS
+    - 镜像源
 ---
 
 本文来源：[Moeomu的博客](/zh-cn/posts/nodejs源配置/)

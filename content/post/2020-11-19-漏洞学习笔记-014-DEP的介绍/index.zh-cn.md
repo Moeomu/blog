@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-014-DEP的介绍
+title: 漏洞利用学习笔记-014-DEP的介绍
 description: Windows的DEP保护和简单的攻击方法
 date: 2020-11-19 12:42:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 数据执行保护
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-014-dep的介绍/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-014-dep的介绍/)
 
 ## DEP的介绍
 

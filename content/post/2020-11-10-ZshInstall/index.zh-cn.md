@@ -1,10 +1,9 @@
 ---
-title: Zsh 安装
+title: OhMyZsh安装指南
 description: 关于zsh的安装和配置
 date: 2020-11-10 19:43:00+0800
 categories:
-    - InstallationGuide
-    - Config
+    - 软件指南
 tags:
     - macOS
     - Linux
@@ -13,7 +12,7 @@ tags:
  
 zsh install and config
 
-本文来源：[Moeomu的博客](/zh-cn/posts/zsh-安装/)
+本文来源：[Moeomu的博客](/zh-cn/posts/ohmyzsh安装指南/)
 
 ## 安装zsh
 
@@ -24,8 +23,8 @@ zsh install and config
 
 ## 克隆Git仓库(clone git repo)
 
-- China mainland: `git clone https://gitee.com/mirrors/oh-my-zsh.git`
-- Global: `git clone https://github.com/ohmyzsh/ohmyzsh.git`
+- 中国大陆: `git clone https://gitee.com/mirrors/oh-my-zsh.git`
+- 世界: `git clone https://github.com/ohmyzsh/ohmyzsh.git`
 
 ## 配置zsh(config)
 
@@ -37,6 +36,6 @@ zsh install and config
 
 ### 自动补全插件(auto suggestions plugin)
 
-- `git clone git://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions`
+- `git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions`
 - edit `~/.zshrc`:
   - `plugins=(git)`=>`plugins=(git zsh-autosuggestions)`

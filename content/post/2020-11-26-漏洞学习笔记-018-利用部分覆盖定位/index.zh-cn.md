@@ -1,15 +1,16 @@
 ---
-title: 漏洞学习笔记-018-利用部分覆盖定位
+title: 漏洞利用学习笔记-018-利用部分覆盖定位
 description: 利用部分覆盖定位shellcode
 date: 2020-11-26 17:54:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 内存地址布局随机化
+    - off-by-word
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-018-利用部分覆盖定位/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-018-利用部分覆盖定位/)
 
 ## 原理
 

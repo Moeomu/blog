@@ -1,16 +1,16 @@
 ---
-title: macOS-pd16修复网络
+title: ParallelsDesktop16 修复网络
 description: macOS-parallels desktop网络初始化失败解决办法
 date: 2020-12-16 13:42:00+0800
 categories:
-    - Config
+    - 软件指南
 tags:
     - macOS
-    - parallels
+    - ParallelsDesktop
 ---
 
 
-本文来源：[Moeomu的博客](/zh-cn/posts/macos-pd16修复网络/)
+本文来源：[Moeomu的博客](/zh-cn/posts/parallelsdesktop16-修复网络/)
 
 ## 前奏
 

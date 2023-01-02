@@ -1,12 +1,11 @@
 ---
-title: Windows Kernel Debugging Learning Notes-002-Structures
+title: Windows Kernel Debugging Learning Notes 002 Structures
 description: Windows kernel related learning notes, this one mainly describes the structure of EPROCESS, PEB
 date: 2020-10-17 20:23:00+0800
 categories:
-    - Kernel
+    - KernelDebug
 tags:
     - Windows
-    - Kernel
 ---
 
 Source: [Moeomu's Blog](/posts/windows-kernel-debugging-learning-notes-002-structures/)

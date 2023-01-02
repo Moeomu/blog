@@ -1,14 +1,15 @@
 ---
-title: Daily miscellaneous 001
+title: Dairy 2021-05-24
 description: some miscellaneous
 date: 2021-05-24 10:36:00+0800
 categories:
     - Dairy
 tags:
-    - Dairy
+    - AutoClockin
+    - ShanxiXQT
 ---
 
-Source: [Moeomu's blog](/posts/daily-miscellaneous-001/)
+Source: [Moeomu's blog](/posts/dairy-2021-05-24/)
 
 ## Mention
 

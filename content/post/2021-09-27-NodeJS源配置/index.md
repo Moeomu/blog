@@ -1,15 +1,15 @@
 ---
-title: NodeJS source configuration
+title: NodeJS mirror source configuration
 description: NodeJS source configuration
 date: 2021-09-27 13:56:01+0800
 categories:
-    - Config
-tags:
     - Programming
+tags:
     - NodeJS
+    - MirrorSource
 ---
 
-Source: [Moeomu's blog](/posts/nodejs-source-configuration/)
+Source: [Moeomu's blog](/posts/nodejs-mirror-source-configuration/)
 
 ## Installation
 

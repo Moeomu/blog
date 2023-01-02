@@ -3,10 +3,10 @@ title: ParallelsTools高版本Kali报错
 description: macOS下的虚拟机Parallels的工具ParallelsTools安装于高版本Kali报错的解决办法
 date: 2021-07-06 15:55:00+0800
 categories:
-    - Solution
+    - 软件指南
 tags:
     - macOS
-    - parallels
+    - ParallelsDesktop
 ---
 
 本文来源：[Moeomu的博客](/zh-cn/posts/parallelstools高版本kali报错/)

@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - ProtectedHeap
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-021-protected-heap/)

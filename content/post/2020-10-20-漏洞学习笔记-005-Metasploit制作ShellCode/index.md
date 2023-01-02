@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - ShellCode
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-005-metasploit-make-shellcode/)

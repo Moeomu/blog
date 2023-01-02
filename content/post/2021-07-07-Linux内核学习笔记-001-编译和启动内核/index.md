@@ -1,15 +1,15 @@
 ---
-title: Linux Kernel learning notes 001 Compiling and Booting Kernel
+title: Linux Kernel Programming study notes 001 Compiling and Booting Kernel
 description: Linux Kernel Learning Notes-001-Compiling and Booting the Kernel
 date: 2021-07-07 11:20:00+0800
 categories:
-    - Kernel
+    - KernelProgramming
 tags:
     - Linux
     - Kernel
 ---
 
-Source: [Moeomu's Blog](/posts/linux-kernel-learning-notes-001-compiling-and-booting-kernel/)
+Source: [Moeomu's Blog](/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/)
 
 ## Prepare the environment
 

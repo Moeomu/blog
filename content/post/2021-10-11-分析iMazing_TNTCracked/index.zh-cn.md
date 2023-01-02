@@ -3,10 +3,9 @@ title: 分析iMazing_TNTCracked
 description: 分析iMazing_TNTCracked
 date: 2021-09-27 13:56:01+0800
 categories:
-    - Analyze
+    - 逆向分析
 tags:
-    - Analyze
-    - Virus
+    - 病毒
     - Windows
 ---
 

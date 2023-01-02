@@ -3,7 +3,7 @@ title: Reverse Tools Radare2 and Cutter
 description: open source reverse tools-Radare2 and Cutter
 date: 2020-11-21 19:04:00+0800
 categories:
-    - Reverse
+    - SoftwareRecommendation
 tags:
     - Reverse
     - Tools

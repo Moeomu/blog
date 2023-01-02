@@ -3,7 +3,7 @@ title: OhMyZsh中的Git命令缩写
 description: OhMyZsh中的Git命令缩写
 date: 2022-04-26 21:26:01+0800
 categories:
-    - Git
+    - 软件指南
 tags:
     - Git
 ---

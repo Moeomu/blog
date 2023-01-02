@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-019-利用HeapSpray攻击ASLR
+title: 漏洞利用学习笔记-019-利用HeapSpray攻击ASLR
 description: 利用Heap Spray(堆喷射)技术来攻击ASLR并定位shellcode
 date: 2020-11-28 12:38:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 堆喷射
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-019-利用heapspray攻击aslr/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-019-利用heapspray攻击aslr/)
 
 ## 原理
 

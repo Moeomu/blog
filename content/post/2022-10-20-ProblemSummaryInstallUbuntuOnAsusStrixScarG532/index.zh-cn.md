@@ -3,8 +3,7 @@ title: 在ROG枪神4上安装Ubuntu遇到的问题和解决办法
 description: 在ROG枪神4上安装Ubuntu遇到的问题总结
 date: 2022-10-20 13:22:01+0800
 categories:
-    - Linux
-    - Solution
+    - 软件指南
 tags:
     - Ubuntu
     - Linux

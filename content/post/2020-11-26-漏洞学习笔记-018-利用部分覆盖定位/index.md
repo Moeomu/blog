@@ -6,7 +6,8 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - ASLR
+    - off-by-word
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-018-using-partial-overlay-location/)

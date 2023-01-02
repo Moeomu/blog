@@ -3,7 +3,7 @@ title: Oh My Zsh Git Command Shortcuts
 description: Oh My Zsh Git Command Shortcuts
 date: 2022-04-26 21:26:01+0800
 categories:
-    - Git
+    - SoftwareGuide
 tags:
     - Git
 ---

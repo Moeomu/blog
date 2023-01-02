@@ -3,11 +3,10 @@ title: Virtual machine hardware acceleration causes Electron application white s
 description: Virtual machine hardware acceleration causes Electron application white screen problem
 date: 2021-10-12 19:22:01+0800
 categories:
-    - VM
-    - Solution
+    - SoftwareGuide
 tags:
     - macOS
-    - parallels
+    - ParallelsDesktop
 ---
 
 Source: [Moeomu's blog](/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/)

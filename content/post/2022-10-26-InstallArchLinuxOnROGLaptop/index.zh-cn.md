@@ -3,16 +3,10 @@ title: 在华硕玩家国度枪神4上安装ArchLinux
 description: 安装ArchLinux+Wayland+Gnome+systemd-boot(安全启动)
 date: 2022-10-26 19:14:09+0800
 categories:
-    - InstallationGuide
-    - Linux
-    - Solution
+    - 软件指南
 tags:
     - ArchLinux
-    - ROG
-    - Gnome
-    - systemd-boot
-    - NetworkManager
-    - Wayland
+    - Linux
 image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
 ---
 

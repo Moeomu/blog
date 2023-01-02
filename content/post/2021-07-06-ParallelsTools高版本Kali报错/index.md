@@ -3,10 +3,10 @@ title: ParallelsTools error on high version Kali
 Description: Solution for ParallelsTools, a tool for virtual machines under macOS, to install on higher versions of Kali with an error
 date: 2021-07-06 15:55:00+0800
 categories:
-    - Solution
+    - SoftwareGuide
 tags:
     - macOS
-    - parallels
+    - ParallelsDesktop
 ---
 
 Source: [Moeomu's blog](/posts/parallelstools-error-on-high-version-kali/)

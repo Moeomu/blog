@@ -1,16 +1,16 @@
 ---
-title: Windows-GitGPG Key Configuration
+title: Signing Git Commit with GPG on Windows
 description: GitGPG key configuration and enable signature verification under Windodws
 date: 2021-06-05 08:50:00+0800
 categories:
-    - Config
+    - SoftwareGuide
 tags:
     - Windows
     - Git
     - GPG
 ---
 
-Source: [Moeomu's Blog](/posts/windows-gitgpg-key-configuration/)
+Source: [Moeomu's Blog](/posts/signing-git-commit-with-gpg-on-windows/)
 
 ## Download GPG4WIN
 

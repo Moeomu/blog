@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-013-SafeSEH简介和简单攻击
+title: 漏洞利用学习笔记-013-SafeSEH简介和简单攻击
 description: SafeSEH简介和简单攻击
 date: 2020-11-12 9:40:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - SafeSEH
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-013-safeseh简介和简单攻击/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-013-safeseh简介和简单攻击/)
 
 ## SafeSEH简介
 

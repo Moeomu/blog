@@ -1,17 +1,17 @@
 ---
-title: 漏洞学习笔记-003-API动态加载
+title: 漏洞利用学习笔记-003-API动态加载
 description: ShellCode的API动态定位
 date: 2020-10-19 20:20:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - ShellCode
 ---
 
 > [点击此处下载本文附可执行程序，shellcode文件](./exploit-study-03.zip)
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-003-api动态加载/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-003-api动态加载/)
 
 ## 通过TEB定位API地址
 

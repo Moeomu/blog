@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - DataExecutionPrevention
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-015-using-virtualprotect-and-virtualalloc-attack-dep/)

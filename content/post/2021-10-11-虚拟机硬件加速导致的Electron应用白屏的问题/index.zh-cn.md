@@ -3,11 +3,10 @@ title: 虚拟机硬件加速导致的Electron应用白屏的问题
 description: 虚拟机硬件加速导致的Electron应用白屏的问题
 date: 2021-10-12 19:22:01+0800
 categories:
-    - VM
-    - Solution
+    - 软件指南
 tags:
     - macOS
-    - parallels
+    - ParallelsDesktop
 ---
 
 本文来源：[Moeomu的博客](/zh-cn/posts/虚拟机硬件加速导致的electron应用白屏的问题/)

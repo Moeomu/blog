@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - SEHOP
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-020-sehop-introduction/)

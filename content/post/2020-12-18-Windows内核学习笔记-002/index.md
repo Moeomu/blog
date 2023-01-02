@@ -1,5 +1,5 @@
 ---
-title: Windows Kernel Learning Notes 002
+title:  Windows Kernel Programming Study Notes 002 Basic Structure
 description: This section is still a review of the basics
 date: 2020-12-18 20:52:00+0800
 categories:
@@ -9,7 +9,7 @@ tags:
     - Kernel
 ---
 
-Source: [Moeomu's blog](/posts/windows-kernel-learning-notes-002/)
+Source: [Moeomu's blog](/posts/windows-kernel-programming-study-notes-002-basic-structure/)
 
 ## String manipulation
 

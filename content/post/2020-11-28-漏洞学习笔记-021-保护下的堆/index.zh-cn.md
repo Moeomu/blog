@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-021-保护下的堆
+title: 漏洞利用学习笔记-021-保护下的堆
 description: 堆的保护和攻击
 date: 2020-11-28 16:15:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 堆保护
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-021-保护下的堆/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-021-保护下的堆/)
 
 ## 简介
 

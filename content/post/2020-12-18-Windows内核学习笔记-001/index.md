@@ -1,15 +1,15 @@
 ---
-title: Windows kernel learning notes 001
-description: This wave, this wave is to learn from scratch again, before learning the kernel some unsystematic, this time must systematically organize once the Windows kernel programming content
+title: Windows Kernel Programming Study Notes 001 Environment Building
+description: This time is to learn from scratch again, before learning the kernel some unsystematic, this time must systematically organize the content of the Windows kernel programming again
 date: 2020-12-18 18:52:00+0800
 categories:
-    - Kernel
+    - KernelProgramming
 tags:
     - Windows
     - Kernel
 ---
 
-Source: [Moeomu's blog](/posts/windows-kernel-learning-notes-001/)
+Source: [Moeomu's blog](/posts/windows-kernel-programming-study-notes-001-environment-building/)
 
 ## Windows kernel development environment configuration
 

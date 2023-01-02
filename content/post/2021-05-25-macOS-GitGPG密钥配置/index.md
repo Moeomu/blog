@@ -1,16 +1,16 @@
 ---
-title: macOS-GitGPG Key Configuration
+title: Using GPG to sign Git Commit under macOS
 description: GitGPG key configuration for macOS and enable signature verification
 date: 2021-05-25 07:55:00 +0800
 categories:
-    - Config
+    - SoftwareGuide
 tags:
     - macOS
     - Git
     - GPG
 ---
 
-Source: [Moeomu's Blog](/posts/macos-gitgpg-key-configuration/)
+Source: [Moeomu's Blog](/posts/using-gpg-to-sign-git-commit-under-macos/)
 
 ## About GitHub GPG Key Verification
 

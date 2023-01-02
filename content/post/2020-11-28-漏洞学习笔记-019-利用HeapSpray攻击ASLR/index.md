@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - HeapSpray
 ---
 
 Source: [Moeomu's blog](/posts/exploit-learning-notes-019-using-heapspray-attack-aslr/)

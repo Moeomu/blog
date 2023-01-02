@@ -1,15 +1,15 @@
 ---
-title: 漏洞学习笔记-020-SEHOP简介
+title: 漏洞利用学习笔记-020-SEHOP简介
 description: SEHOP的介绍和一点简单攻击
 date: 2020-11-28 15:38:00+0800
 categories:
-    - Exploit
+    - 漏洞利用
 tags:
     - Windows
-    - Exploit
+    - 结构化异常处理覆盖保护
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/漏洞学习笔记-020-sehop简介/)
+本文来源：[Moeomu的博客](/zh-cn/posts/漏洞利用学习笔记-020-sehop简介/)
 
 ## 简介
 

@@ -3,7 +3,7 @@ title: 激活Office2021
 description: 激活Office2021
 date: 2022-05-22 21:18:01+0800
 categories:
-    - Crack
+    - 破解软件
 tags:
     - Office
     - KMS

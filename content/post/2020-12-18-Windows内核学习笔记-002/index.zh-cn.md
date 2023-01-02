@@ -1,15 +1,15 @@
 ---
-title: Windows内核学习笔记-002
+title: Windows内核编程学习笔记-002-基本结构
 description: 这一节依旧是基础内容的复习
 date: 2020-12-18 20:52:00+0800
 categories:
-    - Kernel
+    - 内核编程
 tags:
     - Windows
-    - Kernel
+    - 内核
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/windows内核学习笔记-002/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows内核编程学习笔记-002-基本结构/)
 
 ## 字符串操作
 

@@ -1,15 +1,15 @@
 ---
-title: Windows内核学习笔记-001
+title: Windows内核编程学习笔记-001-环境搭建
 description: 这波啊，这波是又从头学起了，之前学的内核有些不系统，这次一定系统地整理一遍Windows内核编程的内容
 date: 2020-12-18 18:52:00+0800
 categories:
-    - Kernel
+    - 内核编程
 tags:
     - Windows
-    - Kernel
+    - 内核
 ---
 
-本文来源：[Moeomu的博客](/zh-cn/posts/windows内核学习笔记-001/)
+本文来源：[Moeomu的博客](/zh-cn/posts/windows内核编程学习笔记-001-环境搭建/)
 
 ## Windows内核开发环境配置
 

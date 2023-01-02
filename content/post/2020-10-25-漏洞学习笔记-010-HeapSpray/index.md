@@ -6,7 +6,8 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - HeapOverflow
+    - StackOverflow
 ---
 
 Disclaimer: The experimental environment is Windows 2000

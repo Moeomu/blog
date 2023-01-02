@@ -6,7 +6,7 @@ categories:
     - Exploit
 tags:
     - Windows
-    - Exploit
+    - DataExecutionPrevention
 ---
 
 Source: [Moeomu's Blog](/posts/exploit-learning-notes-016-executable-memory-and-.net-attack-dep/)
