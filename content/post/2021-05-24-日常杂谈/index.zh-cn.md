@@ -3,7 +3,7 @@ title: 日记-2021-05-24
 description: 一些杂谈
 date: 2021-05-24 10:36:00+0800
 categories:
-    - Dairy
+    - 日记
 tags:
     - 自动打卡
     - 山西校企通
