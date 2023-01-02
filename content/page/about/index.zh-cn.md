@@ -8,7 +8,7 @@ menu:
 comments: false
 ---
 
-> 首先欢迎您的到访，[本项目](https://github.com/Misakaou/blog)的`main`分支是<https://blog.moeomu.com>站点的构建源文件，使用[Vercel](http://vercel.com/)构建。再次欢迎您到访此站点。
+> 首先欢迎您来到Misaka的博客。[本项目](https://github.com/Misakaou/blog)的`main`分支是<https://blog.moeomu.com>站点的构建源文件，使用[Vercel](http://vercel.com/)构建。再次欢迎您到访此站点。
 
 ## 站点介绍
 

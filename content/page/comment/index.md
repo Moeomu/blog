@@ -5,5 +5,5 @@ menu:
     main:
         weight: 5
         params: 
-            icon: brand-hipchat
+            icon: message
 ---
