@@ -8,7 +8,7 @@ links:
   - title: Meiza的小盒
     description: 欢迎来到meiza的小盒 – 这里是meiza的个人网站！
     website: https://meiza.cc
-    image: https://secure.gravatar.com/avatar/182d402c0d3e8f1a891c0004d02bdc4d?s=96&d=monsterid&r=g
+    image: meiza.jpeg
 menu:
     main: 
         weight: 4
