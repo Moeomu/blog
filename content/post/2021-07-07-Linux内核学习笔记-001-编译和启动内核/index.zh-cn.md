@@ -113,4 +113,4 @@ tags:
 
 - 预览如下
 
-  ![RHildI.png](https://z3.ax1x.com/2021/07/07/RHildI.png)
+  ![RHildI.png](./qemu.png)

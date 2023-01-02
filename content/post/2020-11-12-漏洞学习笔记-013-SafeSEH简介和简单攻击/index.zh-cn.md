@@ -29,7 +29,7 @@ tags:
 
 > `RtlIsValidHandler()`函数检测流程图
 
-![BvASMR.png](https://s1.ax1x.com/2020/11/11/BvASMR.png)
+![BvASMR.png](./Flowchart%20of%20RtlIsValidHandler.png)
 
 ### 可行性分析
 
@@ -331,7 +331,7 @@ int main()
 - 创建一个MFC ActiveX控件，我将我创建的工程打包了一份，在此[下载](https://pan.moeomu.com/Tutorial/0Day安全-资料/VulnerAX_SEH/VulnerAX_SEH_SRC.zip)
 - 详细设置图
 
-![BzaLDA.png](https://s3.ax1x.com/2020/11/12/BzaLDA.png)
+![BzaLDA.png](./Detailed%20setup%20diagram.png)
 
 - 使用Unicode字符集，禁用编译优化选项，在静态库中使用MFC，使用release版本编译
 
@@ -397,13 +397,13 @@ void CVulnerAX_SEHCtrl::test(LPCTSTR str)
 
 - 如图，ecx指向的地址`0x01DCF4FC`是溢出字符串的起始地址，距离栈顶最近的异常函数地址位于`0x01DCF610`，计算得填充`0x114`也就是276字节即可覆盖到异常处理函数地址，而第277-280字节放置跳板即可
 
-![地址](https://s3.ax1x.com/2020/11/24/DNFQOA.png)  
-![SEH链](https://s3.ax1x.com/2020/11/24/DNAZxe.png)  
-![异常地址](https://s3.ax1x.com/2020/11/24/DNAV2D.png)  
+![地址](./address.png)  
+![SEH链](./sehchain.png)  
+![异常地址](./exceptionaddress.png)  
 
 - 使用`OllyFindAddr`插件的`Overflow return address->Find CALL/JMP[EBP+N]`选项查找指令，本次实验找到了`0x300B2D1C`的`CALL [EBP+0xC]`作为跳板，如图
 
-![跳板](https://s3.ax1x.com/2020/11/24/DNAHQe.png)
+![跳板](./springboard.pngg)
 
 - 根据前面的计算把跳板地址放到shellcode相应位置中，保存POC页面，test更改函数如下
 
@@ -452,4 +452,4 @@ void CVulnerAX_SEHCtrl::test(LPCTSTR str)
 
 - 成功执行如图
 
-![执行成功](https://s3.ax1x.com/2020/11/24/DNljGd.png)
+![执行成功](./success.png)

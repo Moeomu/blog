@@ -69,4 +69,4 @@ int main()
 
 - 编译程序，运行，直接弹出窗口并成功，重启也一样，如图
 
-![成功](https://s3.ax1x.com/2020/11/28/Dyps2t.png)
+![成功](./success.png)

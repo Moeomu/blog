@@ -69,5 +69,4 @@ int main()
 
 - Compile the program, run it, the window pops up directly and succeeds, and restart the same, as shown in the picture
 
-![Success](https://s3.ax1x.com/2020/11/28/Dyps2t.png)
-
+![Success](./success.png)

@@ -29,7 +29,7 @@ Source: [Moeomu's blog](/posts/exploit-learning-notes-013-safeseh-introduction-a
 
 > Flowchart of `RtlIsValidHandler()` function detection
 
-![BvASMR.png](https://s1.ax1x.com/2020/11/11/BvASMR.png)
+![BvASMR.png](./Flowchart%20of%20RtlIsValidHandler.png)
 
 ### Feasibility analysis
 
@@ -331,7 +331,7 @@ Actually this method is to bypass `SafeSEH` by using the browser version of the 
 - Create an MFC ActiveX control, I packaged a copy of the project I created here [download](https://pan.moeomu.com/Tutorial/0Day安全-资料/VulnerAX_SEH/VulnerAX_SEH_SRC.zip)
 - Detailed setup diagram
 
-![BzaLDA.png](https://s3.ax1x.com/2020/11/12/BzaLDA.png)
+![BzaLDA.png](./Detailed%20setup%20diagram.png)
 
 - Use Unicode character set, disable compile optimization option, use MFC in static library, compile with release version
 
@@ -397,13 +397,13 @@ void CVulnerAX_SEHCtrl::test(LPCTSTR str)
 
 - As shown in the figure, the address `0x01DCF4FC` pointed by ecx is the starting address of the overflow string, and the closest exception function address to the top of the stack is located at `0x01DCF610`, which is calculated to fill `0x114` which is 276 bytes to cover the exception handling function address, and the 277th-280th bytes can be placed in the springboard
 
-![address](https://s3.ax1x.com/2020/11/24/DNFQOA.png)  
-![SEH chain](https://s3.ax1x.com/2020/11/24/DNAZxe.png)  
-![Exception address](https://s3.ax1x.com/2020/11/24/DNAV2D.png)  
+![address](./address.png)  
+![SEH chain](./sehchain.png)  
+![Exception address](./exceptionaddress.png)  
 
 - Using the `OllyFindAddr` plugin's `Overflow return address->Find CALL/JMP[EBP+N]` option to find the instruction, this experiment found the `CALL [EBP+0xC]` of `0x300B2D1C` as a springboard, as shown in the figure
 
-![springboard](https://s3.ax1x.com/2020/11/24/DNAHQe.png)
+![springboard](./springboard.png)
 
 - According to the previous calculation put the springboard address into the shellcode corresponding location, save the POC page, test change the function as follows
 
@@ -452,4 +452,4 @@ void CVulnerAX_SEHCtrl::test(LPCTSTR str)
 
 - Successfully executed as shown
 
-![Execution successful](https://s3.ax1x.com/2020/11/24/DNljGd.png)
+![Execution successful](./success.png)

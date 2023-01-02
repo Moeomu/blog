@@ -44,17 +44,17 @@ tags:
 
 > 配置完成如下图所示
 
-![虚拟机配置图.png](https://s1.ax1x.com/2020/10/18/0j8UKI.png)
+![虚拟机配置图.png](./Virtual%20Machine%20Configuration%20Diagram.png.png)
 
 ### 配置Windows7
 
 - 输入命令`msconfig`，点击引导，如图
 
-![引导.jpg](https://s1.ax1x.com/2020/10/18/0jGpJe.png)
+![引导.jpg](./boot.png)
   
 - 点击高级选项，启用调试，波特率，如图
 
-![高级选项.jpg](https://s1.ax1x.com/2020/10/18/0jGSiD.png)
+![高级选项.jpg](./advanced-options.png)
 
 ---
 

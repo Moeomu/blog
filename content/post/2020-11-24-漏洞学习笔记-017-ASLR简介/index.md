@@ -47,8 +47,8 @@ int main()
 }
 ```
 
-![Windows Vista](https://s3.ax1x.com/2020/11/24/DtT6JK.png)
-![Windows XP](https://s3.ax1x.com/2020/11/24/DtTyi6.png)
+![Windows Vista](./Windows%20Vista.png)
+![Windows XP](./Windows%20XP.png)
 
 - As you can see, the heap addresses are far apart on Vista, while they are identical on XP
 
@@ -78,7 +78,7 @@ int main()
 
 - Test run on Vista, the results are as shown
 
-![PEB/TEB-random-Vista](https://s3.ax1x.com/2020/11/24/DtL3Ct.png)
+![PEB-TEB-random-Vista](./PEB-TEB-random-Vista.png)
 
 - As you can see, the result is very poor, the PEB address is only randomized by one byte, and it is still very regular, the TEB is basically unchanged
 
@@ -99,7 +99,7 @@ int main()
 
 - Reboot the system to see the ASLR module enabled
 
-![ASLR not enabled status](https://s3.ax1x.com/2020/11/26/D0Nlod.png)
+![ASLR not enabled status](./ASLR%20not%20enabled%20status.png)
 
 - Experimental control is not enabled GS
 - Load POC page and Flash9k.ocx via IE7
@@ -146,4 +146,4 @@ int main()
 
 - As shown in the picture, reboot the system, the shellcode runs normally, which means the attack on ASLR is successful
 
-![shellcode run successfully](https://s3.ax1x.com/2020/11/26/D0oYUH.png)
+![shellcode run successfully](./shellcode%20run%20successfully.png)

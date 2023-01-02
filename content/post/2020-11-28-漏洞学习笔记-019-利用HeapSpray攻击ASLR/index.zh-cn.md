@@ -66,6 +66,6 @@ tags:
 
 - 成功攻击ASLR，如图
 
-![pic1](https://s3.ax1x.com/2020/11/28/DyUSMR.png)  
-![pic2](https://s3.ax1x.com/2020/11/28/DyUcl9.jpg)  
-![pic3](https://s3.ax1x.com/2020/11/28/DyN3vR.png)
+![pic1](./p1.png)  
+![pic2](./p2.jpg)  
+![pic3](./p3.png)

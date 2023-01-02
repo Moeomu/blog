@@ -95,8 +95,8 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 
 - 如图
 
-![rYh5BF.png](https://s3.ax1x.com/2020/12/18/rYh5BF.png)
-![rYhq91.png](https://s3.ax1x.com/2020/12/18/rYhq91.png)
+![rYh5BF.png](./shown1.png)
+![rYhq91.png](./shown2.png)
 
 ### 结论
 
@@ -123,7 +123,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 - 通过调用KeGetCurrentIrql函数来获取当前的IRQL
 - 如图所示，IRQL都是0，对照上表，级别是PASSIVE_LEVEL
 
-![rYHLIU.png](https://s3.ax1x.com/2020/12/18/rYHLIU.png)]
+![rYHLIU.png](./shown3.png)
 
 ### 结论
 

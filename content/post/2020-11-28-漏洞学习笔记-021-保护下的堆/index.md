@@ -46,7 +46,7 @@ int safe_remove(ListNode * node)
 
 - heap cookie: similar to the `security cookie` in the stack, Microsoft has introduced a cookie in the heap to detect the occurrence of heap overflows. cookies are placed at the location of the `segment table` of the original heap block at the head of the heap and occupy a size of 1 byte
 
-![heap struct](https://s3.ax1x.com/2020/11/28/DyrdgS.png)
+![heap struct](./heap%20struct.png)
 
 - Metadata encryption: Microsoft started using this security measure in `Windows Vista` and subsequent versions of the operating system. Some important data in the head of the block will be saved with a 4-byte random number to perform an iso operation, when using these data need to perform another iso run to restore, so that we can not directly destroy these data to protect the heap.
 

@@ -38,19 +38,19 @@ ed2k链接没法用motrix下载，准备去下载一个迅雷的精简版，突�
 
 - 更新了BigSur系统后，发现系统中存在`iOS app 安装器`这么个东西，但是无法运行，遂探索了一番
 
-![系统](https://s3.ax1x.com/2020/11/24/Dt5BZt.png)
+![系统](./System.png)
 
 - 查看此软件位置，顺便看看种类，很好，通用，意味着可能以后会支持Intel？
 
-![Locate](https://s3.ax1x.com/2020/11/24/Dt5rIf.png)
+![Locate](./locate.png)
 
 - 打开Terminal，进入此文件夹，运行软件，报错，提示需要依赖文件，如图
 
-![2](https://s3.ax1x.com/2020/11/24/Dt5DdP.png)
+![2](./2.png)
 
 - 找到依赖文件所在位置，发现貌似没有东西，原因可能是仅提供ARM版本的依赖程序
 
-![3](https://s3.ax1x.com/2020/11/24/Dt5wqI.png)
+![3](./3.png)
 
 ### Parallels Desktop 无法联网解决办法
 
@@ -65,7 +65,7 @@ ed2k链接没法用motrix下载，准备去下载一个迅雷的精简版，突�
 - 由于此现象是ls程序出现的，因此问问系统的说明文档，命令`man ls`
 - 很快啊，啪的一下就出来了，如图
 
-![man-ls](https://s3.ax1x.com/2020/11/24/Dto2bn.png)
+![man-ls](./man-ls.png)
 
 ```s
 -@      在long(-l)输出中显示扩展的属性键和大小。

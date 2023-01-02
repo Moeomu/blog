@@ -44,17 +44,17 @@ Source: [Moeomu's blog](/posts/windows-kernel-debugging-learning-notes-001-envir
 
 > The configuration is completed as shown below
 
-![Virtual Machine Configuration Diagram.png](https://s1.ax1x.com/2020/10/18/0j8UKI.png)
+![Virtual Machine Configuration Diagram](./Virtual%20Machine%20Configuration%20Diagram.png.png)
 
 ### Configure Windows 7
 
 - Enter the command `msconfig` and click boot as shown below
 
-![boot.jpg](https://s1.ax1x.com/2020/10/18/0jGpJe.png)
+![boot](./boot.png)
   
 - Click on advanced options, enable debugging, baud rate, as shown
 
-![advanced-options.jpg](https://s1.ax1x.com/2020/10/18/0jGSiD.png)
+![advanced-options](./advanced-options.png)
 
 ---
 
