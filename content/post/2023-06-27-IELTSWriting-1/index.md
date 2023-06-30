@@ -7,7 +7,7 @@ categories:
 tags:
     - IELTS
     - Writing
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
+image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-01-Disadvantage-and-Advantage-Essay.1t76xiwq5tx.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-01-disadvantage-and-advantage-essay/)
@@ -64,7 +64,9 @@ Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-01-disadva
 
 - Do not give direct result
   > First, one positive aspect of promoting public transportation is the improved convenience and effectiveness of the residents' living.
-- [Using the corpus](./IELTS-Essay-AdvancedVocabulary.md) and [Argumentative corpus](./IELTS-Essay-ArgumentativeCorpus.md)t
+- [Using the corpus](./IELTS-Essay-AdvancedVocabulary.md) and [Argumentative corpus](./IELTS-Essay-ArgumentativeCorpus.md)
+- Using [necessary documents (Chinese)](https://disk.moeomu.com/Global-OneDrive/VideoTutorial/Language-%5B%E4%B9%9D%E5%88%86%E5%AD%A6%E9%95%BF%5D%5B6%E6%9C%88%5D%E9%9B%85%E6%80%9D%E5%86%99%E4%BD%9C21%E5%A4%A9%E5%86%B27%E8%AE%A1%E5%88%92/Documents.zip)
+- Watching [Videos (Chinese)](https://disk.moeomu.com/Global-OneDrive/VideoTutorial/Language-%5B%E4%B9%9D%E5%88%86%E5%AD%A6%E9%95%BF%5D%5B6%E6%9C%88%5D%E9%9B%85%E6%80%9D%E5%86%99%E4%BD%9C21%E5%A4%A9%E5%86%B27%E8%AE%A1%E5%88%92)
 - More generalized sentences
   > First, one positive aspect of promoting public transportation is related to / associated with / concerns people's daily lives. By doing this, the convenience and effectiveness of the residents' mobility can be greatly enhanced.
 
