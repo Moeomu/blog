@@ -3,7 +3,7 @@ title: IELTS Writing Course Note 04 Compare(Outweigh) and Report Essay
 description: How to write the Expanded Paragraph in IELTS Compare(Outweigh) and Report Essay
 date: 2023-06-30 16:00:00+0800
 categories:
-    - WritingNotes
+    - Literature
 tags:
     - IELTS
     - Writing

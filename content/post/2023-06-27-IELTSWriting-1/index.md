@@ -3,7 +3,7 @@ title: IELTS Writing Course Note 01 Disadvantage and Advantage Essay
 description: How to write the Expanded Paragraph in IELTS Disadvantage and Advantage Essay
 date: 2023-06-27 16:00:00+0800
 categories:
-    - WritingNotes
+    - Literature
 tags:
     - IELTS
     - Writing

@@ -3,7 +3,7 @@ title: IELTS Writing Course Note 03 Discuss Essay
 description: How to write the Expanded Paragraph in IELTS Discuss Essay
 date: 2023-06-29 16:00:00+0800
 categories:
-    - WritingNotes
+    - Literature
 tags:
     - IELTS
     - Writing

@@ -3,7 +3,7 @@ title: IELTS Writing Course Note 02 Opinion Essay
 description: How to write the Expanded Paragraph in IELTS Opinion Essay
 date: 2023-06-28 16:00:00+0800
 categories:
-    - WritingNotes
+    - Literature
 tags:
     - IELTS
     - Writing
