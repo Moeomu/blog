@@ -1,7 +1,7 @@
 ---
 title: IELTS Writing Course Note 06 Diagram Essay
 description: How to write the Expanded Paragraph in IELTS Diagram Essay
-date: 2023-07-02 16:00:00+0800
+date: 2023-07-02 14:00:00+0800
 categories:
     - Literature
 tags:

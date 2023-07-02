@@ -1,7 +1,7 @@
 ---
 title: IELTS Writing Course Note 07 FlowChart and Map Essay
 description: How to write the Expanded Paragraph in IELTS FlowChart and Map Essay
-date: 2023-07-02 17:00:00+0800
+date: 2023-07-02 15:00:00+0800
 categories:
     - Literature
 tags:
