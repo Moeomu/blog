@@ -1,8 +1,16 @@
 # 12 Directions Argumentative Corpus for the IELTS Essay
 
+---
+
+> ## CAREER 职业
+
+---
+
 ## Jobs & Careers
 
-### Jobs
+> **【基本表达：工作及职业】**
+
+### 工作领域
 
 - enter/participate in the **workforce** (workforce can be considered one of the most versatile expressions for "work")
 - begin a career/**working life**
@@ -88,6 +96,8 @@
 
 ## Professional and skilled work
 
+> **【基本表达：专业及技能工作】**
+
 ### 专业及技能工作
 
 - **professional** work（这是"专业性工作"的表达）
@@ -101,6 +111,8 @@
 - **trade** skills（特指"技能性能力"）
 
 ## Industry and Occupation Type
+
+> *【基本表达：产业及职业类型】*
 
 ### 不同产业
 
@@ -125,6 +137,8 @@
 - energy and fuel products
 
 ## The meaning of work
+
+> **【论证语料：工作的意义】**
 
 ### 为自己
 
@@ -171,6 +185,8 @@
 
 ## The meaning of internship
 
+> **【论证语料：实习的意义】**
+
 ### 上大学之后
 
 #### real-world experience
@@ -200,6 +216,8 @@
 （需要可以写出每种不同工作具体"在做些什么"）
 
 ### 科研性工作
+
+> **【论证语料：工作职责】**
 
 - **conducting research** and **driving innovation**
   - e.g. reviewing existing studies on the topic
@@ -264,6 +282,8 @@
 
 ## Responsibilities of leaders and employees
 
+> **【论证语料：领导和员工的职责】**
+
 ### 领导工作
 
 - setting team goals and objectives
@@ -277,6 +297,8 @@
 - **fit in with** the team and contribute effort and talent
 
 ## Working Environment
+
+> **【论证语料：工作环境】**
 
 ### 正式 formality
 
@@ -302,6 +324,8 @@
   - less **discrimination and bias**
 
 ## Robotics
+
+> **【论证语料：工作环境】**
 
 ### 优势
 
@@ -336,7 +360,15 @@
     - generate **fake news**
       - e.g. robots are used in **content generation**
 
+---
+
+> ## CITY 城市
+
+---
+
 ## Urban Planning
+
+> 【基本表达：城市规划】
 
 ### 基本表达
 
@@ -345,6 +377,8 @@
 - master plan
 
 ## Types of urban planning
+
+> *【基本表达：城市规划的类型】*
 
 ### 城市不同区域
 
@@ -367,6 +401,8 @@
   - environmental degradation and pollution
 
 ## Advantages and disadvantages of urbanization
+
+> **【论证语料：城市化的优缺点】**
 
 ### 城市化的好处
 
@@ -397,7 +433,15 @@
 - **lack of community and social isolation**
   - **limited green space, parks, outdoor activity venues**
 
+---
+
+> ## CONSUMPTION 消费
+
+---
+
 ## Consumption
+
+> **【基本表达：消费】**
 
 ### 商品
 
@@ -467,6 +511,8 @@
 
 ## Advertisement
 
+> **【基本表达：广告】**
+
 ### 广告的分类
 
 - television **commercials**
@@ -529,6 +575,8 @@
 
 ## Advantages and disadvantages of consumerism
 
+> **【论证语料：消费主义的优缺点】**
+
 ### 优点
 
 #### 促进经济
@@ -563,7 +611,15 @@
 - leading to **feelings of inadequacy, anxiety, and a distorted sense of self-worth**
   - create **pressure to conform to societal expectations**
 
+---
+
+> ## CRIME 犯罪
+
+---
+
 ## Crime
+
+> **【基本表达：犯罪】**
 
 ### 犯罪
 
@@ -639,6 +695,8 @@
 
 ## Laws and Regulations
 
+> **【基本表达：法律及法规】**
+
 ### 法律及规则
 
 - **law and regulation**
@@ -674,6 +732,8 @@
 
 ## Causes of Crime
 
+> **【论证语料：犯罪的原因】**
+
 ### 缺少教育及工作 lack of education and jobs
 
 - lack of **financial resources** and **a sense of belonging**
@@ -691,7 +751,15 @@
   - do not have **strong moral values**
   - do not have **decision-making skills**
 
+---
+
+> ## CULTURE 文化
+
+---
+
 ## Cultural Traditions
+
+> **【基本表达：文化传统】**
 
 ### 文化遗产
 
@@ -742,6 +810,8 @@
 
 ## The role of conservation culture
 
+> **【论证语料：保护文化的作用】**
+
 ### 保护文化的作用
 
 #### create a sense of pride and identity
@@ -773,6 +843,8 @@
 
 ## Cultural Heritage
 
+> **【论证语料：文化遗产】**
+
 ### 传统行为 Traditional Practices
 
 - maintain the **traditional lifestyle/practices**
@@ -794,7 +866,15 @@
   - historical/legendary/old-time **figures/heroes**
   - former **legends**/historical **occurrences**
 
+---
+
+> ## EDUCATION 教育
+
+---
+
 ## Study
+
+> **【基本表达：学习】**
 
 ### 学术学习
 
@@ -811,6 +891,8 @@
 - **instruction(s)/instruct**
 
 ## (Schooling) Socialization and Collaboration
+
+> **【论证语料：（学校教育）社交与协作】**
 
 ### 最终好处
 
@@ -837,6 +919,8 @@
 
 ## Critical thinking (schooling)
 
+> **【论证语料：（学校教育）批判思维】**
+
 ### 批判思维最终好处
 
 - make **informed decisions**
@@ -852,6 +936,8 @@
   - express ideas and listen to others **through class discussions, debates and group projects**
 
 ## Ethics (school and home education)
+
+> **【论证语料：（学校及家庭教育）道德】**
 
 ### 道德最终好处
 
@@ -875,6 +961,8 @@
       - demonstrating determination and resilience in the face of obstacles or challenges
 
 ## Student and teacher characteristics and relationships
+
+> **【论证语料：学生及老师的特点及关系】**
 
 ### 学生的优点
 
@@ -928,6 +1016,8 @@
 
 ## Advantages and disadvantages of homeschooling
 
+> **【论证语料：家庭教育的优缺点】**
+
 ### 家庭教育的优点
 
 #### 个性化及灵活
@@ -958,6 +1048,8 @@
 
 ## Online Education
 
+> **【论证语料：在线教育】**
+
 ### 灵活性 flexible
 
 - **flexible scheduling**/be accessed at any time（时间灵活）
@@ -970,6 +1062,8 @@
 ### 互动与沉浸 Interactive and immersive
 
 ## Vocational Education
+
+> **【论证语料：职业教育】**
 
 ### 职业教育优点
 
@@ -994,6 +1088,8 @@
 
 ## Physical Education
 
+> **【论证语料：体育教育】**
+
 ### 体育的好处
 
 #### 有益身体健康
@@ -1011,6 +1107,8 @@
 - can be very **lucrative** and provide **a stable source of income**
 
 ## The advantages and disadvantages of making mistakes
+
+> **【论证语料：犯错误的优缺点】**
 
 ### 好处
 
@@ -1035,7 +1133,15 @@
 
 - make mistakes **repeatedly** and become **frustrated or discouraged**
 
+---
+
+> ## ENVIRONMENT 环境
+
+---
+
 ## Climate Type
+
+> *【基本表达：气候类型】*
 
 ### 气候类型
 
@@ -1045,6 +1151,8 @@
 - Continental: characterized by large temperature fluctuations between seasons, with a mix of deciduous and coniferous trees.
 
 ## Sustainable Directions
+
+> **【基本表达：可持续的方向】**
 
 ### 保证自然资源可持续
 
@@ -1059,6 +1167,8 @@
 - encouraging the innovation of **greener products and servies**
 
 ## Natural environment deterioration
+
+> **【论证语料：自然环境恶化】**
 
 ### 影响环境的人类行为 human activities
 
@@ -1107,6 +1217,8 @@
 
 ## Urban Environmental Degradation
 
+> **【论证语料：城市环境恶化】**
+
 ### 空气污染
 
 - long-term **exposure to air pollution**
@@ -1119,6 +1231,8 @@
   - **disrupt sleep patterns/cause sleep deprivation**
 
 ## People and Animals
+
+> 【论证语料：人与动物】
 
 ### 人不应该（过度）保护动物
 
@@ -1157,9 +1271,17 @@
   - reduce the need for **animal agriculture**
   - use **non-animal testing methods** (computer models) in scientific research
 
+---
+
+> ## FOOD 食物
+
+---
+
 ## Agriculture
 
-（考到与"食物"有关的话题时经常使用）
+> 【基本表达：农业】
+>
+>（考到与"食物"有关的话题时经常使用）
 
 ### 农业
 
@@ -1185,6 +1307,8 @@
 
 ## Foods
 
+> **【基本表达：食物】**
+
 ### 饮食
 
 - diet/dietary option
@@ -1203,6 +1327,8 @@
     - providing energy
 
 ## Food supply
+
+> **【论证语料：食物供给】**
 
 ### 食物基本供给
 
@@ -1229,6 +1355,8 @@
 
 ## Food Safety
 
+> **【论证语料：食品安全】**
+
 ### 保证食品安全措施
 
 - guarantee the **health and safety of ingredients**
@@ -1238,6 +1366,8 @@
   - prevent food from **becoming spoiled**
 
 ## Junk Food
+
+> **【论证语料：垃圾食品】**
 
 ### 垃圾食品（缺点）
 
@@ -1255,7 +1385,15 @@
 - **affordable** for many people
   - **cheaper** than healthier options
 
+---
+
+> ## GOVERNMENT 政府
+
+---
+
 ## Education and Medical Facilities
+
+> 【基本表达：教育及医疗设施】
 
 ### 教育设施
 
@@ -1272,6 +1410,8 @@
 - public health education centers
 
 ## Leisure facilities
+
+> 【基本表达：休闲设施】
 
 ### 针对儿童
 
@@ -1291,6 +1431,8 @@
 - accessible facilities
 
 ## Minority groups
+
+> **【基本表达：少数人群】**
 
 ### 少数族群
 
@@ -1317,6 +1459,8 @@
 - limit the ability to participate in society and influence policy decisions
 
 ## Legal, Education & Infrastructure
+
+> **【论证语料：法律、教育及基础设施】**
 
 ### 收税/费
 
@@ -1346,6 +1490,8 @@
 
 ## National Security
 
+> 【论证语料：国家安全】
+
 - maintain a **strong and well-equipped military**
   - investing in **advanced military technology**
   - ensuring that the **troops are properly trained and equipped**
@@ -1354,6 +1500,8 @@
   - implementing **intrusion detection systems**
 
 ## Promoting the economy
+
+> **【基本语料：促进经济】**
 
 ### 路径一：提供教育
 
@@ -1372,6 +1520,8 @@
 - **offering tax breaks or credits to** various industries
 
 ## Guaranteeing freedom and equality
+
+> **【论证语料：保证自由、平等】**
 
 ### 最终目的
 
@@ -1397,12 +1547,16 @@
 
 ## Personal freedom
 
+> 【论证语料：个人自由】
+
 ### 个人自由
 
 - protect **personal freedom** and **individual autonomy**
   - people can **take risks and make choices for themselves**
 
 ## Country Relations
+
+> **【论证语料：国家关系】**
 
 ### 国家关系正向
 
@@ -1440,7 +1594,15 @@
 - leading to the **loss of cultural heritage and identity**
   - **influx of goods, services, and ideas from developed countries** can impact local cultures and traditions
 
+---
+
+> ## INTERNET 互联网
+
+---
+
 ## Internet
+
+> 【基本表达：互联网】
 
 ### 互联网基本表达
 
@@ -1500,7 +1662,9 @@
 
 ### 互联网交流的优点（朋友及家人）
 
-（需要能具体给出不同的与家人朋友联系的场景）
+> **【论证语料：互联网交流】**
+>
+> （需要能具体给出不同的与家人朋友联系的场景）
 
 - **communicate/stay in touch/keep connected** with friends and family
     members (**loved ones**)（基本的联系）
@@ -1534,6 +1698,8 @@
       - neglect to share the struggles and hardships
 
 ## Advantages of the Internet
+
+> **【论证语料：互联网的优点】**
 
 ### 信息的可达 accessibility
 
@@ -1592,6 +1758,8 @@
 
 ## Disadvantages of the Internet
 
+> **【论证语料：互联网的缺点】**
+
 ### 有限的可达
 
 - **access to news becomes limited** for the elderly and people in underdeveloped areas
@@ -1631,7 +1799,9 @@
 
 ## Advantages of paper and pencil (vs. electronic)
 
-（电子的优点参考"互联网的优点"，以下只列举"纸笔的优点"）
+> **【论证语料：纸笔（对比电子）的优点】**
+>
+> （电子的优点参考"互联网的优点"，以下只列举"纸笔的优点"）
 
 ### 隐私
 
@@ -1651,7 +1821,15 @@
   - **bring** memories of people and moments that have long passed **back to life**
     - providing a **physical** record of one's life/**tangible** (can be touched, smelled and seen)
 
+---
+
+> ## LIFE 生活
+
+---
+
 ## General population
+
+> **【基本表达：常规人群】**
 
 ### 儿童
 
@@ -1721,6 +1899,8 @@
 
 ## Life Status
 
+> **【基本表达：生活状态】**
+
 ### 感觉压力
 
 - feel **stressed out/burnout**
@@ -1743,6 +1923,8 @@
 - **manage** the stress of
 
 ## Clothing
+
+> 【基本表达：着装】
 
 ### 着装
 
@@ -1775,6 +1957,8 @@
 
 ## Wealth
 
+> **【基本表达：财富】**
+
 ### 赚取工资
 
 - earn a salary
@@ -1801,6 +1985,8 @@
 
 ## Travel Destinations
 
+> **【基本表达：旅游目的地】**
+
 ### 目的地
 
 - a city with a **rich cultural heritage**
@@ -1813,12 +1999,16 @@
 
 ## Basic needs of life
 
+> **【基本表达：生活基本需求】**
+
 ### 生活基本需求及必需品
 
 - **life basic needs/demands**
 - **necessities**
 
 ## Life Activities
+
+> 【基本表达：生活活动】
 
 ### 起居
 
@@ -1833,6 +2023,8 @@
 - commute to and from school/work
 
 ## Products and services that enhance the quality of life
+
+> 【基本表达：提升生活质量的产品和服务】
 
 ### 家用电器及功能基本表达
 
@@ -1849,6 +2041,8 @@
 - **vacuum cleaner**: cleaning floors and carpets
 
 ## Sports & Exercise
+
+> 【基本表达：体育与运动】
 
 ### 体育与运动
 
@@ -1875,6 +2069,8 @@
 
 ## Purpose of household appliances
 
+> **【论证语料：家用电器目的】**
+
 ### 家用电器目的
 
 - provide **greater convenience**
@@ -1885,6 +2081,8 @@
   - reduce the **potential risks/hazards** during household tasks/chores
 
 ## Advantages and disadvantages of TV
+
+> **【论证语料：电视的优缺点】**
 
 ### 电视的优点
 
@@ -1902,6 +2100,8 @@
 - **limit** daily TV **viewing time/screen time**
 
 ## Advantages and disadvantages of travel
+
+> **【论证语料：旅游的优缺点】**
 
 ### 给目的地带来的好处
 
@@ -1973,6 +2173,8 @@
 
 ## Other leisure activities
 
+> **【论证语料：其他休闲活动】**
+
 ### 听音乐 music/melodies/tunes/rhythms
 
 （真题中有"音乐"主题的题目，同时"音乐"也可以与"文化"主题相关联）
@@ -2011,7 +2213,9 @@
 
 ## Having a baby
 
-（频率不高，但是是一个需要准备独立内容的方向）
+> 【论证语料：生孩子】
+>
+> （频率不高，但是是一个需要准备独立内容的方向）
 
 ### 生孩子晚的原因
 
@@ -2031,7 +2235,15 @@
 - wait until one feels he/she **achieve the goals** before starting a family
   - **focus on other priorities** such as travel, personal growth, or pursuing their hobbies and interests
 
+---
+
+> ## TRANSPORTATION 交通
+
+---
+
 ## Transportation
+
+> **【基本表达：交通】**
 
 ### 交通流动及交通拥堵
 
@@ -2129,6 +2341,8 @@
 
 ## Ways and purposes of traffic improvement
 
+> **【论证语料：交通改善的方式和目的】**
+
 ### 交通改良最终目的
 
 - ensure **safe/orderly/organinzed/structured** traffic flow
@@ -2151,6 +2365,8 @@
   - e.g. **autonomous driving/self-driving/driverless** techonolgy（遵守交通规则）
 
 ## Public Transportation Benefits
+
+> **【论证语料：公共交通好处】**
 
 ### 公共交通好处
 
@@ -2184,6 +2400,8 @@
 
 ## Private transportation benefits
 
+> **【论证语料：私人交通好处】**
+
 ### 私人交通好处
 
 #### 私人交通灵活
@@ -2216,6 +2434,8 @@
   - music systems
 
 ## Benefits of walking or cycling
+
+> **【基本语料：步行或骑车的好处】**
 
 ### 步行或骑车的好处
 
