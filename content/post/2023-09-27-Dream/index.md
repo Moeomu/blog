@@ -13,7 +13,7 @@ tags:
 image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/webpageheadimageLiterature_84636833.3nwqlcfdnx4w.webp
 ---
 
-Source of this article: [MoeomuBlog](/posts/Dream-Recollection---Dream-as-Life,-I-Desire-You/)
+Source of this article: [MoeomuBlog](/posts/dream-recollection-dream-as-life-i-desire-you/)
 
 ## Background
 

@@ -13,7 +13,7 @@ tags:
 image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/webpageheadimageLiterature_84636833.3nwqlcfdnx4w.webp
 ---
 
-本文来源: [MoeomuBlog](/zh-cn/posts/梦忆-梦若浮生，我欲君/)
+本文来源: [MoeomuBlog](/zh-cn/posts/梦忆-梦若浮生我欲君/)
 
 ## 背景
 
