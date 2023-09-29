@@ -10,7 +10,7 @@ tags:
     - Romantic
     - DarkPlot
     - Revenge
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/webpageheadimageLiterature_84636833.3nwqlcfdnx4w.webp
+image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230929/webpageheadimageLiterature_84636833.3nwqlcfdnx4w.5zkk04m0znnk.webp
 ---
 
 本文来源: [MoeomuBlog](/zh-cn/posts/梦忆-梦若浮生我欲君/)
