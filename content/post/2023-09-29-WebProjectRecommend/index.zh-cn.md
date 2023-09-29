@@ -8,7 +8,7 @@ tags:
     - Github
     - Vercel
     - Serverless
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230929/webpageheadimageServerless_92298688.751yj4pxk328.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230929/webpageheadimageServerless_92298688.751yj4pxk328.webp
 ---
 
 本文来源: [MoeomuBlog](/zh-cn/posts/无服务器开源项目推荐/)

@@ -10,7 +10,7 @@ tags:
     - Romantic
     - DarkPlot
     - Revenge
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230929/webpageheadimageLiterature_84636833.3nwqlcfdnx4w.5zkk04m0znnk.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230929/webpageheadimageLiterature_84636833.3nwqlcfdnx4w.5zkk04m0znnk.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/dream-recollection-dream-as-life-i-desire-you/)
