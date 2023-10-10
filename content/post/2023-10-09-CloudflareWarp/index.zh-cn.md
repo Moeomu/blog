@@ -182,7 +182,20 @@ timeout 60s ./warpplus.sh
    ![wireshark-master-secret](https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-14.56.45.31guan99fpog.webp)
 5. 在wireshark中打开http流分析，转储到文件中，内容请[点击这里查看](#warpplus-trafficcapture-httpstream)
 
----
+### 剧透
+
+> 2023年10月10日增补内容
+
+根据[How to get free 12PB to Your Warp Key [BUG / BUFF]](https://telegra.ph/How-to-get-free-12PB-to-Your-Warp-Key-BUG--BUFF-04-09)所描述，符合以下操作就可以将空账户刷入另一个账户的推荐数量。
+
+1. 备份当前设备所拥有的license。
+2. 使用一个账户中已有极多推荐数量的license替换到当前设备中。
+3. 重新启动WARP程序。
+4. 重新将曾经备份到license替换到当前设备中。
+
+这也解释了下文的请求过程，Cheers！
+
+### 分析过程
 
 **为了您的脑子健康，我直接将下文的总结写在这里，本文到此结束。您可以不用看后文的详情。**
 
@@ -202,8 +215,6 @@ timeout 60s ./warpplus.sh
 14. 服务端响应：`"premium_data": 24598563000000000,"quota": 24598563000000000,"referral_count": 24598563`。解释：Cloudflare服务端似乎出现异常，一个无限WARP流量账户创建成功。
 15. 客户端请求：`DELETE /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739`。解释：删除此无WARP账户链接的设备。
 16. 服务端响应：`204 No Content`。解释：操作成功。
-
----
 
 ### WarpPlus TrafficCapture HTTPStream
 
@@ -450,8 +461,6 @@ CF-RAY: 813493218d1396c0-SJC
 
 ## 总结
 
-说实话，笔者到现在依旧没有弄懂Cloudflare的服务端出了什么问题，为什么会发生这样的事情。中间两次更换license就像是魔术一样让人回味无穷。也许需要更多的测试和实验才能揭晓这神秘的原因，但由于时间关系笔者无法再继续。如果正在看这篇文章的您对此有兴趣，那么非常欢迎您接着笔者的实验继续下去，如果有什么新的发现请一定和笔者分享！
-
 最后，感谢您的耐心观看，愿您生活愉悦。
 
 ## 参考文献
@@ -459,3 +468,5 @@ CF-RAY: 813493218d1396c0-SJC
 1. [yonggekkk/warp-yg - Github](https://github.com/yonggekkk/warp-yg)
 2. [WarpKey-Register-PRO - Replit](https://replit.com/@ygkkkk/WarpKey-Register-PRO)
 3. [rwkgyg/CFwarp - Gitlab](https://gitlab.com/rwkgyg/CFwarp)
+4. [How to get free 12PB to Your Warp Key [BUG / BUFF]](https://telegra.ph/How-to-get-free-12PB-to-Your-Warp-Key-BUG--BUFF-04-09)
+5. [WarpKeyGen - Replit](https://replit.com/@SerdarAD/WarpKeyGen)

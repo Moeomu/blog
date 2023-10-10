@@ -180,7 +180,20 @@ At this point, the only thing left to do for network analysis is to export the c
    ![wireshark-master-secret](https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-14.56.45.31guan99fpog.webp)
 5. Open http stream analysis in wireshark, dump to file, content please [click here to view](#warpplus-trafficcapture-httpstream)
 
----
+### Spoilers
+
+> October 10, 2023 Addendum.
+
+As described in [How to get free 12PB to Your Warp Key [BUG / BUFF]](https://telegra.ph/How-to-get-free-12PB-to-Your-Warp-Key-BUG--BUFF-04-09), conforming to the following actions is fine Swipe an empty account to the recommended amount of another account.
+
+1. Backup the license you currently have on your device.
+2. Replace the license in the current device with an account that already has a very large number of referrals.
+3. Restart the WARP program.
+4. Replace the backed up license with the current device.
+
+This also explains the request process below, Cheers!
+
+### Analyzing the process
 
 **For the sake of your brain's health, I'm going to summarize the following directly here, where this article ends. You may not need to read the details afterward.**
 
@@ -200,8 +213,6 @@ At this point, the only thing left to do for network analysis is to export the c
 14. Server response: `"premium_data": 24598563000000000, "quota": 24598563000000000, "referral_count": 24598563`. Explanation: Cloudflare server seems to have an exception, an unlimited WARP traffic account was created successfully.
 15. Client request: `DELETE /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739`. Explanation: Remove this device with no WARP account link.
 16. Server response: `204 No Content`. Explanation: The operation was successful.
-
----
 
 ### WarpPlus TrafficCapture HTTPStream
 
@@ -447,8 +458,6 @@ CF-RAY: 813493218d1396c0-SJC
 ```
 
 ## Conclusion
-
-To be honest, I still haven't figured out what went wrong on the server side of Cloudflare and why it happened. Replacing the license twice in the middle is like a magic trick that brings back memories. Perhaps more tests and experiments are needed to unravel the mystery, but I can't continue due to time constraints. If you are reading this article are interested in this, then you are very welcome to continue with the author's experiments, if there is any new discovery please be sure to share with the author!
 
 Finally, thank you for your patience, may you live a happy life.
 
