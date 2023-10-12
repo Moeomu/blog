@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Dairy on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/categories/dairy/</link><description>Recent content in Dairy on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 24 May 2021 10:36:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/categories/dairy/index.xml" rel="self" type="application/rss+xml"/><item><title>Dairy 2021-05-24</title><link>https://blog.moeomu.com/posts/dairy-2021-05-24/</link><pubDate>Mon, 24 May 2021 10:36:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/dairy-2021-05-24/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/dairy-2021-05-24/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="mention">Mention&lt;/h2>
+&lt;p>A little mention, Shanxi school enterprise pass the automatic clocking project after thinking about it will it decided to open source it, this is just a rush out of immature code, so there may be some reading difficulties, but the use will not have problems, but also has been stable operation for more than half a year, Readme I wrote all the use of methods and notes, the following is the open source address&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/Misakaou/XQT-Clockin" target="_blank" rel="noopener"
+>[Github]-XQT-Auto-Clockin&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>Features
+&lt;ul>
+&lt;li>Automatic clocking&lt;/li>
+&lt;li>multi-user automatic clocking (to prevent the server is blocked IP set a delay clocking)&lt;/li>
+&lt;li>No account password required, only ID number is needed&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="my-way">My Way&lt;/h2>
+&lt;p>Seems to fall into depression more often, seems to be more and more difficult to control themselves, maybe should go to the hospital&lt;/p></description></item></channel></rss>

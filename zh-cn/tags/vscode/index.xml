@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>vscode on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/vscode/</link><description>Recent content in vscode on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 19 Jan 2021 17:48:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/vscode/index.xml" rel="self" type="application/rss+xml"/><item><title>Windows下用vscode编写python的问题总结</title><link>https://blog.moeomu.com/zh-cn/posts/windows%E4%B8%8B%E7%94%A8vscode%E7%BC%96%E5%86%99python%E7%9A%84%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</link><pubDate>Tue, 19 Jan 2021 17:48:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/windows%E4%B8%8B%E7%94%A8vscode%E7%BC%96%E5%86%99python%E7%9A%84%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/windows%e4%b8%8b%e7%94%a8vscode%e7%bc%96%e5%86%99python%e7%9a%84%e9%97%ae%e9%a2%98%e6%80%bb%e7%bb%93/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="vscode-python-venv-powershell未签名环境无法激活">VSCode-Python-Venv-PowerShell未签名环境无法激活&lt;/h2>
+&lt;blockquote>
+&lt;p>在Windows下激活VENV虚拟Python环境写代码遇到了PowerShell文件的无法运行的事情，原因是PowerShell脚本文件未签名，百度寻找了一下解决办法却是清一色的让将Windows安全策略改成签名，如下&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>set-executionpolicy remotesigned&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>总觉得不应该这样，这样修改策略实属下策，去谷歌找了一下解决办法，发现这是个2018年的问题，未有良好的解决办法，但是仍旧找到了一份好的策略，即将当前用户的签名策略改成需远程签名，其它用户仍旧是阻挡&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>随后可以通过以下代码查看策略修改情况&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Get-ExecutionPolicy -LIST&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="python更换pip源">Python更换PIP源&lt;/h2>
+&lt;blockquote>
+&lt;p>每次都搜索引擎找源太麻烦了，不如直接记个笔记备份到本地为好&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;p>&lt;code>%HOMEPATH%/pip/pip.ini&lt;/code>&lt;/p>
+&lt;h3 id="linux--macos">Linux &amp;amp; macOS&lt;/h3>
+&lt;p>&lt;code>~/.pip/pip.conf&lt;/code>&lt;/p>
+&lt;h3 id="编辑格式">编辑格式&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[global]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[install]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">trusted-host=pypi.tuna.tsinghua.edu.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="pip源">pip源&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>名称&lt;/th>
+&lt;th>源的地址&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>清华&lt;/td>
+&lt;td>&lt;a class="link" href="https://pypi.tuna.tsinghua.edu.cn/simple" target="_blank" rel="noopener"
+>https://pypi.tuna.tsinghua.edu.cn/simple&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>阿里云&lt;/td>
+&lt;td>&lt;a class="link" href="http://mirrors.aliyun.com/pypi/simple/" target="_blank" rel="noopener"
+>http://mirrors.aliyun.com/pypi/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>中国科技大学&lt;/td>
+&lt;td>&lt;a class="link" href="https://pypi.mirrors.ustc.edu.cn/simple/" target="_blank" rel="noopener"
+>https://pypi.mirrors.ustc.edu.cn/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>华中理工大学&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.hustunique.com/" target="_blank" rel="noopener"
+>http://pypi.hustunique.com/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>山东理工大学&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.sdutlinux.org/" target="_blank" rel="noopener"
+>http://pypi.sdutlinux.org/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>豆瓣&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.douban.com/simple/" target="_blank" rel="noopener"
+>http://pypi.douban.com/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="pip模块未找到错误">pip模块未找到错误&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>python -m ensurepip&lt;/code>&lt;/li>
+&lt;li>&lt;code>python -m pip install --upgrade pip&lt;/code>&lt;/li>
+&lt;/ul></description></item></channel></rss>

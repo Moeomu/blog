@@ -1,0 +1,469 @@
+<!doctype html><html lang=en dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Windows kernel related learning notes, this one mainly describes the structure of EPROCESS, PEB"><title>Windows Kernel Debugging Learning Notes 002 Structures</title><link rel=canonical href=https://blog.moeomu.com/posts/windows-kernel-debugging-learning-notes-002-structures/><link rel=stylesheet href=/scss/style.min.abbd69b2908fdfcd5179898beaafd374514a86538d81639ddd2c58c06ae54e40.css><meta property="og:title" content="Windows Kernel Debugging Learning Notes 002 Structures"><meta property="og:description" content="Windows kernel related learning notes, this one mainly describes the structure of EPROCESS, PEB"><meta property="og:url" content="https://blog.moeomu.com/posts/windows-kernel-debugging-learning-notes-002-structures/"><meta property="og:site_name" content="Misaka's Secrect Garden"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Windows"><meta property="article:published_time" content="2020-10-17T20:23:00+08:00"><meta property="article:modified_time" content="2020-10-17T20:23:00+08:00"><meta name=twitter:title content="Windows Kernel Debugging Learning Notes 002 Structures"><meta name=twitter:description content="Windows kernel related learning notes, this one mainly describes the structure of EPROCESS, PEB"><script async src=https://umami.moeomu.com/Prototype data-website-id=da63d88b-4c19-4ee6-93cc-e12bd941eb81></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu5c4b01d6d06a4818a5284ca6e51e5ac9_24136_300x0_resize_q75_box.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a>
+<span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/>Misaka's Secrect Garden</a></h1><h2 class=site-description>In the gardens embrace, a celestial sprite dances.</h2></div></header><ol class=social-menu><li><a href=https://github.com/Misakaou target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>Home</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>Archives</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>Search</span></a></li><li><a href=/links/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg><span>Links</span></a></li><li><a href=/comment/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg><span>Comment</span></a></li><li><a href=/about/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>About</span></a></li><div class=menu-bottom-section><li id=i18n-switch><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><select name=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://blog.moeomu.com/ selected>English</option><option value=https://blog.moeomu.com/zh-cn/>中文</option></select></li><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>Dark Mode</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#non-public-kernel-structures>Non-public kernel structures</a></li><li><a href=#eprocesskpebkernel-process-environment-block>EPROCESS(KPEB)(Kernel Process Environment Block)</a><ol><li><a href=#structure-information>Structure information</a></li><li><a href=#structure-composition>Structure composition</a></li></ol></li><li><a href=#pebprocess-environment-block>PEB(Process Environment Block)</a><ol><li><a href=#structure-information-1>Structure information</a></li><li><a href=#structure-composition-1>Structure composition</a></li></ol></li><li><a href=#reference-documentation>Reference Documentation</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/kerneldebug/>KernelDebug</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/posts/windows-kernel-debugging-learning-notes-002-structures/>Windows Kernel Debugging Learning Notes 002 Structures</a></h2><h3 class=article-subtitle>Windows kernel related learning notes, this one mainly describes the structure of EPROCESS, PEB</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Oct 17, 2020</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>8 minute read</time></div></footer><footer class=article-translations><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E8%B0%83%E8%AF%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-%E7%BB%93%E6%9E%84%E4%BD%93/ class=link>中文</a></div></footer></div></header><section class=article-content><p>Source: <a class=link href=/posts/windows-kernel-debugging-learning-notes-002-structures/>Moeomu&rsquo;s Blog</a></p><h2 id=non-public-kernel-structures>Non-public kernel structures</h2><p>Windows has a lot of non-public structures, and some of them are semi-public, and although they have field names, their purpose can only be inferred<br>WinDbg can load some kernel debugging symbols, and in these PDB files there is information about some semi-public structures</p><hr><h2 id=eprocesskpebkernel-process-environment-block>EPROCESS(KPEB)(Kernel Process Environment Block)</h2><p>Each process is represented by an EPROCESS structure, which is linked by a two-way chain table</p><h3 id=structure-information>Structure information</h3><ul><li>0x000 offset is the address of the PCB (Process Control Block), which is located in R0</li><li>0x0b4 offset is the PID, which is the unique identifier that identifies this process</li><li>0x0b8 offset is the active process chain table, which can be used to traverse all EPROCESS structures of the system</li></ul><h3 id=structure-composition>Structure composition</h3><blockquote><p>Here are the details of this structure</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kd&gt; dt _eprocess
+</span></span><span class=line><span class=cl>nt!_EPROCESS
+</span></span><span class=line><span class=cl>   +0x000 Pcb              : _KPROCESS // 进程控制块
+</span></span><span class=line><span class=cl>   +0x098 ProcessLock      : _EX_PUSH_LOCK // 进程锁
+</span></span><span class=line><span class=cl>   +0x0a0 CreateTime       : _LARGE_INTEGER // 创建时间
+</span></span><span class=line><span class=cl>   +0x0a8 ExitTime         : _LARGE_INTEGER // 退出时间
+</span></span><span class=line><span class=cl>   +0x0b0 RundownProtect   : _EX_RUNDOWN_REF // 进程加保护
+</span></span><span class=line><span class=cl>   +0x0b4 UniqueProcessId  : Ptr32 Void // PID
+</span></span><span class=line><span class=cl>   +0x0b8 ActiveProcessLinks : _LIST_ENTRY // 活动进程链表
+</span></span><span class=line><span class=cl>   +0x0c0 ProcessQuotaUsage : [2] Uint4B // 物理页相关的统计信息
+</span></span><span class=line><span class=cl>   +0x0c8 ProcessQuotaPeak : [2] Uint4B // 物理页相关的统计信息
+</span></span><span class=line><span class=cl>   +0x0d0 CommitCharge     : Uint4B
+</span></span><span class=line><span class=cl>   +0x0d4 QuotaBlock       : Ptr32 _EPROCESS_QUOTA_BLOCK
+</span></span><span class=line><span class=cl>   +0x0d8 CpuQuotaBlock    : Ptr32 _PS_CPU_QUOTA_BLOCK
+</span></span><span class=line><span class=cl>   +0x0dc PeakVirtualSize  : Uint4B // 虚拟内存池大小
+</span></span><span class=line><span class=cl>   +0x0e0 VirtualSize      : Uint4B // 虚拟内存大小
+</span></span><span class=line><span class=cl>   +0x0e4 SessionProcessLinks : _LIST_ENTRY
+</span></span><span class=line><span class=cl>   +0x0ec DebugPort        : Ptr32 Void // 调试端口
+</span></span><span class=line><span class=cl>   +0x0f0 ExceptionPortData : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x0f0 ExceptionPortValue : Uint4B
+</span></span><span class=line><span class=cl>   +0x0f0 ExceptionPortState : Pos 0, 3 Bits
+</span></span><span class=line><span class=cl>   +0x0f4 ObjectTable      : Ptr32 _HANDLE_TABLE
+</span></span><span class=line><span class=cl>   +0x0f8 Token            : _EX_FAST_REF // 权限令牌的地址
+</span></span><span class=line><span class=cl>   +0x0fc WorkingSetPage   : Uint4B
+</span></span><span class=line><span class=cl>   +0x100 AddressCreationLock : _EX_PUSH_LOCK
+</span></span><span class=line><span class=cl>   +0x104 RotateInProgress : Ptr32 _ETHREAD
+</span></span><span class=line><span class=cl>   +0x108 ForkInProgress   : Ptr32 _ETHREAD
+</span></span><span class=line><span class=cl>   +0x10c HardwareTrigger  : Uint4B
+</span></span><span class=line><span class=cl>   +0x110 PhysicalVadRoot  : Ptr32 _MM_AVL_TABLE
+</span></span><span class=line><span class=cl>   +0x114 CloneRoot        : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x118 NumberOfPrivatePages : Uint4B
+</span></span><span class=line><span class=cl>   +0x11c NumberOfLockedPages : Uint4B
+</span></span><span class=line><span class=cl>   +0x120 Win32Process     : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x124 Job              : Ptr32 _EJOB
+</span></span><span class=line><span class=cl>   +0x128 SectionObject    : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x12c SectionBaseAddress : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x130 Cookie           : Uint4B
+</span></span><span class=line><span class=cl>   +0x134 Spare8           : Uint4B
+</span></span><span class=line><span class=cl>   +0x138 WorkingSetWatch  : Ptr32 _PAGEFAULT_HISTORY
+</span></span><span class=line><span class=cl>   +0x13c Win32WindowStation : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x140 InheritedFromUniqueProcessId : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x144 LdtInformation   : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x148 VdmObjects       : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x14c ConsoleHostProcess : Uint4B
+</span></span><span class=line><span class=cl>   +0x150 DeviceMap        : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x154 EtwDataSource    : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x158 FreeTebHint      : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x160 PageDirectoryPte : _HARDWARE_PTE
+</span></span><span class=line><span class=cl>   +0x160 Filler           : Uint8B
+</span></span><span class=line><span class=cl>   +0x168 Session          : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x16c ImageFileName    : [15] UChar
+</span></span><span class=line><span class=cl>   +0x17b PriorityClass    : UChar
+</span></span><span class=line><span class=cl>   +0x17c JobLinks         : _LIST_ENTRY
+</span></span><span class=line><span class=cl>   +0x184 LockedPagesList  : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x188 ThreadListHead   : _LIST_ENTRY // ETHREAD结构链表头
+</span></span><span class=line><span class=cl>   +0x190 SecurityPort     : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x194 PaeTop           : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x198 ActiveThreads    : Uint4B // 正在运行的线程数量
+</span></span><span class=line><span class=cl>   +0x19c ImagePathHash    : Uint4B
+</span></span><span class=line><span class=cl>   +0x1a0 DefaultHardErrorProcessing : Uint4B
+</span></span><span class=line><span class=cl>   +0x1a4 LastThreadExitStatus : Int4B
+</span></span><span class=line><span class=cl>   +0x1a8 Peb              : Ptr32 _PEB // 进程环境块地址
+</span></span><span class=line><span class=cl>   +0x1ac PrefetchTrace    : _EX_FAST_REF
+</span></span><span class=line><span class=cl>   +0x1b0 ReadOperationCount : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1b8 WriteOperationCount : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1c0 OtherOperationCount : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1c8 ReadTransferCount : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1d0 WriteTransferCount : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1d8 OtherTransferCount : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1e0 CommitChargeLimit : Uint4B
+</span></span><span class=line><span class=cl>   +0x1e4 CommitChargePeak : Uint4B
+</span></span><span class=line><span class=cl>   +0x1e8 AweInfo          : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x1ec SeAuditProcessCreationInfo : _SE_AUDIT_PROCESS_CREATION_INFO
+</span></span><span class=line><span class=cl>   +0x1f0 Vm               : _MMSUPPORT
+</span></span><span class=line><span class=cl>   +0x25c MmProcessLinks   : _LIST_ENTRY
+</span></span><span class=line><span class=cl>   +0x264 HighestUserAddress : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x268 ModifiedPageCount : Uint4B
+</span></span><span class=line><span class=cl>   +0x26c Flags2           : Uint4B
+</span></span><span class=line><span class=cl>   +0x26c JobNotReallyActive : Pos 0, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c AccountingFolded : Pos 1, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c NewProcessReported : Pos 2, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c ExitProcessReported : Pos 3, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c ReportCommitChanges : Pos 4, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c LastReportMemory : Pos 5, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c ReportPhysicalPageChanges : Pos 6, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c HandleTableRundown : Pos 7, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c NeedsHandleRundown : Pos 8, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c RefTraceEnabled  : Pos 9, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c NumaAware        : Pos 10, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c ProtectedProcess : Pos 11, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c DefaultPagePriority : Pos 12, 3 Bits
+</span></span><span class=line><span class=cl>   +0x26c PrimaryTokenFrozen : Pos 15, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c ProcessVerifierTarget : Pos 16, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c StackRandomizationDisabled : Pos 17, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c AffinityPermanent : Pos 18, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c AffinityUpdateEnable : Pos 19, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c PropagateNode    : Pos 20, 1 Bit
+</span></span><span class=line><span class=cl>   +0x26c ExplicitAffinity : Pos 21, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 Flags            : Uint4B
+</span></span><span class=line><span class=cl>   +0x270 CreateReported   : Pos 0, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 NoDebugInherit   : Pos 1, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 ProcessExiting   : Pos 2, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 ProcessDelete    : Pos 3, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 Wow64SplitPages  : Pos 4, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 VmDeleted        : Pos 5, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 OutswapEnabled   : Pos 6, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 Outswapped       : Pos 7, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 ForkFailed       : Pos 8, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 Wow64VaSpace4Gb  : Pos 9, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 AddressSpaceInitialized : Pos 10, 2 Bits
+</span></span><span class=line><span class=cl>   +0x270 SetTimerResolution : Pos 12, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 BreakOnTermination : Pos 13, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 DeprioritizeViews : Pos 14, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 WriteWatch       : Pos 15, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 ProcessInSession : Pos 16, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 OverrideAddressSpace : Pos 17, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 HasAddressSpace  : Pos 18, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 LaunchPrefetched : Pos 19, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 InjectInpageErrors : Pos 20, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 VmTopDown        : Pos 21, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 ImageNotifyDone  : Pos 22, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 PdeUpdateNeeded  : Pos 23, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 VdmAllowed       : Pos 24, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 CrossSessionCreate : Pos 25, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 ProcessInserted  : Pos 26, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 DefaultIoPriority : Pos 27, 3 Bits
+</span></span><span class=line><span class=cl>   +0x270 ProcessSelfDelete : Pos 30, 1 Bit
+</span></span><span class=line><span class=cl>   +0x270 SetTimerResolutionLink : Pos 31, 1 Bit
+</span></span><span class=line><span class=cl>   +0x274 ExitStatus       : Int4B
+</span></span><span class=line><span class=cl>   +0x278 VadRoot          : _MM_AVL_TABLE
+</span></span><span class=line><span class=cl>   +0x298 AlpcContext      : _ALPC_PROCESS_CONTEXT
+</span></span><span class=line><span class=cl>   +0x2a8 TimerResolutionLink : _LIST_ENTRY
+</span></span><span class=line><span class=cl>   +0x2b0 RequestedTimerResolution : Uint4B
+</span></span><span class=line><span class=cl>   +0x2b4 ActiveThreadsHighWatermark : Uint4B
+</span></span><span class=line><span class=cl>   +0x2b8 SmallestTimerResolution : Uint4B
+</span></span><span class=line><span class=cl>   +0x2bc TimerResolutionStackRecord : Ptr32 _PO_DIAG_STACK_RECORD
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=pebprocess-environment-block>PEB(Process Environment Block)</h2><p>This structure is located at the R3 level and is relatively easy to modify</p><h3 id=structure-information-1>Structure information</h3><ul><li>0x002 offset is the location of the FLAG whether to be debugged or not, this value can be modified under R3</li><li>0x068 offset is the value of 0 normally, 0x70 when debugged</li><li>0x018 offset is the address of _HEAP structure, this structure can be judged as non-debug state when offset 0x40=2 and 0x44=0</li></ul><h3 id=structure-composition-1>Structure composition</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span><span class=lnt>90
+</span><span class=lnt>91
+</span><span class=lnt>92
+</span><span class=lnt>93
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>kd&gt; dt _PEB
+</span></span><span class=line><span class=cl>nt!_PEB
+</span></span><span class=line><span class=cl>   +0x000 InheritedAddressSpace : UChar
+</span></span><span class=line><span class=cl>   +0x001 ReadImageFileExecOptions : UChar
+</span></span><span class=line><span class=cl>   +0x002 BeingDebugged    : UChar // 是否被调试
+</span></span><span class=line><span class=cl>   +0x003 BitField         : UChar
+</span></span><span class=line><span class=cl>   +0x003 ImageUsesLargePages : Pos 0, 1 Bit
+</span></span><span class=line><span class=cl>   +0x003 IsProtectedProcess : Pos 1, 1 Bit
+</span></span><span class=line><span class=cl>   +0x003 IsLegacyProcess  : Pos 2, 1 Bit
+</span></span><span class=line><span class=cl>   +0x003 IsImageDynamicallyRelocated : Pos 3, 1 Bit
+</span></span><span class=line><span class=cl>   +0x003 SkipPatchingUser32Forwarders : Pos 4, 1 Bit
+</span></span><span class=line><span class=cl>   +0x003 SpareBits        : Pos 5, 3 Bits
+</span></span><span class=line><span class=cl>   +0x004 Mutant           : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x008 ImageBaseAddress : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x00c Ldr              : Ptr32 _PEB_LDR_DATA // 进程装载的模块结构体
+</span></span><span class=line><span class=cl>   +0x010 ProcessParameters : Ptr32 _RTL_USER_PROCESS_PARAMETERS
+</span></span><span class=line><span class=cl>   +0x014 SubSystemData    : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x018 ProcessHeap      : _HEAP // 0x40=2&amp;&amp;0x44=0为非调试状态
+</span></span><span class=line><span class=cl>   +0x01c FastPebLock      : Ptr32 _RTL_CRITICAL_SECTION
+</span></span><span class=line><span class=cl>   +0x020 AtlThunkSListPtr : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x024 IFEOKey          : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x028 CrossProcessFlags : Uint4B
+</span></span><span class=line><span class=cl>   +0x028 ProcessInJob     : Pos 0, 1 Bit
+</span></span><span class=line><span class=cl>   +0x028 ProcessInitializing : Pos 1, 1 Bit
+</span></span><span class=line><span class=cl>   +0x028 ProcessUsingVEH  : Pos 2, 1 Bit
+</span></span><span class=line><span class=cl>   +0x028 ProcessUsingVCH  : Pos 3, 1 Bit
+</span></span><span class=line><span class=cl>   +0x028 ProcessUsingFTH  : Pos 4, 1 Bit
+</span></span><span class=line><span class=cl>   +0x028 ReservedBits0    : Pos 5, 27 Bits
+</span></span><span class=line><span class=cl>   +0x02c KernelCallbackTable : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x02c UserSharedInfoPtr : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x030 SystemReserved   : [1] Uint4B
+</span></span><span class=line><span class=cl>   +0x034 AtlThunkSListPtr32 : Uint4B
+</span></span><span class=line><span class=cl>   +0x038 ApiSetMap        : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x03c TlsExpansionCounter : Uint4B
+</span></span><span class=line><span class=cl>   +0x040 TlsBitmap        : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x044 TlsBitmapBits    : [2] Uint4B
+</span></span><span class=line><span class=cl>   +0x04c ReadOnlySharedMemoryBase : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x050 HotpatchInformation : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x054 ReadOnlyStaticServerData : Ptr32 Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x058 AnsiCodePageData : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x05c OemCodePageData  : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x060 UnicodeCaseTableData : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x064 NumberOfProcessors : Uint4B
+</span></span><span class=line><span class=cl>   +0x068 NtGlobalFlag     : Uint4B // 反调试用
+</span></span><span class=line><span class=cl>   +0x070 CriticalSectionTimeout : _LARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x078 HeapSegmentReserve : Uint4B
+</span></span><span class=line><span class=cl>   +0x07c HeapSegmentCommit : Uint4B
+</span></span><span class=line><span class=cl>   +0x080 HeapDeCommitTotalFreeThreshold : Uint4B
+</span></span><span class=line><span class=cl>   +0x084 HeapDeCommitFreeBlockThreshold : Uint4B
+</span></span><span class=line><span class=cl>   +0x088 NumberOfHeaps    : Uint4B
+</span></span><span class=line><span class=cl>   +0x08c MaximumNumberOfHeaps : Uint4B
+</span></span><span class=line><span class=cl>   +0x090 ProcessHeaps     : Ptr32 Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x094 GdiSharedHandleTable : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x098 ProcessStarterHelper : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x09c GdiDCAttributeList : Uint4B
+</span></span><span class=line><span class=cl>   +0x0a0 LoaderLock       : Ptr32 _RTL_CRITICAL_SECTION
+</span></span><span class=line><span class=cl>   +0x0a4 OSMajorVersion   : Uint4B // 系统主版本号
+</span></span><span class=line><span class=cl>   +0x0a8 OSMinorVersion   : Uint4B // 系统子版本号
+</span></span><span class=line><span class=cl>   +0x0ac OSBuildNumber    : Uint2B // 系统构建版本号
+</span></span><span class=line><span class=cl>   +0x0ae OSCSDVersion     : Uint2B
+</span></span><span class=line><span class=cl>   +0x0b0 OSPlatformId     : Uint4B
+</span></span><span class=line><span class=cl>   +0x0b4 ImageSubsystem   : Uint4B
+</span></span><span class=line><span class=cl>   +0x0b8 ImageSubsystemMajorVersion : Uint4B
+</span></span><span class=line><span class=cl>   +0x0bc ImageSubsystemMinorVersion : Uint4B
+</span></span><span class=line><span class=cl>   +0x0c0 ActiveProcessAffinityMask : Uint4B
+</span></span><span class=line><span class=cl>   +0x0c4 GdiHandleBuffer  : [34] Uint4B
+</span></span><span class=line><span class=cl>   +0x14c PostProcessInitRoutine : Ptr32 void
+</span></span><span class=line><span class=cl>   +0x150 TlsExpansionBitmap : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x154 TlsExpansionBitmapBits : [32] Uint4B
+</span></span><span class=line><span class=cl>   +0x1d4 SessionId        : Uint4B
+</span></span><span class=line><span class=cl>   +0x1d8 AppCompatFlags   : _ULARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1e0 AppCompatFlagsUser : _ULARGE_INTEGER
+</span></span><span class=line><span class=cl>   +0x1e8 pShimData        : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x1ec AppCompatInfo    : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x1f0 CSDVersion       : _UNICODE_STRING
+</span></span><span class=line><span class=cl>   +0x1f8 ActivationContextData : Ptr32 _ACTIVATION_CONTEXT_DATA
+</span></span><span class=line><span class=cl>   +0x1fc ProcessAssemblyStorageMap : Ptr32 _ASSEMBLY_STORAGE_MAP
+</span></span><span class=line><span class=cl>   +0x200 SystemDefaultActivationContextData : Ptr32 _ACTIVATION_CONTEXT_DATA
+</span></span><span class=line><span class=cl>   +0x204 SystemAssemblyStorageMap : Ptr32 _ASSEMBLY_STORAGE_MAP
+</span></span><span class=line><span class=cl>   +0x208 MinimumStackCommit : Uint4B
+</span></span><span class=line><span class=cl>   +0x20c FlsCallback      : Ptr32 _FLS_CALLBACK_INFO
+</span></span><span class=line><span class=cl>   +0x210 FlsListHead      : _LIST_ENTRY
+</span></span><span class=line><span class=cl>   +0x218 FlsBitmap        : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x21c FlsBitmapBits    : [4] Uint4B
+</span></span><span class=line><span class=cl>   +0x22c FlsHighIndex     : Uint4B
+</span></span><span class=line><span class=cl>   +0x230 WerRegistrationData : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x234 WerShipAssertPtr : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x238 pContextData     : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x23c pImageHeaderHash : Ptr32 Void
+</span></span><span class=line><span class=cl>   +0x240 TracingFlags     : Uint4B
+</span></span><span class=line><span class=cl>   +0x240 HeapTracingEnabled : Pos 0, 1 Bit
+</span></span><span class=line><span class=cl>   +0x240 CritSecTracingEnabled : Pos 1, 1 Bit
+</span></span><span class=line><span class=cl>   +0x240 SpareTracingBits : Pos 2, 30 Bits
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=reference-documentation>Reference Documentation</h2><p>[1]Infosavvy.Understanding EProcess Structure[J/OL].2020-07-24</p></section><footer class=article-footer><section class=article-tags><a href=/tags/windows/>Windows</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/posts/windows-kernel-debugging-learning-notes-001-environment-building/><div class=article-details><h2 class=article-title>Windows Kernel Debugging Learning Notes 001 Environment Building</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=Moeomu/blog data-repo-id=R_kgDOHHJl4A data-category=Announcements data-category-id=DIC_kwDOHHJl4M4CR7uM data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en crossorigin=anonymous async></script>
+<script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2023 Misaka's Secrect Garden</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.21.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

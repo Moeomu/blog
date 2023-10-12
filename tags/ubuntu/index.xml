@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ubuntu on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/ubuntu/</link><description>Recent content in Ubuntu on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 20 Oct 2022 13:22:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/ubuntu/index.xml" rel="self" type="application/rss+xml"/><item><title>Problem summary of installing Ubuntu on AsusStrixScarG532</title><link>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/</link><pubDate>Thu, 20 Oct 2022 13:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp" alt="Featured image of post Problem summary of installing Ubuntu on AsusStrixScarG532" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="system-sound-problems">System sound problems&lt;/h2>
+&lt;h3 id="no-sound">No sound&lt;/h3>
+&lt;ol>
+&lt;li>&lt;code>/etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;li>Append a line at the end of this file:&lt;code>options snd-hda-intel model=asus-zenbook&lt;/code>&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ol>
+&lt;h3 id="sound-is-not-adjustable">Sound is not adjustable&lt;/h3>
+&lt;blockquote>
+&lt;p>Description: The master volume is not adjustable, can only be mute or maximum.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>Edit &lt;code>/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Add the following to the front of &lt;code>[Element PCM]&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[Element Master]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">switch = mute
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">volume = ignore
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kill pulse audio daemon and it will automatically restart: &lt;code>pulseaudio -k&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Note: Do not run pulseaudio as root, otherwise the daemon will not close properly.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="suspend-problems">Suspend problems&lt;/h2>
+&lt;h3 id="cant-wake-up-again-after-locking-the-screen">Can&amp;rsquo;t wake up again after locking the screen&lt;/h3>
+&lt;blockquote>
+&lt;p>Description: After locking the screen, the computer can&amp;rsquo;t wake up again. The hard drive and other hardware work fine, but the screen is all black.&lt;/p>
+&lt;/blockquote>
+&lt;ol>
+&lt;li>install laptop-mod-tools: &lt;code>sudo apt install laptop-mode-tools&lt;/code>&lt;/li>
+&lt;li>start laptop-mode-tools: &lt;code>sudo laptop_mode start&lt;/code>&lt;/li>
+&lt;li>add mutter debug environment variable, edit &lt;code>/etc/environment&lt;/code>
+&lt;ul>
+&lt;li>if in Ubuntu 22.04: &lt;code>MUTTER_DEBUG_ENABLE_ATOMIC_KMS=0&lt;/code>&lt;/li>
+&lt;li>if in Ubuntu 22.10 and later: &lt;code>MUTTER_DEBUG_FORCE_KMS_MODE=simple&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ol>
+&lt;h2 id="reference">reference&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://askubuntu.com/questions/1288054/snd-hda-intel-model-for-ubuntu-20-04-installed-in-an-asus-rog-strix-g15-g512" target="_blank" rel="noopener"
+>snd-hda-intel model for UBUNTU 20.04 installed in an ASUS ROG STRIX G15 (G512) - AskUbuntu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntuforums.org/showthread.php?t=2414755" target="_blank" rel="noopener"
+>Volume either muted or maxed out, nothing in between - ubuntu forums&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bugs.launchpad.net/ubuntu/&amp;#43;source/mutter/&amp;#43;bug/1968040" target="_blank" rel="noopener"
+>Blanked screen doesn&amp;rsquo;t wake up after locking - Launchpad&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

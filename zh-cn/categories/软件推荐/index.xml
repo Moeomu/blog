@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>软件推荐 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/categories/%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90/</link><description>Recent content in 软件推荐 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 29 Sep 2023 16:32:43 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/categories/%E8%BD%AF%E4%BB%B6%E6%8E%A8%E8%8D%90/index.xml" rel="self" type="application/rss+xml"/><item><title>无服务器开源项目推荐</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%97%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E6%8E%A8%E8%8D%90/</link><pubDate>Fri, 29 Sep 2023 16:32:43 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%97%A0%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%BC%80%E6%BA%90%E9%A1%B9%E7%9B%AE%E6%8E%A8%E8%8D%90/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230929/webpageheadimageServerless_92298688.751yj4pxk328.webp" alt="Featured image of post 无服务器开源项目推荐" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%97%a0%e6%9c%8d%e5%8a%a1%e5%99%a8%e5%bc%80%e6%ba%90%e9%a1%b9%e7%9b%ae%e6%8e%a8%e8%8d%90/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="前言">前言&lt;/h2>
+&lt;p>如果您打算使用 Vercel，请先 fork 原始项目后部署。在 GitHub 上，您可以轻松地将上游项目更新到您的 fork 中。&lt;/p>
+&lt;h2 id="rsshub">RSSHub&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/DIYgod/RSSHub" target="_blank" rel="noopener"
+>DIYgod/RSSHub&lt;/a>&lt;/p>
+&lt;h3 id="简介">简介&lt;/h3>
+&lt;p>RSSHub 是一款开源、易用、可扩展的 RSS 源聚合器，它能够从几乎所有内容生成 RSS 源。&lt;/p>
+&lt;p>RSSHub 提供从各种来源聚合的数百万条内容，我们充满活力的开源社区确保 RSSHub 的新路线、新功能和错误修复的交付。&lt;/p>
+&lt;h3 id="优点">优点&lt;/h3>
+&lt;ul>
+&lt;li>无服务器部署&lt;/li>
+&lt;li>不收取额外费用&lt;/li>
+&lt;li>第三方全文 RSS 抓取&lt;/li>
+&lt;li>支持大量网站&lt;/li>
+&lt;/ul>
+&lt;h3 id="我的观点">我的观点&lt;/h3>
+&lt;p>如果您想随时了解新闻并接收来自任何平台的实时更新，您可以通过这项服务来实现。它易于设置，是摆脱信息审查和信息孤岛的最佳选择。&lt;/p>
+&lt;blockquote>
+&lt;p>评分: 9/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="umami">umami&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/umami-software/umami" target="_blank" rel="noopener"
+>umami-software/umami&lt;/a>&lt;/p>
+&lt;h3 id="简介-1">简介&lt;/h3>
+&lt;p>Umami 是一款简单、快速、注重隐私的 Google Analytics 替代软件。&lt;/p>
+&lt;h3 id="优点-1">优点&lt;/h3>
+&lt;ul>
+&lt;li>无服务器部署&lt;/li>
+&lt;li>不收取额外费用&lt;/li>
+&lt;li>保护客人的隐私不受 Google 和其他实体的侵犯。&lt;/li>
+&lt;/ul>
+&lt;h3 id="缺点">缺点&lt;/h3>
+&lt;ul>
+&lt;li>需要一个数据库。&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>解决方案： 使用无服务器数据库： &lt;a class="link" href="https://planetscale.com/" target="_blank" rel="noopener"
+>PlanetScale&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="我的观点-1">我的观点&lt;/h3>
+&lt;p>正如它所描述的那样，这是一款方便的访客分析工具，易于部署。修改 JavaScript 文件名后，可将其插入任何位置。&lt;/p>
+&lt;blockquote>
+&lt;p>评分: 7/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="onedrive-index">Onedrive-Index&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/iRedScarf/onedrive-index" target="_blank" rel="noopener"
+>iRedScarf/onedrive-index&lt;/a>&lt;/p>
+&lt;h3 id="简介-2">简介&lt;/h3>
+&lt;p>使用 onedrive-vercel-index 在 OneDrive 中展示、共享、预览和下载文件。&lt;/p>
+&lt;h3 id="优点-2">优点&lt;/h3>
+&lt;ul>
+&lt;li>无服务器部署&lt;/li>
+&lt;li>不收取额外费用&lt;/li>
+&lt;li>与他人共享文件&lt;/li>
+&lt;/ul>
+&lt;h3 id="缺点-1">缺点&lt;/h3>
+&lt;ul>
+&lt;li>无人积极维护&lt;/li>
+&lt;li>原始项目已存档&lt;/li>
+&lt;/ul>
+&lt;h3 id="我的观点-2">我的观点&lt;/h3>
+&lt;p>方便地从 OneDrive 共享文件，一旦设置好，就无需再担心，因为它会顺利运行。&lt;/p>
+&lt;blockquote>
+&lt;p>评分: 6/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="picx">Picx&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/Moeomu/picx" target="_blank" rel="noopener"
+>XPoet/picx&lt;/a>&lt;/p>
+&lt;h3 id="简介-3">简介&lt;/h3>
+&lt;p>基于 GitHub API 和 jsDelivr 开发的 CDN 加速图像托管管理工具。无需下载或安装，可通过网页浏览器在线使用。它免费、稳定、方便，而且快如闪电。&lt;/p>
+&lt;h3 id="优点-3">优点&lt;/h3>
+&lt;ul>
+&lt;li>无服务器部署&lt;/li>
+&lt;li>无额外费用&lt;/li>
+&lt;li>图像存储&lt;/li>
+&lt;/ul>
+&lt;h3 id="缺点-2">缺点&lt;/h3>
+&lt;ul>
+&lt;li>无英文翻译&lt;/li>
+&lt;/ul>
+&lt;h3 id="我的观点-3">我的观点&lt;/h3>
+&lt;p>您可以在这里放置博客图片，还可以免费使用 CDN 加速，确保获得最佳流畅体验。&lt;/p>
+&lt;blockquote>
+&lt;p>评分: 7/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://docs.rsshub.app/" target="_blank" rel="noopener"
+>RSSHub - Docs&lt;/a>&lt;/li>
+&lt;/ol></description></item><item><title>逆向工具-Radare2和Cutter</title><link>https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/</link><pubDate>Sat, 21 Nov 2020 19:04:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e9%80%86%e5%90%91%e5%b7%a5%e5%85%b7-radare2%e5%92%8ccutter/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="介绍">介绍&lt;/h2>
+&lt;h3 id="radare2">Radare2&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>r2是对radare的一次重写，目的是提供一套处理二进制文件的库和工具。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Radare项目开始时是一个取证工具，一个能够打开磁盘文件的可编写的命令行十六进制编辑器，但后来增加了对分析二进制文件、反汇编代码、调试程序、附加到远程gdb服务器的支持。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>radare2是可移植的。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>要了解更多信息，你可以阅读官方的radare2书籍，源代码，或者浏览网络上的博客文章或r2con的演讲。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="cutter">Cutter&lt;/h3>
+&lt;ul>
+&lt;li>Cutter是一个由radare2驱动的免费和开源的逆向工程框架。它的目标是建立一个先进的、可定制的、FOSS的逆向工程平台，同时考虑到用户体验。Cutter是由逆向工程师为逆向工程师创建的。&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装">安装&lt;/h2>
+&lt;blockquote>
+&lt;p>由于Cutter是Radare2的GUI化程序，因此只需要下载Cutter即可&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>本次测试系统：macOS Catalina 10.15.7&lt;/li>
+&lt;li>Github下载链接：&lt;a class="link" href="https://github.com/radareorg/cutter/releases" target="_blank" rel="noopener"
+>github.com/radareorg/cutter/releases&lt;/a>&lt;/li>
+&lt;li>Moeomu网盘下载链接(可能不是最新)：&lt;a class="link" href="https://pan.moeomu.com/Software/macOS/Tools-Reverse_Pwn/Cutter-v1.12.0-x64.macOS.dmg" target="_blank" rel="noopener"
+>Cutter-v1.12.0-x64.dmg&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="macos-catalina无法运行cutter的原因">macOS Catalina无法运行Cutter的原因&lt;/h2>
+&lt;blockquote>
+&lt;p>不知道Windows怎么样，反正在macOS Catalina上安装后无法正常运行，解决方法如下&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>找出无法正常运行的原因&lt;/li>
+&lt;li>进入Cutter的文件夹：&lt;code>cd /Applications/Cutter.app/Contents/MacOS/&lt;/code>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder.png"
+width="637"
+height="152"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="CD-Cutter-Folder"
+class="gallery-image"
+data-flex-grow="419"
+data-flex-basis="1005px"
+>&lt;/li>
+&lt;li>直接运行Cutter查看原因：&lt;code>./Cutter&lt;/code>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder.png"
+width="637"
+height="152"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Cutter-Error-Message"
+class="gallery-image"
+data-flex-grow="419"
+data-flex-basis="1005px"
+>&lt;/li>
+&lt;li>安装&lt;code>gettext&lt;/code>解决问题：&lt;code>brew install gettext&lt;/code>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/install-gettext.png"
+width="889"
+height="131"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="install-gettext"
+class="gallery-image"
+data-flex-grow="678"
+data-flex-basis="1628px"
+>&lt;/li>
+&lt;/ul></description></item></channel></rss>

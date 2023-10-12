@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Brewcask on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/brewcask/</link><description>Recent content in Brewcask on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 10 Nov 2020 19:43:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/brewcask/index.xml" rel="self" type="application/rss+xml"/><item><title>Homebrew and Brewcask installation</title><link>https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/</guid><description>&lt;p>Please note the timeliness:&lt;strong>This article was written on 2020/11/10&lt;/strong>&amp;amp;&amp;amp;&lt;strong>This article was updated on 2021/07/02&lt;/strong>&lt;/p>
+&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="install-git">Install git&lt;/h2>
+&lt;ul>
+&lt;li>Method 1: Install XCode Terminal:&lt;code>xcode-select --install&lt;/code>&lt;/li>
+&lt;li>Method 2: Go directly to the git website and download the macOS installer for git&lt;/li>
+&lt;/ul>
+&lt;h2 id="install-homebrew">Install HomeBrew&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>First download the original &lt;a class="link" href="https://cdn.jsdelivr.net/gh/Homebrew/install@master/install.sh" target="_blank" rel="noopener"
+>installer.sh&lt;/a> jsDelivr CDN image&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run it by entering the following command.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/homebrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/homebrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/linuxbrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/linuxbrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/brew.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/brew&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod +x install.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">HOMEBREW_BOTTLE_DOMAIN&lt;/span>&lt;span class="o">=&lt;/span>https://mirrors.ustc.edu.cn/homebrew-bottles ./install.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Cloning the Homebrew-Cask project via USTC&amp;rsquo;s git repository&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>cd /usr/local/Homebrew/Library/Taps/homebrew&lt;/code>&lt;/li>
+&lt;li>&lt;code>git clone https://mirrors.ustc.edu.cn/homebrew-cask.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="check-source-configuration">Check source configuration&lt;/h2>
+&lt;ul>
+&lt;li>Checking the brew mirror source: &lt;code>git -C &amp;quot;$(brew --repo)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>View homebrew-core mirror source: &lt;code>git -C &amp;quot;$(brew --repo homebrew/core)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>View homebrew-cask mirror sources: &lt;code>git -C &amp;quot;$(brew --repo homebrew/cask)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>The qualifying criteria is that the addresses of these sources are all USTC URLs&lt;/li>
+&lt;/ul>
+&lt;h2 id="update">Update&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>brew update&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="install-oh-my-zsh-not-required">Install Oh-My-Zsh (not required)&lt;/h2>
+&lt;ul>
+&lt;li>Update zsh: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>git clone oh-my-zsh project: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>Rename the project: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Copy the template to the home directory named .zshrc: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;li>Exit Terminal, start Terminal, success&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-terminal-not-required">Configure Terminal (not required)&lt;/h2>
+&lt;ul>
+&lt;li>Preferences-On startup, open-New window with description file-Homebrew&lt;/li>
+&lt;li>Preferences-Description File-Homebrew-Text-Font-14 points&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-terminal-agent-not-required">Configure Terminal agent (not required)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

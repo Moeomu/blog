@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>macOS on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/macos/</link><description>Recent content in macOS on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 12 Oct 2021 19:22:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/macos/index.xml" rel="self" type="application/rss+xml"/><item><title>虚拟机硬件加速导致的Electron应用白屏的问题</title><link>https://blog.moeomu.com/zh-cn/posts/%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A1%AC%E4%BB%B6%E5%8A%A0%E9%80%9F%E5%AF%BC%E8%87%B4%E7%9A%84electron%E5%BA%94%E7%94%A8%E7%99%BD%E5%B1%8F%E7%9A%84%E9%97%AE%E9%A2%98/</link><pubDate>Tue, 12 Oct 2021 19:22:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A1%AC%E4%BB%B6%E5%8A%A0%E9%80%9F%E5%AF%BC%E8%87%B4%E7%9A%84electron%E5%BA%94%E7%94%A8%E7%99%BD%E5%B1%8F%E7%9A%84%E9%97%AE%E9%A2%98/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e8%99%9a%e6%8b%9f%e6%9c%ba%e7%a1%ac%e4%bb%b6%e5%8a%a0%e9%80%9f%e5%af%bc%e8%87%b4%e7%9a%84electron%e5%ba%94%e7%94%a8%e7%99%bd%e5%b1%8f%e7%9a%84%e9%97%ae%e9%a2%98/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="问题再现">问题再现&lt;/h2>
+&lt;ul>
+&lt;li>可重现：是&lt;/li>
+&lt;li>主机系统：macOS BigSur 11.6&lt;/li>
+&lt;li>虚拟机系统：Ubuntu Desktop 20.04.3&lt;/li>
+&lt;li>Parallels虚拟机版本：17.0.1&lt;/li>
+&lt;li>问题描述：虚拟机系统在安装或者运行基于NodeJS尤其是Electron的应用后，应用会出现占据1/4的白色屏幕且3/4黑屏的异常显示情况，无法正常使用&lt;/li>
+&lt;li>故障典型应用：
+&lt;ul>
+&lt;li>VSCode&lt;/li>
+&lt;li>Motrix&lt;/li>
+&lt;li>Typora&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/WvksDr9PTQFi3ut.png"
+loading="lazy"
+alt="vscode"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/bRWZPJSQqjhFUNG.png"
+loading="lazy"
+alt="typora"
+>&lt;/p>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;h3 id="方案一">方案一&lt;/h3>
+&lt;p>给每一个Electron应用添加启动时参数&lt;code>--disable-gpu&lt;/code>&lt;/p>
+&lt;blockquote>
+&lt;p>补充：可以在桌面建立一个快捷方式实现，以vscode为例，内容如下&lt;/p>
+&lt;p>code.desktop&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Entry&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>Visual Studio Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Comment&lt;/span>&lt;span class="o">=&lt;/span>Code Editing. Redefined.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">GenericName&lt;/span>&lt;span class="o">=&lt;/span>Text Editor
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --unity-launch %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Type&lt;/span>&lt;span class="o">=&lt;/span>Application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupNotify&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupWMClass&lt;/span>&lt;span class="o">=&lt;/span>Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Categories&lt;/span>&lt;span class="o">=&lt;/span>Utility&lt;span class="p">;&lt;/span>TextEditor&lt;span class="p">;&lt;/span>Development&lt;span class="p">;&lt;/span>IDE&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">MimeType&lt;/span>&lt;span class="o">=&lt;/span>text/plain&lt;span class="p">;&lt;/span>inode/directory&lt;span class="p">;&lt;/span>application/x-code-workspace&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Actions&lt;/span>&lt;span class="o">=&lt;/span>new-empty-window&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Keywords&lt;/span>&lt;span class="o">=&lt;/span>vscode&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Desktop-File-Install-Version&lt;span class="o">=&lt;/span>0.24
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Action new-empty-window&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>New Empty Window
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --new-window %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="方案二">方案二&lt;/h3>
+&lt;p>关闭Parallels/其他虚拟化软件-此虚拟机的图形-硬件加速功能，如下图所示&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/vSLmaJbtXiBd3xR.png"
+loading="lazy"
+alt="close"
+>&lt;/p>
+&lt;h2 id="其他信息">其他信息&lt;/h2>
+&lt;p>Electron的官方开发人员在&lt;a class="link" href="https://github.com/electron/electron/issues/5257#issuecomment-213890151" target="_blank" rel="noopener"
+>Github&lt;/a>上提到&lt;/p>
+&lt;blockquote>
+&lt;p>You can probably disable GPU acceleration to work around this, or just use another visual machine software. Basically the GPU acceleration of Linux in virtual machines is a mess, depending on the software of visual machine, the version and distribution of Linux, and the version of Chromium, you can get various results and bugs.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Linux的虚拟机硬件加速一团糟，因此出现这个情况是正常的&lt;/li>
+&lt;/ul></description></item><item><title>macOS关闭内置屏幕</title><link>https://blog.moeomu.com/zh-cn/posts/macos%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E5%B1%8F%E5%B9%95/</link><pubDate>Thu, 16 Sep 2021 17:00:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/macos%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E5%B1%8F%E5%B9%95/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/macos%e5%85%b3%e9%97%ad%e5%86%85%e7%bd%ae%e5%b1%8f%e5%b9%95/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="磁铁大法">磁铁大法&lt;/h2>
+&lt;p>寻找两块磁铁，放置在 MacBook的音响附近的位置，欺骗系统合盖检测从而实现关闭内置屏幕&lt;/p>
+&lt;h2 id="nvram启动设置法">NVRAM启动设置法&lt;/h2>
+&lt;blockquote>
+&lt;p>此方法从驱动层面实现了将画面单独显示在外接屏幕上&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="启用">启用&lt;/h3>
+&lt;ul>
+&lt;li>重新启动，按着&lt;code>Command+R&lt;/code>按键不放&lt;/li>
+&lt;li>输入密码进入启动设置-终端&lt;/li>
+&lt;li>输入命令&lt;code>nvram boot-args=&amp;quot;niog=1&amp;quot;&lt;/code>&lt;/li>
+&lt;li>连接外接显示器，连接电源，重新启动&lt;/li>
+&lt;li>启动后输入用户密码立刻合盖，随后看到外接屏有画面，打开MacBook的盖子，成功&lt;/li>
+&lt;/ul>
+&lt;h3 id="还原">还原&lt;/h3>
+&lt;ul>
+&lt;li>重新启动，按着&lt;code>Command+R&lt;/code>按键不放&lt;/li>
+&lt;li>输入密码进入启动设置-终端&lt;/li>
+&lt;li>输入命令&lt;code>nvram -d boot-args&lt;/code>&lt;/li>
+&lt;li>重新启动&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsTools高版本Kali报错</title><link>https://blog.moeomu.com/zh-cn/posts/parallelstools%E9%AB%98%E7%89%88%E6%9C%ACkali%E6%8A%A5%E9%94%99/</link><pubDate>Tue, 06 Jul 2021 15:55:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/parallelstools%E9%AB%98%E7%89%88%E6%9C%ACkali%E6%8A%A5%E9%94%99/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/parallelstools%e9%ab%98%e7%89%88%e6%9c%ackali%e6%8a%a5%e9%94%99/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="首先更新kali源">首先更新kali源&lt;/h2>
+&lt;ul>
+&lt;li>阿里云源如下&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="报错内容">报错内容&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">An error occurred &lt;span class="k">while&lt;/span> installing the following packages:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- libelf-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- linux-headers-5.10.0-kali9-amd64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Install these packages manually and start the Parallels Tools installation again.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;ul>
+&lt;li>安装缺失的包&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt intall libelf-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>坑点记录：&lt;br>
+Kali 2021默认的&lt;code>xfce&lt;/code>桌面环境会导致安装ParallelsTools后白屏，所以要事先将桌面环境切换为&lt;code>gnome&lt;/code>或者在安装kali的时候就取消选择&lt;code>xface&lt;/code>，选中&lt;code>gnome&lt;/code>&lt;/p>
+&lt;/blockquote></description></item><item><title>macOS下使用GPG为Git Commit签名</title><link>https://blog.moeomu.com/zh-cn/posts/macos%E4%B8%8B%E4%BD%BF%E7%94%A8gpg%E4%B8%BAgit-commit%E7%AD%BE%E5%90%8D/</link><pubDate>Tue, 25 May 2021 07:55:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/macos%E4%B8%8B%E4%BD%BF%E7%94%A8gpg%E4%B8%BAgit-commit%E7%AD%BE%E5%90%8D/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/macos%e4%b8%8b%e4%bd%bf%e7%94%a8gpg%e4%b8%bagit-commit%e7%ad%be%e5%90%8d/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="关于github-gpg密钥验证">关于GitHub GPG密钥验证&lt;/h2>
+&lt;h3 id="开启commit签名">开启Commit签名&lt;/h3>
+&lt;p>GitHub有个新的“警惕模式”，启用后GPG密钥需要签名认证的commit才会显示“Verity”，启用方法如下&lt;/p>
+&lt;ul>
+&lt;li>首先创建GPG密钥（&lt;a class="link" href="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/generating-a-new-gpg-key" target="_blank" rel="noopener"
+>GitHub官方Docs&lt;/a>有详细方法，不再赘述）&lt;/li>
+&lt;li>列出GPG密钥的特征码：&lt;code>gpg -K --keyid-format LONG&lt;/code>，将&lt;strong>keyid&lt;/strong>记录&lt;/li>
+&lt;li>告知git使用此GPG密钥：&lt;code>git config user.signingkey your_keyid&lt;/code>&lt;/li>
+&lt;li>本地git的用户名和邮箱需要和GPG密钥生成时填入的相同：&lt;code>git config user.name name&lt;/code>，&lt;code>git config user.email email&lt;/code>&lt;/li>
+&lt;li>启用本地git的Commit签名：&lt;code>git config commit.gpgsign true&lt;/code>&lt;/li>
+&lt;li>Commit签名加入-S选项：&lt;code>git commit -S -m message&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="发生致命错误-无法commit-macos">发生致命错误-无法Commit-macOS&lt;/h3>
+&lt;h4 id="问题如下复现于macos-1131中">问题如下，复现于macOS 11.3.1中&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">error: gpg failed to sign the data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">fatal: failed to write commit object
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="macos中的解决办法">macOS中的解决办法&lt;/h4>
+&lt;ul>
+&lt;li>更新&amp;amp;安装&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew upgrade gnupg &lt;span class="c1"># This has a make step which takes a while&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew link --overwrite gnupg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install pinentry-mac
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;pinentry-program /usr/local/bin/pinentry-mac&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.gnupg/gpg-agent.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">killall gpg-agent
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global gpg.program gpg &lt;span class="c1"># perhaps you had this already? On linux maybe gpg2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global commit.gpgsign &lt;span class="nb">true&lt;/span> &lt;span class="c1"># if you want to sign every commit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>再次签名&lt;/li>
+&lt;li>查看commit状态：&lt;code>git log --show-signature -1&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsDesktop16 修复网络</title><link>https://blog.moeomu.com/zh-cn/posts/parallelsdesktop16-%E4%BF%AE%E5%A4%8D%E7%BD%91%E7%BB%9C/</link><pubDate>Wed, 16 Dec 2020 13:42:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/parallelsdesktop16-%E4%BF%AE%E5%A4%8D%E7%BD%91%E7%BB%9C/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/parallelsdesktop16-%e4%bf%ae%e5%a4%8d%e7%bd%91%e7%bb%9c/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="前奏">前奏&lt;/h2>
+&lt;ul>
+&lt;li>在macOS Big Sur下可以使用&lt;/li>
+&lt;li>之前是使用命令启动的不完美解决办法，还会导致一系列权限问题，现在终于完美了&lt;/li>
+&lt;/ul>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;ul>
+&lt;li>最高权限编辑文件&lt;code>/Library/Preferences/Parallels/network.desktop.xml&lt;/code>&lt;/li>
+&lt;li>将&lt;code>UseKextless&lt;/code>字段的值从&lt;code>-1&lt;/code>改为&lt;code>0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>注意：这个值可能并不是所有人-1，也可能并不是所有人改为0都行，勇于尝试嘛&lt;/p>
+&lt;/blockquote></description></item><item><title>macOS-pkg文件逆向解析</title><link>https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/</link><pubDate>Tue, 24 Nov 2020 12:56:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/macos-pkg%e6%96%87%e4%bb%b6%e9%80%86%e5%90%91%e8%a7%a3%e6%9e%90/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="起因">起因&lt;/h2>
+&lt;p>ed2k链接没法用motrix下载，准备去下载一个迅雷的精简版，突然发现找出来的是pkg安装包，引起了我的兴趣&lt;/p>
+&lt;h2 id="经过">经过&lt;/h2>
+&lt;h3 id="解包">解包&lt;/h3>
+&lt;ul>
+&lt;li>一直以来都很奇怪pkg究竟运行了哪些东西，又干了什么，因此开始第一步，解包&lt;/li>
+&lt;li>解包只需要一条命令即可：&lt;code>pkgutil --expand 需要解包的pkg.pkg 自定义解包文件夹名&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="查看">查看&lt;/h3>
+&lt;ul>
+&lt;li>发现有个Res文件，没有后缀，用file查看一下格式发现它被压缩了，索性unar指令解压，出来一个同名文件，但是大小变大了&lt;/li>
+&lt;li>在finder中右键-打开方式-归档实用工具-app被直接解压出来&lt;/li>
+&lt;li>将此app拖入/Application中，发现可以直接使用，就此完成任务&lt;/li>
+&lt;li>看了看其它文件，有个用于打开网页的Unix可执行文件，大概就是推广，没有流氓行为&lt;/li>
+&lt;/ul>
+&lt;h2 id="结果">结果&lt;/h2>
+&lt;ul>
+&lt;li>完成任务&lt;/li>
+&lt;/ul>
+&lt;h2 id="追加">追加&lt;/h2>
+&lt;h3 id="ios-app-安装器的探索">iOS app 安装器的探索&lt;/h3>
+&lt;ul>
+&lt;li>更新了BigSur系统后，发现系统中存在&lt;code>iOS app 安装器&lt;/code>这么个东西，但是无法运行，遂探索了一番&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/System.png"
+width="698"
+height="444"
+srcset="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/System_hu1723c87326acaa09803205f4af5ea488_142422_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/System_hu1723c87326acaa09803205f4af5ea488_142422_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="系统"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>&lt;/p>
+&lt;ul>
+&lt;li>查看此软件位置，顺便看看种类，很好，通用，意味着可能以后会支持Intel？&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/locate.png"
+width="1015"
+height="714"
+srcset="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/locate_hu8e3f40d9df7aabcf533074ca7dd16b08_261770_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/locate_hu8e3f40d9df7aabcf533074ca7dd16b08_261770_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Locate"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="341px"
+>&lt;/p>
+&lt;ul>
+&lt;li>打开Terminal，进入此文件夹，运行软件，报错，提示需要依赖文件，如图&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/2.png"
+width="1017"
+height="773"
+srcset="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/2_hu138e5b67613118e6da8b5c4a82a21cc0_178049_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/2_hu138e5b67613118e6da8b5c4a82a21cc0_178049_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="2"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="315px"
+>&lt;/p>
+&lt;ul>
+&lt;li>找到依赖文件所在位置，发现貌似没有东西，原因可能是仅提供ARM版本的依赖程序&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/3.png"
+width="1017"
+height="773"
+srcset="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/3_hu1bfda4401b2d5aed3657dd62ff969cbc_138990_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/3_hu1bfda4401b2d5aed3657dd62ff969cbc_138990_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="3"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="315px"
+>&lt;/p>
+&lt;h3 id="parallels-desktop-无法联网解决办法">Parallels Desktop 无法联网解决办法&lt;/h3>
+&lt;ul>
+&lt;li>依旧是BigSur的问题，PD16又不能联网了，无奈找了个折中的解决办法&lt;/li>
+&lt;li>运行命令&lt;code>sudo -b /Applications/Parallels\ Desktop.app/Contents/MacOS/prl_client_app&lt;/code>后将会打开PD16，这样就能联网了&lt;/li>
+&lt;li>这条命令的意思是将此程序以管理员权限运行，但是其实应该是BigSur再次收紧了权限，导致PD16破解出问题&lt;/li>
+&lt;li>可以将这条命令写入.command文件中放在桌面，这样双击打开也可&lt;/li>
+&lt;/ul>
+&lt;h3 id="ls--l的符号问题">ls -l的@符号问题&lt;/h3>
+&lt;ul>
+&lt;li>最近发现有的文件夹/文件会出现@符号的标识，有些奇怪这是什么意思，就简单探究了一下&lt;/li>
+&lt;li>由于此现象是ls程序出现的，因此问问系统的说明文档，命令&lt;code>man ls&lt;/code>&lt;/li>
+&lt;li>很快啊，啪的一下就出来了，如图&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/man-ls.png"
+width="1017"
+height="773"
+srcset="https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/man-ls_hu5bdc2da4a7cca823f76be9b81b532952_188342_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/man-ls_hu5bdc2da4a7cca823f76be9b81b532952_188342_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="man-ls"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="315px"
+>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-s" data-lang="s">&lt;span class="line">&lt;span class="cl">&lt;span class="o">-@&lt;/span> 在&lt;span class="nf">long&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">l&lt;/span>&lt;span class="p">)&lt;/span>输出中显示扩展的属性键和大小。
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>非常明了了，就是指的是这种文件/文件夹存在扩展属性，而此属性可以使用&lt;code>xattr -l&lt;/code>命令查看&lt;/li>
+&lt;li>这种属性也可以使用&lt;code>xattr -c&lt;/code>完全清理掉&lt;/li>
+&lt;/ul></description></item><item><title>Homebrew和Brewcask的安装</title><link>https://blog.moeomu.com/zh-cn/posts/homebrew%E5%92%8Cbrewcask%E7%9A%84%E5%AE%89%E8%A3%85/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/homebrew%E5%92%8Cbrewcask%E7%9A%84%E5%AE%89%E8%A3%85/</guid><description>&lt;p>大家请注意时效性：&lt;strong>本文写于2020/11/10&lt;/strong>&amp;amp;&amp;amp;&lt;strong>本文更新于2021/07/02&lt;/strong>&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/homebrew%e5%92%8cbrewcask%e7%9a%84%e5%ae%89%e8%a3%85/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装git">安装git&lt;/h2>
+&lt;ul>
+&lt;li>方法一：安装XCode Terminal:&lt;code>xcode-select --install&lt;/code>&lt;/li>
+&lt;li>方法二：直接去git网站下载git的macOS安装包&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装homebrew">安装HomeBrew&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>首先下载原版&lt;a class="link" href="https://cdn.jsdelivr.net/gh/Homebrew/install@master/install.sh" target="_blank" rel="noopener"
+>installer.sh&lt;/a>的jsDelivr CDN镜像&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>输入下列指令运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/homebrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/homebrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/linuxbrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/linuxbrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/brew.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/brew&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod +x install.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">HOMEBREW_BOTTLE_DOMAIN&lt;/span>&lt;span class="o">=&lt;/span>https://mirrors.ustc.edu.cn/homebrew-bottles ./install.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>通过USTC的git源克隆Homebrew-Cask项目&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>cd /usr/local/Homebrew/Library/Taps/homebrew&lt;/code>&lt;/li>
+&lt;li>&lt;code>git clone https://mirrors.ustc.edu.cn/homebrew-cask.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="检查源配置">检查源配置&lt;/h2>
+&lt;ul>
+&lt;li>查看brew镜像源：&lt;code>git -C &amp;quot;$(brew --repo)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>查看homebrew-core镜像源：&lt;code>git -C &amp;quot;$(brew --repo homebrew/core)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>查看homebrew-cask镜像源：&lt;code>git -C &amp;quot;$(brew --repo homebrew/cask)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>合格的标准是这些源的地址全是USTC的网址&lt;/li>
+&lt;/ul>
+&lt;h2 id="update">Update&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>brew update&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装oh-my-zsh非必须">安装Oh-My-Zsh(非必须)&lt;/h2>
+&lt;ul>
+&lt;li>更新zsh：&lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>git克隆oh-my-zsh项目：&lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>重命名项目：&lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>将模版复制到home目录下命名为.zshrc：&lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;li>退出Terminal，启动Terminal，成功&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置terminal非必须">配置Terminal(非必须)&lt;/h2>
+&lt;ul>
+&lt;li>偏好设置-启动时，打开-使用描述文件新建窗口-Homebrew&lt;/li>
+&lt;li>偏好设置-描述文件-Homebrew-文本-字体-14点&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置terminal代理非必须">配置Terminal代理(非必须)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>OhMyZsh安装指南</title><link>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/ohmyzsh%e5%ae%89%e8%a3%85%e6%8c%87%e5%8d%97/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装zsh">安装zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="克隆git仓库clone-git-repo">克隆Git仓库(clone git repo)&lt;/h2>
+&lt;ul>
+&lt;li>中国大陆: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>世界: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置zshconfig">配置zsh(config)&lt;/h2>
+&lt;h3 id="设置为默认shellset-default-shell">设置为默认shell(set default shell)&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="自动补全插件auto-suggestions-plugin">自动补全插件(auto suggestions plugin)&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

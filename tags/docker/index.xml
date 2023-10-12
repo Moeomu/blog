@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/docker/</link><description>Recent content in Docker on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 24 Oct 2022 22:03:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>Deploying Docker services on a VPS</title><link>https://blog.moeomu.com/posts/deploying-docker-services-on-a-vps/</link><pubDate>Mon, 24 Oct 2022 22:03:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/deploying-docker-services-on-a-vps/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-2908894140.26d7gclffj8g.webp" alt="Featured image of post Deploying Docker services on a VPS" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/deploying-docker-services-on-a-vps/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="pre-introduction">Pre Introduction&lt;/h2>
+&lt;ul>
+&lt;li>There are some open source services that I really want to experience, but can not be deployed on a service like Paas, or can be deployed but can not persistently store some files. So not long ago, I bought a VPS, considering the security of the use of Docker to deploy all services, and the local reverse proxy using Caddy, and Caddy through the Cloudflare API automatically from the Cloudflare CDN protected DNS resolution under the acquisition and renewal of HTTPS certificates. The following is the entire process of deploying my service, if there are errors and omissions please be sure to point out.&lt;/li>
+&lt;li>This article will not go into detail to each command, but describe a general idea of the framework for building.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Warning: If you ignore the advice to read the official documentation in specific paragraphs of this article and execute the next commands directly, there is a high probability that you will make a mistake. At this point, you can go through the official documentation mentioned in that paragraph, or ask questions in the comments section of this article.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="create-docker-basic-service-framework">Create Docker basic service framework&lt;/h2>
+&lt;h3 id="create-a-user">Create a user&lt;/h3>
+&lt;ol>
+&lt;li>
+&lt;p>Run the following command&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl"> useradd -m mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> usermod -s /bin/bash mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> su mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> curl -fsSL https://get.docker.com/rootless &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Follow Docker&amp;rsquo;s official &lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>Run the Docker daemon as a non-root user (Rootless mode) - Docker Document&lt;/a> guide Configure the configuration items you want&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="create-a-docker-network">Create a Docker network&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>docker network create caddy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="deploy-the-web-service">Deploy the web service&lt;/h3>
+&lt;h3 id="deploy-the-alist-service">Deploy the Alist service&lt;/h3>
+&lt;blockquote>
+&lt;p>Alist&amp;rsquo;s Github open source address: &lt;a class="link" href="https://github.com/alist-org/alist" target="_blank" rel="noopener"
+>alist - Github&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Alist deployment commands
+&lt;ul>
+&lt;li>&lt;code>-d&lt;/code> means run in the background&lt;/li>
+&lt;li>&lt;code>--name&lt;/code> specifies the name of this Docker service&lt;/li>
+&lt;li>&lt;code>-p host port:container port&lt;/code> specifies the port to bind to&lt;/li>
+&lt;li>&lt;code>--network=caddy&lt;/code> indicates the bound Docker Network&lt;/li>
+&lt;li>&lt;code>-v host path:container path&lt;/code> specifies the location of the file to be stored permanently&lt;/li>
+&lt;li>&lt;code>--restart=always&lt;/code> indicates that the service is down for restart.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;alist&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5244:5244 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/alist:/opt/alist/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> xhofe/alist:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>More Alist reference commands
+&lt;ul>
+&lt;li>View Alist password: &lt;code>docker exec -it alist . /alist password&lt;/code>&lt;/li>
+&lt;li>View Alist logs: &lt;code>docker logs -f alist&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="deploy-whoogle-service">Deploy Whoogle service&lt;/h3>
+&lt;ul>
+&lt;li>Deploy the following commands, the details of which are not explained, and are the same as above&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name whoogle &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5000:5000 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> benbusby/whoogle-search:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="deploying-caddy">Deploying Caddy&lt;/h2>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;p>Before deploying the Caddy service using Docker, you need to create the required Caddyfile configuration file for the Caddy service to use for automatic configuration.&lt;/p>
+&lt;h3 id="caddyfile">Caddyfile&lt;/h3>
+&lt;ol>
+&lt;li>Create the permanent storage location: &lt;code>mkdir -p $HOME/docker_data/caddy/&lt;/code>&lt;/li>
+&lt;li>Create and edit the Caddyfile file: &lt;code>vim $HOME/docker_data/caddy/Caddyfile&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>Caddyfile&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Caddyfile" data-lang="Caddyfile">&lt;span class="line">&lt;span class="cl">&lt;span class="n">(site_config)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">tls&lt;/span> &lt;span class="s">me_tls@example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">dns&lt;/span> &lt;span class="s">cloudflare&lt;/span> &lt;span class="se">{env.CLOUDFLARE_API_TOKEN}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # more config
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">reverse_proxy&lt;/span> &lt;span class="se">{args.0}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">drive.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">alist:5244&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">search.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">whoogle:5000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>Additional note: The reason why &lt;code>alist:5244&lt;/code> and &lt;code>whoogle:5000&lt;/code> work and are resolved properly is that all three containers exist in the same Docker Network, so they can be resolved by container name.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="deploying-caddy-with-docker">Deploying Caddy with Docker&lt;/h3>
+&lt;ul>
+&lt;li>The deployment command is as follows, the details of the command are not explained, it is the same as above&lt;/li>
+&lt;li>The following special note is needed
+&lt;ul>
+&lt;li>&lt;code>your_cloudflare_login_email@example.com&lt;/code> replaced with your cloudflare account email&lt;/li>
+&lt;li>&lt;code>your_cloudflare_api_token&lt;/code> is replaced with your cloudflare api token, you can follow &lt;a class="link" href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/" target="_blank" rel="noopener"
+>Create an API token - Cloudflare Docs&lt;/a> guide to get your api token, note that when creating it here you must select &lt;code>Zone / DNS / Edit&lt;/code> and &lt;code>Zone / Zone / Read&lt;/code> permissions&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;caddy&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 443:443 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/Caddyfile:/etc/caddy/Caddyfile &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/data:/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/config:/config &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_EMAIL&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_login_email@example.com &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_API_TOKEN&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_api_token &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">ACME_AGREE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> slothcroissant/caddy-cloudflaredns:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="reference">Reference&lt;/h2>
+&lt;ul>
+&lt;li>Run the Docker daemon as a non-root user (Rootless mode). (2022, September 22). Docker Documentation. &lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>https://docs.docker.com/engine/security/rootless/&lt;/a>&lt;/li>
+&lt;li>Docker Hub. (n.d.). Hub.docker.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns" target="_blank" rel="noopener"
+>https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns&lt;/a>&lt;/li>
+&lt;li>Unrecognized directive: dns. (2020, May 14). Caddy Community. &lt;a class="link" href="https://caddy.community/t/unrecognized-directive-dns/8149/9" target="_blank" rel="noopener"
+>https://caddy.community/t/unrecognized-directive-dns/8149/9&lt;/a>&lt;/li>
+&lt;li>Server, C. W. (n.d.). Caddyfile Concepts - Caddy Documentation. Caddyserver.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://caddyserver.com/docs/caddyfile/concepts" target="_blank" rel="noopener"
+>https://caddyserver.com/docs/caddyfile/concepts&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/page/</link><description>Recent content in Pages on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://blog.moeomu.com/page/index.xml" rel="self" type="application/rss+xml"/><item><title>Archives</title><link>https://blog.moeomu.com/archives/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://blog.moeomu.com/archives/</guid><description/></item><item><title>About</title><link>https://blog.moeomu.com/about/</link><pubDate>Sat, 10 Oct 2020 16:27:00 +0800</pubDate><guid>https://blog.moeomu.com/about/</guid><description>&lt;blockquote>
+&lt;p>First of all, welcome to Misaka&amp;rsquo;s blog. The &lt;code>master brance&lt;/code> of &lt;a class="link" href="https://github.com/Misakaou/blog" target="_blank" rel="noopener"
+>this project&lt;/a> is a build source file for the &lt;a class="link" href="https://blog.moeomu.com" target="_blank" rel="noopener"
+>https://blog.moeomu.com&lt;/a> site, built using &lt;a class="link" href="https://vercel.com/" target="_blank" rel="noopener"
+>Vercel&lt;/a>. Again, welcome to this site.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="site-introduction">Site Introduction&lt;/h2>
+&lt;ul>
+&lt;li>The basic content of this blog is my own learning notes, and occasionally I will share my journey&lt;/li>
+&lt;li>This blog is built from &lt;a class="link" href="https://gohugo.io/" target="_blank" rel="noopener"
+>Hugo&lt;/a>, the theme is &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener"
+>Stack&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="personal-tags">Personal Tags&lt;/h2>
+&lt;ul>
+&lt;li>Like code, the more the bottom the more I like&lt;/li>
+&lt;li>Like Japanese anime&lt;/li>
+&lt;li>Loves music&lt;/li>
+&lt;li>Not good at almost any game&lt;/li>
+&lt;/ul>
+&lt;h2 id="contact-me">Contact me&lt;/h2>
+&lt;ul>
+&lt;li>Personal Email (recommended): &lt;a class="link" href="mailto:misakaou@outlook.com" >misakaou@outlook.com&lt;/a> &lt;a class="link" href="https://keybase.io/misakao/pgp_keys.asc?fingerprint=4364fcb36f8a04364bde526b0e3f0fa20d1716d6" target="_blank" rel="noopener"
+>(PGP Key)&lt;/a>&lt;/li>
+&lt;li>Feedback Email: &lt;a class="link" href="mailto:feedback@moeomu.com" >feedback@moeomu.com&lt;/a> &lt;a class="link" href="https://keybase.io/misakao/pgp_keys.asc?fingerprint=3a4c42edbf0dccac73b9b4644bf809a49a630cd2" target="_blank" rel="noopener"
+>(PGP Key)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="build-status">Build Status&lt;/h2>
+&lt;p>&lt;img src="https://github.com/Misakaou/blog/actions/workflows/deploy.yml/badge.svg"
+loading="lazy"
+alt="Deploy to Github Pages"
+>
+&lt;img src="https://github.com/Misakaou/blog/actions/workflows/pages/pages-build-deployment/badge.svg"
+loading="lazy"
+alt="pages-build-deployment"
+>&lt;/p></description></item><item><title>Comment</title><link>https://blog.moeomu.com/comment/</link><pubDate>Sat, 10 Oct 2020 16:27:00 +0800</pubDate><guid>https://blog.moeomu.com/comment/</guid><description/></item><item><title>Links</title><link>https://blog.moeomu.com/links/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.moeomu.com/links/</guid><description/></item><item><title>Search</title><link>https://blog.moeomu.com/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://blog.moeomu.com/search/</guid><description/></item></channel></rss>

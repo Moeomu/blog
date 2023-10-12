@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ubuntu on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/ubuntu/</link><description>Recent content in Ubuntu on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 20 Oct 2022 13:22:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/ubuntu/index.xml" rel="self" type="application/rss+xml"/><item><title>在ROG枪神4上安装Ubuntu遇到的问题和解决办法</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8rog%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85ubuntu%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link><pubDate>Thu, 20 Oct 2022 13:22:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8rog%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85ubuntu%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp" alt="Featured image of post 在ROG枪神4上安装Ubuntu遇到的问题和解决办法" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8rog%e6%9e%aa%e7%a5%9e4%e4%b8%8a%e5%ae%89%e8%a3%85ubuntu%e9%81%87%e5%88%b0%e7%9a%84%e9%97%ae%e9%a2%98%e5%92%8c%e8%a7%a3%e5%86%b3%e5%8a%9e%e6%b3%95/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="声音的问题">声音的问题&lt;/h2>
+&lt;h3 id="问题一没有声音">问题一：没有声音&lt;/h3>
+&lt;ol>
+&lt;li>编辑文件：&lt;code>/etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;li>在这个文件的末尾添加一行：&lt;code>options snd-hda-intel model=asus-zenbook&lt;/code>&lt;/li>
+&lt;li>重新启动系统&lt;/li>
+&lt;/ol>
+&lt;h3 id="问题二声音无法调整">问题二：声音无法调整&lt;/h3>
+&lt;blockquote>
+&lt;p>描述：主声音不可调整，只能是静音或者最大声音。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>编辑文件：&lt;code>/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在&lt;code>[Element PCM]&lt;/code>的前面添加以下内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[Element Master]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">switch = mute
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">volume = ignore
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>关闭pulse音频守护进程，它将被systemd自动重新启动：&lt;code>pulseaudio -k&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>注意：请勿以root身份运行pulseaudio，否则将无法正常关闭守护进程。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="睡眠问题">睡眠问题&lt;/h2>
+&lt;h3 id="锁定屏幕后无法再次唤醒">锁定屏幕后无法再次唤醒&lt;/h3>
+&lt;blockquote>
+&lt;p>描述：锁定屏幕后，计算机不能再次唤醒。硬盘和其他硬件工作正常，但屏幕全黑。&lt;/p>
+&lt;/blockquote>
+&lt;ol>
+&lt;li>安装laptop-mod-tools：&lt;code>sudo apt install laptop-mod-tools&lt;/code>&lt;/li>
+&lt;li>启动laptop-mod-tools：&lt;code>sudo laptop_mode start&lt;/code>&lt;/li>
+&lt;li>添加mutter debug环境变量，编辑文件：&lt;code>/etc/environment&lt;/code>
+&lt;ul>
+&lt;li>如果是Ubuntu 22.04: &lt;code>MUTTER_DEBUG_ENABLE_ATOMIC_KMS=0&lt;/code>&lt;/li>
+&lt;li>如果是Ubuntu 22.10及以后版本：&lt;code>MUTTER_DEBUG_FORCE_KMS_MODE=simple&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>重新启动系统&lt;/li>
+&lt;/ol>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://askubuntu.com/questions/1288054/snd-hda-intel-model-for-ubuntu-20-04-installed-in-an-asus-rog-strix-g15-g512" target="_blank" rel="noopener"
+>snd-hda-intel model for UBUNTU 20.04 installed in an ASUS ROG STRIX G15 (G512) - AskUbuntu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntuforums.org/showthread.php?t=2414755" target="_blank" rel="noopener"
+>Volume either muted or maxed out, nothing in between - ubuntu forums&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bugs.launchpad.net/ubuntu/&amp;#43;source/mutter/&amp;#43;bug/1968040" target="_blank" rel="noopener"
+>Blanked screen doesn&amp;rsquo;t wake up after locking - Launchpad&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

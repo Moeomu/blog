@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Docker on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/docker/</link><description>Recent content in Docker on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 24 Oct 2022 22:03:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/docker/index.xml" rel="self" type="application/rss+xml"/><item><title>在一台VPS上部署Docker服务</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E4%B8%80%E5%8F%B0vps%E4%B8%8A%E9%83%A8%E7%BD%B2docker%E6%9C%8D%E5%8A%A1/</link><pubDate>Mon, 24 Oct 2022 22:03:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E4%B8%80%E5%8F%B0vps%E4%B8%8A%E9%83%A8%E7%BD%B2docker%E6%9C%8D%E5%8A%A1/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-2908894140.26d7gclffj8g.webp" alt="Featured image of post 在一台VPS上部署Docker服务" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8%e4%b8%80%e5%8f%b0vps%e4%b8%8a%e9%83%a8%e7%bd%b2docker%e6%9c%8d%e5%8a%a1/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="背景故事">背景故事&lt;/h2>
+&lt;ul>
+&lt;li>有一些开源的服务非常想体验一下，但是无法部署在Paas这种服务上，或者能部署但是无法持久化存储一些文件。所以不久前自己购买了一个VPS，考虑到安全性使用Docker来部署所有服务，而本地的反向代理使用Caddy，而Caddy通过Cloudflare API自动从受Cloudflare CDN保护的DNS解析下获取和续期HTTPS证书。以下是我部署服务的全部过程，如果有错误和疏漏请一定指出。&lt;/li>
+&lt;li>本文将不会详细到每一条命令，而是描述一个大体的构建框架思路。&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>警告：如果忽略本文中具体段落的阅读官方文档的建议直接执行接下来的指令，很大概率会出错。这时候可以去仔细查看那一段提到的官方文档，或者在本文的评论区提问。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="创建docker基本服务框架">创建Docker基本服务框架&lt;/h2>
+&lt;h3 id="创建用户">创建用户&lt;/h3>
+&lt;ol>
+&lt;li>
+&lt;p>运行以下命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl"> useradd -m mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> usermod -s /bin/bash mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> su mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> curl -fsSL https://get.docker.com/rootless &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>遵循Docker官方的&lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>Run the Docker daemon as a non-root user (Rootless mode) - Docker Document&lt;/a>指南将您希望的配置项配置好&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="创建docker网络">创建Docker网络&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>docker network create caddy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="部署web服务">部署Web服务&lt;/h2>
+&lt;h3 id="部署alist服务">部署Alist服务&lt;/h3>
+&lt;blockquote>
+&lt;p>Alist的Github开源地址：&lt;a class="link" href="https://github.com/alist-org/alist" target="_blank" rel="noopener"
+>alist - Github&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Alist部署指令
+&lt;ul>
+&lt;li>&lt;code>-d&lt;/code>表示在后台运行&lt;/li>
+&lt;li>&lt;code>--name&lt;/code>指定此Docker服务名称&lt;/li>
+&lt;li>&lt;code>-p 宿主机端口:容器端口&lt;/code>指定绑定的端口&lt;/li>
+&lt;li>&lt;code>--network=caddy&lt;/code>表示绑定的Docker Network&lt;/li>
+&lt;li>&lt;code>-v 宿主机路径:容器内路径&lt;/code>指定需要永久存储的文件位置&lt;/li>
+&lt;li>&lt;code>--restart=always&lt;/code>表示服务停机重启。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;alist&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5244:5244 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/alist:/opt/alist/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> xhofe/alist:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>更多Alist参考指令
+&lt;ul>
+&lt;li>查看Alist密码：&lt;code>docker exec -it alist ./alist password&lt;/code>&lt;/li>
+&lt;li>查看Alist日志：&lt;code>docker logs -f alist&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="部署whoogle服务">部署Whoogle服务&lt;/h3>
+&lt;ul>
+&lt;li>部署指令如下，指令详情不再解释，和上文雷同&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name whoogle &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5000:5000 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> benbusby/whoogle-search:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="部署caddy">部署Caddy&lt;/h2>
+&lt;h3 id="先决条件">先决条件&lt;/h3>
+&lt;p>在使用Docker部署Caddy服务之前，需要先创建所需要的Caddyfile配置文件，以供Caddy服务自动配置使用。&lt;/p>
+&lt;h3 id="caddyfile">Caddyfile&lt;/h3>
+&lt;ol>
+&lt;li>创建永久存储位置：&lt;code>mkdir -p $HOME/docker_data/caddy/&lt;/code>&lt;/li>
+&lt;li>创建并编辑Caddyfile文件：&lt;code>vim $HOME/docker_data/caddy/Caddyfile&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>Caddyfile&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Caddyfile" data-lang="Caddyfile">&lt;span class="line">&lt;span class="cl">&lt;span class="n">(site_config)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">tls&lt;/span> &lt;span class="s">me_tls@example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">dns&lt;/span> &lt;span class="s">cloudflare&lt;/span> &lt;span class="se">{env.CLOUDFLARE_API_TOKEN}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # more config
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">reverse_proxy&lt;/span> &lt;span class="se">{args.0}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">drive.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">alist:5244&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">search.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">whoogle:5000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>补充说明：&lt;code>alist:5244&lt;/code>和&lt;code>whoogle:5000&lt;/code>能正常工作并正常被解析的原因是：这三个容器都存在于同一个Docker Network中，因此可以通过容器名称进行解析。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="使用docker部署caddy">使用Docker部署Caddy&lt;/h3>
+&lt;ul>
+&lt;li>部署指令如下，指令详情不再解释，和上文雷同&lt;/li>
+&lt;li>以下需要特别注意的是
+&lt;ul>
+&lt;li>&lt;code>your_cloudflare_login_email@example.com&lt;/code>替换为你的cloudflare账号邮箱&lt;/li>
+&lt;li>&lt;code>your_cloudflare_api_token&lt;/code>替换为你的cloudflare api token，你可以遵循&lt;a class="link" href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/" target="_blank" rel="noopener"
+>Create an API token - Cloudflare Docs&lt;/a>指南获取你的api token，注意这里创建的时候一定要选择&lt;code>Zone / DNS / Edit&lt;/code>和&lt;code>Zone / Zone / Read&lt;/code>权限&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;caddy&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 443:443 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/Caddyfile:/etc/caddy/Caddyfile &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/data:/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/config:/config &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_EMAIL&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_login_email@example.com &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_API_TOKEN&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_api_token &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">ACME_AGREE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> slothcroissant/caddy-cloudflaredns:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>Run the Docker daemon as a non-root user (Rootless mode). (2022, September 22). Docker Documentation. &lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>https://docs.docker.com/engine/security/rootless/&lt;/a>&lt;/li>
+&lt;li>Docker Hub. (n.d.). Hub.docker.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns" target="_blank" rel="noopener"
+>https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns&lt;/a>&lt;/li>
+&lt;li>Unrecognized directive: dns. (2020, May 14). Caddy Community. &lt;a class="link" href="https://caddy.community/t/unrecognized-directive-dns/8149/9" target="_blank" rel="noopener"
+>https://caddy.community/t/unrecognized-directive-dns/8149/9&lt;/a>&lt;/li>
+&lt;li>Server, C. W. (n.d.). Caddyfile Concepts - Caddy Documentation. Caddyserver.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://caddyserver.com/docs/caddyfile/concepts" target="_blank" rel="noopener"
+>https://caddyserver.com/docs/caddyfile/concepts&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

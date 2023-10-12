@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kernel on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/kernel/</link><description>Recent content in Kernel on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 07 Jul 2021 11:20:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/kernel/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux内核编程学习笔记-001-编译和启动内核</title><link>https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/</link><pubDate>Wed, 07 Jul 2021 11:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/linux%e5%86%85%e6%a0%b8%e7%bc%96%e7%a8%8b%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-001-%e7%bc%96%e8%af%91%e5%92%8c%e5%90%af%e5%8a%a8%e5%86%85%e6%a0%b8/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="准备环境">准备环境&lt;/h2>
+&lt;ul>
+&lt;li>Ubuntu 20.04 LTS&lt;/li>
+&lt;li>Linux 4.9.229&lt;/li>
+&lt;li>Busybox 1.33.0&lt;/li>
+&lt;li>qemu&lt;/li>
+&lt;/ul>
+&lt;h3 id="下载内核源代码和文件系统源代码">下载内核源代码和文件系统源代码&lt;/h3>
+&lt;ul>
+&lt;li>在站点&lt;a class="link" href="https://www.kernel.org" target="_blank" rel="noopener"
+>Kernel.org&lt;/a>下载&lt;code>linux-4.9.229.tar.gz&lt;/code>&lt;/li>
+&lt;li>在站点&lt;a class="link" href="https://www.busybox.net/downloads" target="_blank" rel="noopener"
+>Busybox.net&lt;/a>下载&lt;code>busybox-1.33.0.tar.bz2&lt;/code>&lt;/li>
+&lt;li>通过apt安装qemu：&lt;code>sudo apt install qemu-system-x86&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="编译">编译&lt;/h2>
+&lt;h3 id="编译内核">编译内核&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>export ARCH=x86&lt;/code>&lt;/li>
+&lt;li>&lt;code>make x86_64_defconfig&lt;/code>&lt;/li>
+&lt;li>&lt;code>make menuconfig&lt;/code>
+&lt;ul>
+&lt;li>选中&lt;code>General Setup -&amp;gt; Initial RAM filesystem and RAM disk(initramfs/initrd) support&lt;/code>&lt;/li>
+&lt;li>选中&lt;code>Device Drivers -&amp;gt; Block devices -&amp;gt; RAM block device support&lt;/code>&lt;/li>
+&lt;li>修改&lt;code>Device Drivers -&amp;gt; Block devices -&amp;gt; RAM block device support -&amp;gt; (65536)default RAM disk size (kbytes)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>如果这一步报错&lt;code>fatal error: curses.h&lt;/code>，则安装一下&lt;code>sudo apt install libncurses5-dev&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>make&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>编译好的内核被放置在目录&lt;code>arch/x86/boot&lt;/code>下，文件名&lt;code>bzImage&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="编译busybox">编译busybox&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>make menuconfig&lt;/code>
+&lt;ul>
+&lt;li>选中&lt;code>Settings -&amp;gt; Build Options -&amp;gt; [*] Build Busybox as a static binary (no shard libs)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>make &amp;amp;&amp;amp; make install&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="打包文件系统">打包文件系统&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>mkdir etc dev mnt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p proc sys tmp&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p etc/init.d&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/fstab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">proc /proc proc defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs /tmp tmpfs defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysfs /sys sysfs defaults 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Welcome to Moeomu Linux&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/mount -a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Remounting the root filesystem&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mount -o remount rw /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">moutn -t devpts devpts /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> /sbin/mdev &amp;gt; /proc/sys/kernel/hotplug
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mdev -s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/inittab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">::sysinit:/etc/init.d/rcS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::respawn:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::askfirst:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::cttlaltdel:/bin/umount -a -r
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/inittab&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>cd dev&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod console c 5 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod null c 1 3&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod tty1 c 4 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>以下代码在busybox源码目录下逐行执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>rm -rf rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo rm -rf fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dd &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>/dev/zero &lt;span class="nv">of&lt;/span>&lt;span class="o">=&lt;/span>./rootfs.ext3 &lt;span class="nv">bs&lt;/span>&lt;span class="o">=&lt;/span>1M &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkfs.ext3 rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -o loop rootfs.ext3 ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -rf ./_install/* ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gzip --best -c rootfs.ext3 &amp;gt; rootfs.img.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>最终生成了文件系统：&lt;code>rootfs.img.gz&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="使用qemu运行系统">使用QEMU运行系统&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>qemu-system-x86_64 -kernel ./linux-4.9.229/arch/x86_64/boot/bzImage -initrd ./busybox-1.33.1/rootfs.img.gz -append &amp;quot;root=/dev/ram init=/linuxrc&amp;quot; -serial file:output.txt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>预览如下&lt;/p>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu.png"
+width="719"
+height="466"
+srcset="https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="RHildI.png"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

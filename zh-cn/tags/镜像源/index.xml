@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>镜像源 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E9%95%9C%E5%83%8F%E6%BA%90/</link><description>Recent content in 镜像源 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 27 Sep 2021 13:56:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E9%95%9C%E5%83%8F%E6%BA%90/index.xml" rel="self" type="application/rss+xml"/><item><title>NodeJS镜像源配置</title><link>https://blog.moeomu.com/zh-cn/posts/nodejs%E9%95%9C%E5%83%8F%E6%BA%90%E9%85%8D%E7%BD%AE/</link><pubDate>Mon, 27 Sep 2021 13:56:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/nodejs%E9%95%9C%E5%83%8F%E6%BA%90%E9%85%8D%E7%BD%AE/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/nodejs%e6%ba%90%e9%85%8d%e7%bd%ae/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装">安装&lt;/h2>
+&lt;blockquote>
+&lt;p>Debain(Ubuntu, etc.)&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">apt install node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install yarn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>macOS&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew install node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install yarn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="配置镜像源">配置镜像源&lt;/h2>
+&lt;h3 id="设置为淘宝镜像源">设置为淘宝镜像源&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm config &lt;span class="nb">set&lt;/span> registry https://registry.npm.taobao.org/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yarn config &lt;span class="nb">set&lt;/span> registry https://registry.npm.taobao.org/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="重置为官方镜像源">重置为官方镜像源&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm config &lt;span class="nb">set&lt;/span> registry https://registry.npmjs.org/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yarn config &lt;span class="nb">set&lt;/span> registry https://registry.yarnpkg.com/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item></channel></rss>

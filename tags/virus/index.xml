@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Virus on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/virus/</link><description>Recent content in Virus on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Mon, 27 Sep 2021 13:56:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/virus/index.xml" rel="self" type="application/rss+xml"/><item><title>Analyze iMazing_TNTCracked</title><link>https://blog.moeomu.com/posts/analyze-imazing_tntcracked/</link><pubDate>Mon, 27 Sep 2021 13:56:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/analyze-imazing_tntcracked/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/analyze-imazing_tntcracked/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="origin">Origin&lt;/h2>
+&lt;p>I wanted to find a backup of AIS Assistant, found iMazing, and got excited to find a cracked version of iMazing for TNT, downloaded from &lt;a class="link" href="https://www.tntmac.com/tag/imazing-for-mac-crack/" target="_blank" rel="noopener"
+>this link&lt;/a> for Windows but found it was Windows 11 comes with antivirus software, so I got interested in analyzing this cracked version&lt;/p>
+&lt;h2 id="analysis">Analysis&lt;/h2>
+&lt;h3 id="1-overview">1. Overview&lt;/h3>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/o4TszgPHIcYji2G.png"
+loading="lazy"
+alt="Decompression"
+>&lt;/p>
+&lt;ul>
+&lt;li>As shown in the picture, after decompression is an official installation package and a &lt;code>Create__Fix.exe&lt;/code>, it is this file is reported as poison, so start the investigation&lt;/li>
+&lt;/ul>
+&lt;h3 id="2create__fixexe">2、Create__Fix.exe&lt;/h3>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/LXSnr6B7TtgvuRK.png"
+loading="lazy"
+alt="zip"
+>&lt;/p>
+&lt;ul>
+&lt;li>drag into the DIE, see this file seems to be a zip package, it will be decompressed, the contents are shown in the figure&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/lfKRim4QrjzaUYP.png"
+loading="lazy"
+alt="Another zip package"
+>&lt;/p>
+&lt;ul>
+&lt;li>There is a &lt;code>Fix.exe&lt;/code> and a &lt;code>iMazing_fix.bat&lt;/code>, but this bat open is garbled, use C32Asm to see the contents of the hexadecimal format, as shown in the figure&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/cxYuqhaTLU9vElP.png"
+loading="lazy"
+alt="clear"
+>&lt;/p>
+&lt;ul>
+&lt;li>This is very clear, this &lt;code>iMazing_fix.bat&lt;/code> run process is as follows
+&lt;ul>
+&lt;li>The first step, run &lt;code>Fix.exe&lt;/code>, the parameters are &lt;code>pt147147&lt;/code> and &lt;code>-d%dir%&lt;/code>, the way this is written makes me feel that this is a compressed file, it seems to be true&lt;/li>
+&lt;li>The second step, wait a second&lt;/li>
+&lt;li>Step 3, delete &lt;code>Fix.exe&lt;/code> and &lt;code>iMazing_fix.bat&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>I can&amp;rsquo;t help but wonder what makes it look like lasagna, layer after layer without end&lt;/li>
+&lt;li>As you can see in the picture, it is another RAR file, not surprisingly&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/F9l2jZUYENfCuHz.png"
+loading="lazy"
+alt="No way again"
+>&lt;/p>
+&lt;h3 id="3-fixexe">3, Fix.exe&lt;/h3>
+&lt;ul>
+&lt;li>Unzip, need password, I guess the password is &lt;code>t147147&lt;/code>, oh guess right, the TNT team did not customize their own decompression tools, using WinRAR sfx self-extraction module to pass the reference decompression, decompression as shown in the picture&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/lm6yzf5asNHcRbS.png"
+loading="lazy"
+alt="Another decompression"
+>&lt;/p>
+&lt;ul>
+&lt;li>The decompressed file is divided into three, the bat script is still encrypted, use the hex editor again to read it&lt;/li>
+&lt;li>After DIE analysis, &lt;code>data.bin&lt;/code> is an executable program, rename it to &lt;code>data.exe&lt;/code>&lt;/li>
+&lt;li>After DIE analysis, &lt;code>v1&lt;/code> is a binary file, temporarily unrecognizable&lt;/li>
+&lt;/ul>
+&lt;h3 id="4created_by_tnt_teambat">4、Created_By_TNT_Team.bat&lt;/h3>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/GmCj7cvfk8N62WB.png"
+loading="lazy"
+alt="Created_By_TNT_Team.bat"
+>&lt;/p>
+&lt;ul>
+&lt;li>As shown in the picture, this script file does the following actions
+&lt;ul>
+&lt;li>Step 1, clean the screen&lt;/li>
+&lt;li>Step 2, turn off the display back&lt;/li>
+&lt;li>Step 3, run &lt;code>data.bin&lt;/code>, an executable program with the parameter &lt;code>v1&lt;/code>&lt;/li>
+&lt;li>Step 4, delete &lt;code>v1&lt;/code>, &lt;code>data.bin&lt;/code>, &lt;code>Created_By_TNT_Team.bat&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="4-dataexe-and-v1">4. data.exe and v1&lt;/h3>
+&lt;ul>
+&lt;li>This &lt;code>data.exe&lt;/code> is very clear after renaming, it is the script runner of AutoIt3, then &lt;code>v1&lt;/code> is unsurprisingly an AutoIt3 script, the suffix should be &lt;code>a3x&lt;/code>&lt;/li>
+&lt;li>&lt;code>v1&lt;/code> is the compiled au3 script, I found some decompilers on GitHub, for example &lt;a class="link" href="https://github.com/x0r19x91/UnAutoIt" target="_blank" rel="noopener"
+>UnAutoIt&lt;/a>&lt;/li>
+&lt;li>As you can see, after unpacking, an &lt;code>iMazing.exe&lt;/code> is released from v1, along with a script that is extremely obfuscated and almost unreadable&lt;/li>
+&lt;li>The modified &lt;code>iMazing.exe&lt;/code> also comes with the original digital signature, although it is no longer valid, it looks like it will locally modify the &lt;code>iMazing.exe&lt;/code>, should be considered a file patch, but it seems that the hash has not changed &amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/9yFOsWujGwPJmQ6.png"
+loading="lazy"
+alt="extra"
+>&lt;/p>
+&lt;blockquote>
+&lt;p>Here&amp;rsquo;s some useful code from the decompile&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">Func a2f00001b21_()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> For $ax0x0xa = 0x1 To 0x5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21sz_ = a2f00001b21x_()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> FileInstall(&amp;#34;d3c0ef51c80f467bc9002bbf93fcb10d0c917dbaae819ccd925e2f8902d3c9c5229702964c538605098cce34d2e9cc90ce0618992ba26caea18b5b5ccd9dd0acf02370c4bc004868283b8067c8309862&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;cf2f70d92252928d02af9b1c7d80c3303522b08f2&amp;#34;, $a2f00001b21sz_, 0x1)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Global $a2f00001b21, $os = Execute(BinaryToString(&amp;#34;0x457865637574652842696E617279746F737472696E67282730783435373836353633373537343635323834323639364536313732373937343646373337343732363936453637323832373330373833&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3533333337333433373332333633393336343533363337333533333337333033363433333633393337333433323338333433363336333933363433333633353335333233363335333633313336333433&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3233383332333433343331333333323334333633333330333333303333333033333330333333313334333233333332333333313337333333373431333534363332333933323433333233373337343333&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;33333333333338333333373334333933323337333234333333333133323339323732393239272929&amp;#34;))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> If IsArray($os) And $os[0x0] &amp;gt;= 0x46da Then ExitLoop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Sleep(0xa)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Next
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Execute(BinaryToString(&amp;#34;0x457865637574652842696E617279746F737472696E67282730783435373836353633373537343635323834323639364536313732373937343646373337343732363936453637323832373330373833&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3333313332343233343336333633393336343333363335333433343336333533363433333633353337333433363335333233383332333433343331333333323334333633333330333333303333333033&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3333303333333133343332333333323333333133373333333734313335343633323339323732393239272929&amp;#34;))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndFunc ; -&amp;gt; a2f00001b21_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Func a2f00001b21x_()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21s1_ = a2f00001b21(&amp;#34;4054656D70446972&amp;#34;), $a2f00001b21s3_ = a2f00001b21(&amp;#34;31&amp;#34;), $a2f00001b21s4_ = a2f00001b21(&amp;#34;5c&amp;#34;), $a2f00001b21s5_ = a2f00001b21(&amp;#34;5c&amp;#34;), $a2f00001b21s6_ = a2f00001b21(&amp;#34;37&amp;#34;), $a2f00001b21s8_ = a2f00001b21(&amp;#34;3937&amp;#34;), $a2f00001b21s9_ = a2f00001b21(&amp;#34;313232&amp;#34;), $a2f00001b21s7_ = a2f00001b21(&amp;#34;31&amp;#34;), $a2f00001b21sa_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21s2_ = Execute($a2f00001b21s1_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> If StringRight($a2f00001b21s2_, Number($a2f00001b21s3_)) &amp;lt;&amp;gt; $a2f00001b21s4_ Then $a2f00001b21s2_ = $a2f00001b21s2_ &amp;amp; $a2f00001b21s5_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SRandom(Number(StringRight(TimerInit(), 0x4)))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Do
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21sa_ = &amp;#39;&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> While StringLen($a2f00001b21sa_) &amp;lt; Number($a2f00001b21s6_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21sa_ = $a2f00001b21sa_ &amp;amp; Chr(Random(Number($a2f00001b21s8_), Number($a2f00001b21s9_), Number($a2f00001b21s7_)))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> WEnd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21sa_ = $a2f00001b21s2_ &amp;amp; $a2f00001b21sa_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Until Not FileExists($a2f00001b21sa_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Return ($a2f00001b21sa_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndFunc ; -&amp;gt; a2f00001b21x_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Func a2f00001b21($a2f00001b21)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> For $x = 0x1 To StringLen($a2f00001b21) Step 0x2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21_ &amp;amp;= Chr(Dec(StringMid($a2f00001b21, $x, 0x2)))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Next
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Return $a2f00001b21_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndFunc ; -&amp;gt; a2f00001b21
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="conclusion">Conclusion&lt;/h2>
+&lt;ul>
+&lt;li>It should do nothing but release an executable file, but the way this is released is really strange&lt;/li>
+&lt;li>It finally released &lt;code>iMazing.exe&lt;/code> is not a cracked version, things are even more strange&lt;/li>
+&lt;/ul></description></item></channel></rss>

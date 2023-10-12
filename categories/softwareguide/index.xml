@@ -1,0 +1,1830 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SoftwareGuide on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/categories/softwareguide/</link><description>Recent content in SoftwareGuide on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 26 Oct 2022 19:14:09 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/categories/softwareguide/index.xml" rel="self" type="application/rss+xml"/><item><title>Installing ArchLinux on ASUS ROG Strix Scar G532</title><link>https://blog.moeomu.com/posts/installing-archlinux-on-asus-rog-strix-scar-g532/</link><pubDate>Wed, 26 Oct 2022 19:14:09 +0800</pubDate><guid>https://blog.moeomu.com/posts/installing-archlinux-on-asus-rog-strix-scar-g532/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp" alt="Featured image of post Installing ArchLinux on ASUS ROG Strix Scar G532" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/installing-archlinux-on-asus-rog-strix-scar-g532/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="introduction-to-this-article">Introduction to this article&lt;/h2>
+&lt;blockquote>
+&lt;p>Asus Strix ScarG532&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>If you have the same machine as I do then you can follow this article exactly step by step and you will definitely end up with a successful installation of ArchLinux. I will exhaustively link the reference next to it so you can view and modify it to the configuration you want.&lt;/li>
+&lt;li>This note above is against the Arch way, so I am kidding. Please do not follow the configuration below step by step, and if you encounter the same problem as I did, you can refer to my solution&lt;/li>
+&lt;li>The components I have installed are as follows
+&lt;ul>
+&lt;li>Secure boot component: PreLoader&lt;/li>
+&lt;li>Bootloader: systemd-boot&lt;/li>
+&lt;li>Network and DHCP service: NetworkManager (because of better integration with Gnome)&lt;/li>
+&lt;li>Desktop environment: Gnome based on Wayland&lt;/li>
+&lt;li>Chinese input: ibus-libpinyin based on ibus (because of better integration with Gnome)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="installing-archlinux">Installing ArchLinux&lt;/h2>
+&lt;blockquote>
+&lt;p>This section follows exactly the &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>Installation guide - ArchWiki&lt;/a>, you can check this official documentation link for a more detailed explanation&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="pre-installation">Pre-installation&lt;/h3>
+&lt;h4 id="boot-disk-creation">Boot disk creation&lt;/h4>
+&lt;ul>
+&lt;li>You can visit the &lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>Download - ArchLinux&lt;/a> page to get the official boot image&lt;/li>
+&lt;li>Once downloaded, it is recommended to use &lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>balenaEtcher&lt;/a> to write the image to a USB stick&lt;/li>
+&lt;li>Boot the created ArchLinux installation environment from the USB stick&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>These three steps are too simple so do not repeat, if you need help please leave a message in the comments section&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="verify-uefi-mode-boot">Verify UEFI mode boot&lt;/h4>
+&lt;p>Execute the command &lt;code>ls /sys/firmware/efi/efivars&lt;/code>, if there is an output value then it proves that it is UEFI mode boot, later in the article the bootloader will use UEFI&lt;/p>
+&lt;h4 id="check-and-connect-to-the-network">Check and connect to the network&lt;/h4>
+&lt;blockquote>
+&lt;p>The following section will use the wireless card for network connection&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>rfkill&lt;/code>, if the output is as follows then the hardware is fine&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">ID TYPE DEVICE SOFT HARD
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">0&lt;/span> bluetooth hci0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">1&lt;/span> wlan phy0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>iwctl&lt;/code> to enter the network connection configuration tool interface, see &lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>iwctl - ArchWiki&lt;/a> for more details&lt;/li>
+&lt;li>Execute &lt;code>device list&lt;/code> to view the list of devices&lt;/li>
+&lt;li>Execute &lt;code>station wlan0 scan&lt;/code> to scan with wlan0 devices&lt;/li>
+&lt;li>Execute &lt;code>station wlan0 get-networks&lt;/code> to see the list of scanned networks&lt;/li>
+&lt;li>Execute &lt;code>station wlan0 connect SSID&lt;/code> to connect to the network&lt;/li>
+&lt;li>Execute &lt;code>ping archlinux.org&lt;/code> to check network connectivity&lt;/li>
+&lt;/ul>
+&lt;h4 id="calibrate-the-time">calibrate the time&lt;/h4>
+&lt;blockquote>
+&lt;p>systemd-timesyncd will automatically calibrate the time when it detects a network connection, so there is no need to manually calibrate the time&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>timedatectl status&lt;/code> to check and make sure the system time is correct&lt;/li>
+&lt;/ul>
+&lt;h4 id="disk-operations-data-is-priceless-be-careful">disk operations (&lt;strong>data is priceless, be careful&lt;/strong>)&lt;/h4>
+&lt;blockquote>
+&lt;p>This section must not be copied, you may have a different number of disks than I do, and your disk partition situation must be different than mine&lt;br>
+Be sure to refer to &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks" target="_blank" rel="noopener"
+>Partition the disks - ArchWiki&lt;/a> for disk partitioning&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>fdisk -l&lt;/code> to see how your disk is partitioned, and partition it as you see fit&lt;/li>
+&lt;li>Execute &lt;code>fdisk /dev/nvme0n1&lt;/code> for the first SSD operation, press &lt;code>m&lt;/code> to show help, save and exit the &lt;code>fdisk&lt;/code> interface after the operation is finished, this tool will write to the hard disk partition table only when it is saved, please feel free to operate it&lt;/li>
+&lt;li>(Danger) Execute &lt;code>mkfs.ext4 /dev/nvme0n1p4&lt;/code> to format the fourth partition of the first SSD, in this case it will be the mount point of &lt;code>/&lt;/code>&lt;/li>
+&lt;li>(Danger) Execute &lt;code>mkfs.ext4 /dev/nvme2n1p1&lt;/code> to format the first partition of the third SSD, which in this case will be the mount point of &lt;code>/home&lt;/code>.&lt;/li>
+&lt;li>Execute &lt;code>e2label /dev/nvme0n1p4 &amp;quot;ArchSys&amp;quot;&lt;/code> to set the label of the fourth partition of the first SSD to ArchSys, which will be used by systemd-boot&lt;/li>
+&lt;li>Execute &lt;code>e2label /dev/nvme2n1p1 &amp;quot;ArchData&amp;quot;&lt;/code> to set the label of the first partition of the third SSD to ArchData, which will be used by systemd-boot&lt;/li>
+&lt;li>Execute &lt;code>blkid | grep Arch&lt;/code> to check the disk label setting&lt;/li>
+&lt;li>Execute &lt;code>mount /dev/nvme0n1p4 /mnt&lt;/code> to mount the disk, it will be &lt;code>/&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>mount --mkdir /dev/nvme0n1p1 /mnt/boot&lt;/code> to mount the disk, it will be &lt;code>/boot&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>mount --mkdir /dev/nvme2n1p1 /mnt/home&lt;/code> to mount the disk, it will be &lt;code>/home&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>mkswap /dev/nvme0n1p5&lt;/code> to format the fifth partition of the first SSD as a memory swap partition&lt;/li>
+&lt;li>Execute &lt;code>swapon /dev/nvme0n1p5&lt;/code> to enable the memory swap partition&lt;/li>
+&lt;/ul>
+&lt;h3 id="start-installation">Start installation&lt;/h3>
+&lt;h4 id="change-the-address-of-the-selected-mirror">change the address of the selected mirror&lt;/h4>
+&lt;blockquote>
+&lt;p>vim is a command line text editor, if you don&amp;rsquo;t know how to use it, you can switch to nano, if you are already in the vim interface, you can exit vim in normal mode by typing an English colon and q&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>vim /etc/pacman.d/mirrorlist&lt;/code> to edit the installation source image list&lt;/li>
+&lt;li>Add this line &lt;code>Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch&lt;/code> to the top, or you can follow your own custom&lt;/li>
+&lt;/ul>
+&lt;h4 id="to-install-the-necessary-packages">to install the necessary packages&lt;/h4>
+&lt;blockquote>
+&lt;p>intel-ucode is the microcode update package for intel, recommended to install&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>pacstrap -K /mnt base linux linux-firmware intel-ucode&lt;/code> to install the system base package&lt;/li>
+&lt;li>Execute &lt;code>pacstrap /mnt networkmanager bluez vim sudo bash-completion openssh man git wget zsh&lt;/code> to install some software you need&lt;/li>
+&lt;/ul>
+&lt;h3 id="configure-the-new-system">Configure the new system&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>genfstab -U /mnt &amp;gt;&amp;gt; /mnt/etc/fstab&lt;/code> to create a system partition table definition&lt;/li>
+&lt;li>Execute &lt;code>arch-chroot /mnt&lt;/code> to switch the shell to the new system and execute the command&lt;/li>
+&lt;li>Execute &lt;code>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime&lt;/code> to set the system time zone to Asia-Shanghai&lt;/li>
+&lt;li>Execute &lt;code>hwclock --systohc&lt;/code> to synchronize the hardware time&lt;/li>
+&lt;li>Execute &lt;code>vim /etc/locale.gen&lt;/code> to edit the system&amp;rsquo;s localization settings, my settings are as follows, which can be used as a reference. &lt;strong>Note: If you don&amp;rsquo;t add &lt;code>zh_CN.UTF-8 UTF-8&lt;/code> in this step, then you won&amp;rsquo;t find Pinyin input in Gnome&amp;rsquo;s &lt;code>Keyboard&lt;/code> option&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">en_US.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">zh_CN.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>locale-gen&lt;/code> to generate localization settings&lt;/li>
+&lt;li>Execute &lt;code>vim /etc/locale.conf&lt;/code> to edit the language configuration file, I use English system, enter &lt;code>LANG=en_US.UTF-8&lt;/code>, if you use Chinese system, change it to &lt;code>LANG=zh_CN.UTF-8&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>vim /etc/hostname&lt;/code> to edit this host name&lt;/li>
+&lt;li>Execute &lt;code>mkinitcpio -P&lt;/code> to create a boot memory initialization image&lt;/li>
+&lt;li>Execute &lt;code>passwd&lt;/code> to change the root user password&lt;/li>
+&lt;/ul>
+&lt;h3 id="configure-system-startup-items">Configure system startup items&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>bootctl --path=/boot install&lt;/code> to install systemd-boot into /boot&lt;/li>
+&lt;li>Execute &lt;code>systemctl enable systemd-boot-update.service&lt;/code> to start systemd-boot&amp;rsquo;s automatic update service&lt;/li>
+&lt;li>Execute &lt;code>vim /boot/loader/loader.conf&lt;/code> to edit the systemd-boot startup configuration file&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">default archlinux.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">timeout 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">console-mode max
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">editor no
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-entries 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-firmware 1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>vim /boot/loader/entries/archlinux.conf&lt;/code> to edit ArchLinux boot entries&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>vim /boot/loader/entries/arch-fallback.conf&lt;/code> to edit the ArchLinux-Fallback boot entry&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux (fallback initramfs)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux-fallback.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="other">Other&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>systemctl enable NetworkManager.service&lt;/code> to make NetworkManager&amp;rsquo;s service start on boot&lt;/li>
+&lt;li>Execute &lt;code>systemctl enbale bluetooth.service&lt;/code> to make the Bluetooth service start on boot&lt;/li>
+&lt;li>Execute &lt;code>exit&lt;/code> to exit the new system environment&lt;/li>
+&lt;li>Execute &lt;code>reboot&lt;/code> to reboot the system&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;blockquote>
+&lt;p>&lt;strong>Hint: You can actually end up here, but if you use it as a primary system, ArchLinux as it is now is clearly not up to the task, so here is more software installation reference&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;hr>
+&lt;h2 id="more-installation-configurations">More installation configurations&lt;/h2>
+&lt;h3 id="connecting-to-the-network">Connecting to the network&lt;/h3>
+&lt;blockquote>
+&lt;p>Using the NetworkManager command line tool&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>nmcli device wifi list&lt;/code> to see the wifi list&lt;/li>
+&lt;li>Execute &lt;code>nmcli device wifi connect SSID_or_BSSID password your_password&lt;/code> to connect to the network&lt;/li>
+&lt;li>Execute &lt;code>nmcli connection show&lt;/code> to see the current connection&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>You can see more usage in the &lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager#nmcli_examples" target="_blank" rel="noopener"
+>nmcli example - ArchWiki&lt;/a> article&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="create-a-new-user">Create a new user&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>useradd -m misaka&lt;/code> to create a new user named misaka&lt;/li>
+&lt;li>Execute &lt;code>export EDITOR=vim &amp;amp;&amp;amp; visudo&lt;/code> to edit this file and follow the prompts to add the new user to the privileged users group, so that the new user can use sudo for privileged operations normally&lt;/li>
+&lt;li>Execute &lt;code>usermod -a -G wheel misaka&lt;/code> to add the misaka user to the wheel user group, the advantage of this is that Gnome can correctly identify the privileges of this new user, and the authentication of this user name will pop up by default when doing root privileges in Gnome&lt;/li>
+&lt;li>Execute &lt;code>passwd misaka&lt;/code> to change the password of the new user&lt;/li>
+&lt;/ul>
+&lt;h3 id="install-gnome-gui">Install Gnome GUI&lt;/h3>
+&lt;blockquote>
+&lt;p>Hint: The command below is written to install a lot of software because there are a lot of software in the Gnome package that I don&amp;rsquo;t need, so I have to manually select the software I want to install, or you can use the simpler &lt;code>pacman -S gnome&lt;/code> instead of the installation command below, as you like&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Executing the following command will install the base components of Gnome&lt;/li>
+&lt;li>&lt;code>pacman -S file-roller gdm gedit gnome-backgrounds gnome-calculator gnome-control-center gnome-disk-utility gnome-logs gnome-menus gnome- settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gvfs nautilus seahorse seahorse- nautilus xdg-user-dirs-gtk&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>If the installation gives you a choice between using &lt;code>jack2&lt;/code> or &lt;code>pipewire&lt;/code>, choose &lt;code>pipewire&lt;/code>. This is the system&amp;rsquo;s sound service.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>systemctl enable gdm.service&lt;/code> to make the Gnome login screen boot up and self start, it will start Gnome on the next reboot&lt;/li>
+&lt;/ul>
+&lt;h3 id="install-chinese-input-method-and-fonts">Install Chinese input method and fonts&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>pacman -S ttf-dejavu wqy-zenhei wqy-microhei adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts&lt;/code> to install Chinese fonts&lt;/li>
+&lt;li>Execute &lt;code>ibus ibus-libpinyin&lt;/code> to install ibus and ibus&amp;rsquo; Smart Pinyin input method&lt;/li>
+&lt;/ul>
+&lt;h3 id="reboot-and-login-as-normal-user">Reboot and login as normal user&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>reboot&lt;/code>&lt;/li>
+&lt;li>Start Terminal&lt;/li>
+&lt;/ul>
+&lt;h3 id="gnome-window-control-button-settings">Gnome window control button settings&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>gsettings set org.gnome.desktop.wm.preferences button-layout &amp;quot;close,minimize,maximize:&amp;quot;&lt;/code> which will show all windows close, minimize and maximize buttons and put them on the left side&lt;/li>
+&lt;/ul>
+&lt;h3 id="nvidia-driver-settings">NVIDIA driver settings&lt;/h3>
+&lt;blockquote>
+&lt;p>&lt;strong>Warning: Do not reboot while this section is running&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>sudo pacman -S nvidia nvidia-settings&lt;/code> to install the NVIDIA driver and setup program&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>It will change the default window system from Wayland to X11, if you want to continue using Wayland as the window system, please execute the following command&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>sudo ln -s /dev/null /etc/udev/rules.d/61-gdm.rules&lt;/code> to disable udev&amp;rsquo;s rules for disabling Wayland in GDM&lt;/li>
+&lt;li>Execute &lt;code>gsettings set org.gnome.mutter experimental-features '[&amp;quot;kms-modifiers&amp;quot;]'&lt;/code> to enable kms-modifiers for gsettings&lt;/li>
+&lt;li>Execute &lt;code>sudo vim /boot/loader/entries/archlinux.conf&lt;/code> to edit the boot entry and change the last line to &lt;code>options root=&amp;quot;LABEL=ArchSys&amp;quot; rw quiet splash nvidia-drm.modeset=1&lt;/code>&lt;/li>
+&lt;li>Run &lt;code>sudo vim /etc/mkinitcpio.conf&lt;/code> to edit modsettings to change &lt;code>MODULES=()&lt;/code> to &lt;code>nvidia nvidia_modeset nvidia_uvm nvidia_drm&lt;/code> and save the file. For more help information please refer to &lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA#DRM_kernel_mode_setting" target="_blank" rel="noopener"
+>DRM_kernel_mode_setting - ArchWiki&lt;/a>&lt;/li>
+&lt;li>Execute &lt;code>sudo mkinitcpio -P&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Reference source for this section: &lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>Use Wayland with proprietary NVIDIA drivers - Manjaro Forum&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="secure-boot">Secure Boot&lt;/h3>
+&lt;blockquote>
+&lt;p>Reference source for this section: &lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>Unified Extensible Firmware Interface/Secure Boot - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Downloaded from &lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>Linux Foundation Secure Boot System Release - James Bottomley&amp;rsquo;s Random Page&lt;/a> PreLoader.efi and HashTool.efi&lt;/li>
+&lt;li>If you configured them as above, then copy these two files to your &lt;code>/boot/EFI/systemd&lt;/code> directory&lt;/li>
+&lt;li>Rename &lt;code>/boot/EFI/systemd/systemd-bootx64.efi&lt;/code> to &lt;code>/boot/EFI/systemd/loader.efi&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp your_download_path/&lt;span class="o">{&lt;/span>PreLoader,HashTool&lt;span class="o">}&lt;/span>.efi esp/EFI/systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp esp/EFI/systemd/systemd-bootx64.efi esp/EFI/systemd/loader.efi
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Run &lt;code>sudo pacman -S efibootmgr&lt;/code> to install efibootmgr&lt;/li>
+&lt;li>&lt;strong>Please note that maybe your disk is different from mine&lt;/strong>, run &lt;code>sudo efibootmgr --verbose --disk /dev/nvme0n1 --part 1 --create --label &amp;quot;Arch Linux Security Boot&amp;quot; --loader /boot/EFI/ systemd/PreLoader.efi&lt;/code> adds an NVRAM boot entry&lt;/li>
+&lt;/ul>
+&lt;h3 id="install-the-gnome-extensions">Install the Gnome extensions&lt;/h3>
+&lt;ul>
+&lt;li>Run &lt;code>flatpak install com.mattjakeman.ExtensionManager&lt;/code> to install Gnome Extension Manager&lt;/li>
+&lt;li>Search for and install the following extensions in the Gnome Extension Manager and configure them
+&lt;ul>
+&lt;li>TrayIcons: reinstall (highly recommended)&lt;/li>
+&lt;li>Blur My Shell&lt;/li>
+&lt;li>Gnome Clipboard&lt;/li>
+&lt;li>Compiz similar magic light effect&lt;/li>
+&lt;li>Run to the dock&lt;/li>
+&lt;li>No activity button&lt;/li>
+&lt;li>Open Weather&lt;/li>
+&lt;li>Privacy quick settings menu&lt;/li>
+&lt;li>Vital Signs&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="other-issues">Other issues&lt;/h2>
+&lt;blockquote>
+&lt;p>The following section will use the Aur software repository, which can be found in &lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>Aur - ArchLinux&lt;/a> for more information.&lt;br>
+&lt;code>paru&lt;/code> is an Aur repositories utility that automatically fetches programs within the installed Aur repositories, visit &lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>Morganamilo/paru - Github&lt;/a> to see how to install and use paru.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="gnome-cant-mount-ntfs-external-disk-properly">Gnome can&amp;rsquo;t mount NTFS external disk properly&lt;/h3>
+&lt;blockquote>
+&lt;p>It may be that gvfs in Gnome needs to use some utilities in ntfs-3g to mount NTFS disks properly. ntfs driver is built in after Linux kernel version 5.15, so you can install ntfs utilities using kernel ntfs driver separately with the above command.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>paru ntfsprogs-ntfs3&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="no-sound">No sound&lt;/h3>
+&lt;blockquote>
+&lt;p>This section references.&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>Problem summary of installing Ubuntu on AsusStrixScarG532 - MoeomuBlog&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>ASUS ROG G533QS - ArchWiki&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;p>There are two solutions above, please use which one according to your preference&lt;/p>
+&lt;h3 id="gpg-problem">GPG problem&lt;/h3>
+&lt;blockquote>
+&lt;p>Reference for this section: &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>GnuPG - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="ioctl-error">ioctl error&lt;/h4>
+&lt;blockquote>
+&lt;p>Guide: &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG#Invalid_IPC_response_and_Inappropriate_ioctl_for_device" target="_blank" rel="noopener"
+>Invalid_IPC_response_and_Inappropriate_ioctl_for_device - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Add &lt;code>export GPG_TTY=$(tty)&lt;/code> to environment variables such as &lt;code>.bashrc&lt;/code>, &lt;code>.zshrc&lt;/code>, etc.&lt;/li>
+&lt;/ul>
+&lt;h4 id="configure-pinentry-as-gnome3-style">configure pinentry as Gnome3 style&lt;/h4>
+&lt;blockquote>
+&lt;p>Failure to do so will cause GPG to fail to find the GUI password entry program, which in turn will cause more GUI program errors&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>echo pinentry-program /usr/bin/pinentry-gnome3 &amp;gt;&amp;gt; .gnupg/gpg-agent.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="keyboard-lighting-and-power-control">Keyboard lighting and power control&lt;/h3>
+&lt;blockquote>
+&lt;p>read more at &lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>ASUS Linux&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>paru asusctl&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>paru rog-control-center&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="reference">Reference&lt;/h2>
+&lt;ul>
+&lt;li>[HowTo] Use Wayland with proprietary NVIDIA drivers. (2022, February 10). Manjaro Linux Forum. &lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130&lt;/a>&lt;/li>
+&lt;li>Arch Linux - Downloads. (n.d.). Archlinux.org. &lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>https://archlinux.org/download/&lt;/a>&lt;/li>
+&lt;li>Arch Linux 源使用帮助 — USTC Mirror Help 文档. (n.d.). Mirrors.ustc.edu.cn. Retrieved October 26, 2022, from &lt;a class="link" href="https://mirrors.ustc.edu.cn/help/archlinux.html" target="_blank" rel="noopener"
+>https://mirrors.ustc.edu.cn/help/archlinux.html&lt;/a>&lt;/li>
+&lt;li>ASUS NoteBook Linux. (n.d.). Asus-Linux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>https://asus-linux.org/&lt;/a>&lt;/li>
+&lt;li>ASUS ROG G533QS - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/ASUS_ROG_G533QS&lt;/a>&lt;/li>
+&lt;li>AUR (en) - Home. (n.d.). Aur.archlinux.org. &lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>https://aur.archlinux.org/&lt;/a>&lt;/li>
+&lt;li>balenaEtcher - Home. (2020). BalenaEtcher. &lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>https://www.balena.io/etcher/&lt;/a>&lt;/li>
+&lt;li>GnuPG - ArchWiki. (2018). Archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/GnuPG&lt;/a>&lt;/li>
+&lt;li>Installation guide - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Installation_guide&lt;/a>&lt;/li>
+&lt;li>iwd - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Iwctl&lt;/a>&lt;/li>
+&lt;li>Linux Foundation Secure Boot System Released | James Bottomley’s random Pages. (n.d.). Retrieved October 26, 2022, from &lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/&lt;/a>&lt;/li>
+&lt;li>Lulu. (2022, October 26). Paru. GitHub. &lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>https://github.com/Morganamilo/paru&lt;/a>&lt;/li>
+&lt;li>Misaka. (2022, October 20). Problem summary of installing Ubuntu on AsusStrixScarG532. Moeomu Blog. &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems&lt;/a>&lt;/li>
+&lt;li>NetworkManager - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NetworkManager&lt;/a>&lt;/li>
+&lt;li>NVIDIA - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NVIDIA&lt;/a>&lt;/li>
+&lt;li>Unified Extensible Firmware Interface/Secure Boot - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Deploying Docker services on a VPS</title><link>https://blog.moeomu.com/posts/deploying-docker-services-on-a-vps/</link><pubDate>Mon, 24 Oct 2022 22:03:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/deploying-docker-services-on-a-vps/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-2908894140.26d7gclffj8g.webp" alt="Featured image of post Deploying Docker services on a VPS" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/deploying-docker-services-on-a-vps/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="pre-introduction">Pre Introduction&lt;/h2>
+&lt;ul>
+&lt;li>There are some open source services that I really want to experience, but can not be deployed on a service like Paas, or can be deployed but can not persistently store some files. So not long ago, I bought a VPS, considering the security of the use of Docker to deploy all services, and the local reverse proxy using Caddy, and Caddy through the Cloudflare API automatically from the Cloudflare CDN protected DNS resolution under the acquisition and renewal of HTTPS certificates. The following is the entire process of deploying my service, if there are errors and omissions please be sure to point out.&lt;/li>
+&lt;li>This article will not go into detail to each command, but describe a general idea of the framework for building.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Warning: If you ignore the advice to read the official documentation in specific paragraphs of this article and execute the next commands directly, there is a high probability that you will make a mistake. At this point, you can go through the official documentation mentioned in that paragraph, or ask questions in the comments section of this article.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="create-docker-basic-service-framework">Create Docker basic service framework&lt;/h2>
+&lt;h3 id="create-a-user">Create a user&lt;/h3>
+&lt;ol>
+&lt;li>
+&lt;p>Run the following command&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl"> useradd -m mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> usermod -s /bin/bash mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> su mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> curl -fsSL https://get.docker.com/rootless &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Follow Docker&amp;rsquo;s official &lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>Run the Docker daemon as a non-root user (Rootless mode) - Docker Document&lt;/a> guide Configure the configuration items you want&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="create-a-docker-network">Create a Docker network&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>docker network create caddy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="deploy-the-web-service">Deploy the web service&lt;/h3>
+&lt;h3 id="deploy-the-alist-service">Deploy the Alist service&lt;/h3>
+&lt;blockquote>
+&lt;p>Alist&amp;rsquo;s Github open source address: &lt;a class="link" href="https://github.com/alist-org/alist" target="_blank" rel="noopener"
+>alist - Github&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Alist deployment commands
+&lt;ul>
+&lt;li>&lt;code>-d&lt;/code> means run in the background&lt;/li>
+&lt;li>&lt;code>--name&lt;/code> specifies the name of this Docker service&lt;/li>
+&lt;li>&lt;code>-p host port:container port&lt;/code> specifies the port to bind to&lt;/li>
+&lt;li>&lt;code>--network=caddy&lt;/code> indicates the bound Docker Network&lt;/li>
+&lt;li>&lt;code>-v host path:container path&lt;/code> specifies the location of the file to be stored permanently&lt;/li>
+&lt;li>&lt;code>--restart=always&lt;/code> indicates that the service is down for restart.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;alist&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5244:5244 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/alist:/opt/alist/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> xhofe/alist:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>More Alist reference commands
+&lt;ul>
+&lt;li>View Alist password: &lt;code>docker exec -it alist . /alist password&lt;/code>&lt;/li>
+&lt;li>View Alist logs: &lt;code>docker logs -f alist&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="deploy-whoogle-service">Deploy Whoogle service&lt;/h3>
+&lt;ul>
+&lt;li>Deploy the following commands, the details of which are not explained, and are the same as above&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name whoogle &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5000:5000 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> benbusby/whoogle-search:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="deploying-caddy">Deploying Caddy&lt;/h2>
+&lt;h3 id="prerequisites">Prerequisites&lt;/h3>
+&lt;p>Before deploying the Caddy service using Docker, you need to create the required Caddyfile configuration file for the Caddy service to use for automatic configuration.&lt;/p>
+&lt;h3 id="caddyfile">Caddyfile&lt;/h3>
+&lt;ol>
+&lt;li>Create the permanent storage location: &lt;code>mkdir -p $HOME/docker_data/caddy/&lt;/code>&lt;/li>
+&lt;li>Create and edit the Caddyfile file: &lt;code>vim $HOME/docker_data/caddy/Caddyfile&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>Caddyfile&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Caddyfile" data-lang="Caddyfile">&lt;span class="line">&lt;span class="cl">&lt;span class="n">(site_config)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">tls&lt;/span> &lt;span class="s">me_tls@example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">dns&lt;/span> &lt;span class="s">cloudflare&lt;/span> &lt;span class="se">{env.CLOUDFLARE_API_TOKEN}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # more config
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">reverse_proxy&lt;/span> &lt;span class="se">{args.0}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">drive.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">alist:5244&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">search.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">whoogle:5000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>Additional note: The reason why &lt;code>alist:5244&lt;/code> and &lt;code>whoogle:5000&lt;/code> work and are resolved properly is that all three containers exist in the same Docker Network, so they can be resolved by container name.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="deploying-caddy-with-docker">Deploying Caddy with Docker&lt;/h3>
+&lt;ul>
+&lt;li>The deployment command is as follows, the details of the command are not explained, it is the same as above&lt;/li>
+&lt;li>The following special note is needed
+&lt;ul>
+&lt;li>&lt;code>your_cloudflare_login_email@example.com&lt;/code> replaced with your cloudflare account email&lt;/li>
+&lt;li>&lt;code>your_cloudflare_api_token&lt;/code> is replaced with your cloudflare api token, you can follow &lt;a class="link" href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/" target="_blank" rel="noopener"
+>Create an API token - Cloudflare Docs&lt;/a> guide to get your api token, note that when creating it here you must select &lt;code>Zone / DNS / Edit&lt;/code> and &lt;code>Zone / Zone / Read&lt;/code> permissions&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;caddy&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 443:443 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/Caddyfile:/etc/caddy/Caddyfile &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/data:/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/config:/config &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_EMAIL&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_login_email@example.com &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_API_TOKEN&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_api_token &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">ACME_AGREE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> slothcroissant/caddy-cloudflaredns:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="reference">Reference&lt;/h2>
+&lt;ul>
+&lt;li>Run the Docker daemon as a non-root user (Rootless mode). (2022, September 22). Docker Documentation. &lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>https://docs.docker.com/engine/security/rootless/&lt;/a>&lt;/li>
+&lt;li>Docker Hub. (n.d.). Hub.docker.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns" target="_blank" rel="noopener"
+>https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns&lt;/a>&lt;/li>
+&lt;li>Unrecognized directive: dns. (2020, May 14). Caddy Community. &lt;a class="link" href="https://caddy.community/t/unrecognized-directive-dns/8149/9" target="_blank" rel="noopener"
+>https://caddy.community/t/unrecognized-directive-dns/8149/9&lt;/a>&lt;/li>
+&lt;li>Server, C. W. (n.d.). Caddyfile Concepts - Caddy Documentation. Caddyserver.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://caddyserver.com/docs/caddyfile/concepts" target="_blank" rel="noopener"
+>https://caddyserver.com/docs/caddyfile/concepts&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Problem summary of installing Ubuntu on AsusStrixScarG532</title><link>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/</link><pubDate>Thu, 20 Oct 2022 13:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp" alt="Featured image of post Problem summary of installing Ubuntu on AsusStrixScarG532" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="system-sound-problems">System sound problems&lt;/h2>
+&lt;h3 id="no-sound">No sound&lt;/h3>
+&lt;ol>
+&lt;li>&lt;code>/etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;li>Append a line at the end of this file:&lt;code>options snd-hda-intel model=asus-zenbook&lt;/code>&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ol>
+&lt;h3 id="sound-is-not-adjustable">Sound is not adjustable&lt;/h3>
+&lt;blockquote>
+&lt;p>Description: The master volume is not adjustable, can only be mute or maximum.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>Edit &lt;code>/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Add the following to the front of &lt;code>[Element PCM]&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[Element Master]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">switch = mute
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">volume = ignore
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kill pulse audio daemon and it will automatically restart: &lt;code>pulseaudio -k&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Note: Do not run pulseaudio as root, otherwise the daemon will not close properly.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="suspend-problems">Suspend problems&lt;/h2>
+&lt;h3 id="cant-wake-up-again-after-locking-the-screen">Can&amp;rsquo;t wake up again after locking the screen&lt;/h3>
+&lt;blockquote>
+&lt;p>Description: After locking the screen, the computer can&amp;rsquo;t wake up again. The hard drive and other hardware work fine, but the screen is all black.&lt;/p>
+&lt;/blockquote>
+&lt;ol>
+&lt;li>install laptop-mod-tools: &lt;code>sudo apt install laptop-mode-tools&lt;/code>&lt;/li>
+&lt;li>start laptop-mode-tools: &lt;code>sudo laptop_mode start&lt;/code>&lt;/li>
+&lt;li>add mutter debug environment variable, edit &lt;code>/etc/environment&lt;/code>
+&lt;ul>
+&lt;li>if in Ubuntu 22.04: &lt;code>MUTTER_DEBUG_ENABLE_ATOMIC_KMS=0&lt;/code>&lt;/li>
+&lt;li>if in Ubuntu 22.10 and later: &lt;code>MUTTER_DEBUG_FORCE_KMS_MODE=simple&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ol>
+&lt;h2 id="reference">reference&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://askubuntu.com/questions/1288054/snd-hda-intel-model-for-ubuntu-20-04-installed-in-an-asus-rog-strix-g15-g512" target="_blank" rel="noopener"
+>snd-hda-intel model for UBUNTU 20.04 installed in an ASUS ROG STRIX G15 (G512) - AskUbuntu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntuforums.org/showthread.php?t=2414755" target="_blank" rel="noopener"
+>Volume either muted or maxed out, nothing in between - ubuntu forums&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bugs.launchpad.net/ubuntu/&amp;#43;source/mutter/&amp;#43;bug/1968040" target="_blank" rel="noopener"
+>Blanked screen doesn&amp;rsquo;t wake up after locking - Launchpad&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Safer use of PGP</title><link>https://blog.moeomu.com/posts/safer-use-of-pgp/</link><pubDate>Tue, 28 Jun 2022 08:58:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/safer-use-of-pgp/</guid><description>&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/safer-use-of-pgp/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="introduction-of-gnupg">Introduction of GnuPG&lt;/h2>
+&lt;h3 id="official-introduction">Official Introduction&lt;/h3>
+&lt;blockquote>
+&lt;p>Source: &lt;a class="link" href="https://www.gnupg.org/" target="_blank" rel="noopener"
+>GnuPG&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>GnuPG is a complete and free implementation of the OpenPGP standard as defined by RFC4880 (also known as PGP). GnuPG allows you to encrypt and sign your data and communications; it features a versatile key management system, along with access modules for all kinds of public key directories. GnuPG, also known as GPG, is a command line tool with features for easy integration with other applications. A wealth of frontend applications and libraries are available. GnuPG also provides support for S/MIME and Secure Shell (ssh).&lt;/p>
+&lt;p>Since its introduction in 1997, GnuPG is Free Software (meaning that it respects your freedom). It can be freely used, modified and distributed under the terms of the GNU General Public License .&lt;/p>
+&lt;blockquote>
+&lt;p>Arguing that you don&amp;rsquo;t care about the right to privacy because you have nothing to hide is no different from saying you don&amp;rsquo;t care about free speech because you have nothing to say.&lt;br>
+– Edward Snowden&lt;/p>
+&lt;/blockquote>
+&lt;p>Using encryption helps to protect your privacy and the privacy of the people you communicate with. Encryption makes life difficult for bulk surveillance systems. GnuPG is one of the tools that Snowden used to uncover the secrets of the NSA.&lt;/p>
+&lt;p>Please visit the &lt;a class="link" href="%28https://emailselfdefense.fsf.org/en/%29" >Email Self-Defense site&lt;/a> to learn how and why you should use GnuPG for your electronic communication.&lt;/p>
+&lt;h3 id="so">So&lt;/h3>
+&lt;h4 id="q1-why-should-i-use-gnupg">Q1: Why should I use GnuPG?&lt;/h4>
+&lt;ul>
+&lt;li>Because it is free software and can be used, modified and distributed freely.&lt;/li>
+&lt;li>By using it, your communication information will be encrypted and secure.&lt;/li>
+&lt;li>PGP can guarantee that a message is sent by someone you trust, and no one else can decrypt it except you two, and this message is transmitted without any modification of even one punctuation or one byte in between.&lt;/li>
+&lt;li>A PGP-signed message can be transmitted over any untrusted channel and cannot be tampered with or decrypted by anyone in the middle.&lt;/li>
+&lt;/ul>
+&lt;h4 id="q2-im-obviously-not-afraid-of-censorship-what-other-reasons-do-you-have-to-recommend-gnupg">Q2: I&amp;rsquo;m obviously not afraid of censorship. What other reasons do you have to recommend GnuPG?&lt;/h4>
+&lt;ul>
+&lt;li>Your privacy is up to you, and most people don&amp;rsquo;t want to live under surveillance.&lt;/li>
+&lt;li>If even mild criticism is not allowed, silence will be perceived as ill-intentioned. If silence were no longer allowed, it would be a crime to praise inadequate efforts. If only one voice is allowed to exist, then the only voice that exists is a lie.&lt;/li>
+&lt;li>If it were more unfortunate to live in a totalitarian state, encrypted communications would protect yourself and the friends you care about.&lt;/li>
+&lt;/ul>
+&lt;h2 id="installation">Installation&lt;/h2>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;blockquote>
+&lt;p>Gpg4win is recommended, it has a complete package and an easy to use GUI.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Download the version for your computer from &lt;a class="link" href="https://gpg4win.org/download.html" target="_blank" rel="noopener"
+>Gpg4win&lt;/a>. In general, if you have no special needs, just click the green download button.&lt;/li>
+&lt;/ul>
+&lt;h3 id="macos">macOS&lt;/h3>
+&lt;blockquote>
+&lt;p>GPGSuite is recommended&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Download the version for your computer from &lt;a class="link" href="https://gpgtools.org" target="_blank" rel="noopener"
+>GPGSuite&lt;/a>. In general, if you have no special needs, just click the red download button.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Reminder: GPGMail in the GPGSuite suite is paid software, so if you need to use it to automatically encrypt emails, then you need to purchase GPGMail. but rest assured that the encrypted signature of text and files is completely free.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="linux">Linux&lt;/h3>
+&lt;blockquote>
+&lt;p>GnuPG is recommended&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Most Linux distributions come with GnuPG pre-installed and you do not need to install any software. However, it is recommended that you install a GUI management interface &lt;code>GPA&lt;/code>, as it is more user-friendly.&lt;/li>
+&lt;/ul>
+&lt;h2 id="generating-keys">Generating keys&lt;/h2>
+&lt;blockquote>
+&lt;p>Please experiment with this section first, and then generate your main key after you become proficient.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="generate-a-master-key">Generate a master key&lt;/h3>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg -expert --full-gen-key&lt;/code>&lt;/li>
+&lt;li>Select key type: default&lt;/li>
+&lt;li>Enter the key length: 4096&lt;/li>
+&lt;li>Enter the key expiration time: &lt;code>2y&lt;/code> (for two years, you can enter 0 to never expire, you can change the key expiration time at any time), enter y to confirm.&lt;/li>
+&lt;li>Enter your name, this is optional, you can enter your screen name or even leave it out.&lt;/li>
+&lt;li>Enter your email, which is optional and can even be left out. If you want to use email encryption, then you must enter it.&lt;/li>
+&lt;li>Enter a note, which can be left blank.&lt;/li>
+&lt;li>Enter O to confirm the information is correct, then you need to enter a key password to start the key generation.&lt;/li>
+&lt;/ul>
+&lt;h3 id="generate-revocation-certificate">Generate revocation certificate&lt;/h3>
+&lt;blockquote>
+&lt;p>If you lose your master key (or it is taken), you can use a revocation certificate to prove that it is no longer in use. If you do not have a revocation certificate, then you must notify your friends one by one.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg --gen-revoke -ao revoke.pgp email@email.com #uid or key id&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="view-subkeys">View subkeys&lt;/h3>
+&lt;blockquote>
+&lt;p>The master key should not be used on a daily basis, you should use the generated subkeys on a daily basis. The advantage of this is that if you leak a subkey, you can immediately revoke it without having to deprecate the entire key pair.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>List all public keys and subkeys: &lt;code>-list-keys&lt;/code> or &lt;code>gpg -k&lt;/code>&lt;/li>
+&lt;li>List all keys, subkeys: &lt;code>-list-secret-keys&lt;/code> or &lt;code>gpg -K&lt;/code>&lt;/li>
+&lt;li>To see the key fingerprint information, you can add the &lt;code>-fingerprint&lt;/code> parameter, such as &lt;code>gpg --list-secret-keys --fingerprint&lt;/code>&lt;/li>
+&lt;li>If you want to see the key ID information, you can add the &lt;code>-keyid-format long&lt;/code> parameter, such as &lt;code>gpg --list-secret-keys --keyid-format long&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="exporting-keys">Exporting keys&lt;/h2>
+&lt;blockquote>
+&lt;p>Since subkeys are to be used for daily use, the master key should not exist in the same place, GPG cannot delete the key, it can only export and pour in only the subkeys needed.&lt;/p>
+&lt;p>Note: The exclamation mark after the key ID cannot be missing, otherwise all keys will be exported&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="export-public-key">Export public key&lt;/h3>
+&lt;ul>
+&lt;li>Export public key: &lt;code>gpg -ao public-key --export master-key-id&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="export-the-master-key">Export the master key&lt;/h3>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg -ao master-key --export-secret-key master-key ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="export-subkeys">Export subkeys&lt;/h3>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg -ao sub-key --export-secret-subkeys Sub-key ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="import-keys">Import keys&lt;/h2>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg --import filename&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="communicate-securely-with-your-friends">Communicate securely with your friends&lt;/h2>
+&lt;ul>
+&lt;li>Now that you&amp;rsquo;re done, you&amp;rsquo;ll have a hard time leaving PGP after you get into the habit of using it daily&lt;/li>
+&lt;/ul>
+&lt;h2 id="publish-to-the-public-key-server">Publish to the public key server&lt;/h2>
+&lt;p>&amp;hellip; To be continued&amp;hellip;&lt;/p>
+&lt;h2 id="references">References&lt;/h2>
+&lt;ul>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（上）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8a/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-上/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（中）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%ad/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-中/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（下）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8b/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-下/&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Oh My Zsh Git Command Shortcuts</title><link>https://blog.moeomu.com/posts/oh-my-zsh-git-command-shortcuts/</link><pubDate>Tue, 26 Apr 2022 21:26:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/oh-my-zsh-git-command-shortcuts/</guid><description>&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/oh-my-zsh-git-command-shortcuts/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="git-command-shortcuts">Git Command Shortcuts&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">g&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gaa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gapa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --patch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gau&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gav&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --verbose&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git apply&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gapt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git apply --3way&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gba&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -a&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -d&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbda&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --no-color --merged | command grep -vE &amp;#34;^([+*]|\s*($(git_main_branch)|$(git_develop_branch))\s*$)&amp;#34; | command xargs git branch -d 2&amp;gt;/dev/null&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbD&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -D&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git blame -b -w&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbnm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --no-merged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --remote&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect bad&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect good&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect reset&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect start&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gc!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcn!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gca&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gca!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcan!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcans!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a -s --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcam&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcsm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcas&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcasm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout -b&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git config --list&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git clone --recurse-submodules&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gclean&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git clean -id&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpristine&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --hard &amp;amp;&amp;amp; git clean -dffx&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcmsg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gco&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcor&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout --recurse-submodules&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcount&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git shortlog -sn&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcpa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcpc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcssm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdca&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --cached&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdcw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --cached --word-diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdct&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git describe --tags $(git rev-list --tags --max-count=1)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gds&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --staged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff-tree --no-commit-id --name-only -r&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff @{upstream}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --word-diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># --jobs=&amp;lt;n&amp;gt; was added in git 2.8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">is-at-least 2.8 &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$git_version&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch --all --prune --jobs=10&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch --all --prune&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch origin&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git ls-files | grep&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git gui citool&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git gui citool --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpur&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;ggu&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpull&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull origin &amp;#34;$(git_current_branch)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpush&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push origin &amp;#34;$(git_current_branch)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggsup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --set-upstream-to=origin/$(git_current_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpsup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --set-upstream origin $(git_current_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ghh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git help&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gignore&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git update-index --assume-unchanged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gignored&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git ls-files -v | grep &amp;#34;^[[:lower:]]&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> git-svn-dcommit-push&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn dcommit &amp;amp;&amp;amp; git push github $(git_main_branch):svntrunk&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gk&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;\gitk --all --branches &amp;amp;!&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;\gitk --all $(git log -g --pretty=%h) &amp;amp;!&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --stat&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --stat -p&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph --decorate --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph --max-count=10&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glol&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glols&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --stat&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glod&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glods&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --date=short&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glola&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --all&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glog&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate --graph&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gloga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate --graph --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;_git_log_prettily&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmom&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge origin/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmtl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git mergetool --no-prompt&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmtlvim&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git mergetool --no-prompt --tool=vimdiff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmum&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge upstream/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gma&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --dry-run&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --force-with-lease&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gpf!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --force&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpoat&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push origin --all &amp;amp;&amp;amp; git push origin --tags&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push upstream&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gra&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote add&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grba&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbi&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase -i&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbom&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase origin/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --onto&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --skip&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grev&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git revert&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grhh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --hard&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">groh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset origin/$(git_current_branch) --hard&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rm&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grmc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rm --cached&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grmv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote rename&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grrm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote remove&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote set-url&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore --source&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore --staged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;cd &amp;#34;$(git rev-parse --show-toplevel || echo .)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gru&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status -sb&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn dcommit&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git show&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsi&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git submodule init&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsps&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git show --pretty=short --show-signature&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># use the default stash push on git 2.13 and newer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">is-at-least 2.13 &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$git_version&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsta&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash push&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsta&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash save&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstaa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash apply&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash clear&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash drop&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash list&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash pop&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsts&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash show --text&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;gsta --include-untracked&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstall&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git submodule update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch -c&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gts&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git tag -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gtv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git tag | sort -V&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gtl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;gtl(){ git tag --sort=-v:refname -n -l &amp;#34;${1}*&amp;#34; }; noglob gtl&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gunignore&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git update-index --no-assume-unchanged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gunwip&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log -n 1 | grep -q -c &amp;#34;\-\-wip\-\-&amp;#34; &amp;amp;&amp;amp; git reset HEAD~1&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase --autostash&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupav&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase --autostash -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glum&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull upstream $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gwch&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git whatchanged -p --abbrev-commit --pretty=medium&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gwip&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add -A; git rm $(git ls-files --deleted) 2&amp;gt; /dev/null; git commit --no-verify --no-gpg-sign -m &amp;#34;--wip-- [skip ci]&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gam&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gamc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gams&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --skip&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gama&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gamscp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --show-current-patch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Problems Encountered In Installing Arch on ROGLaptop</title><link>https://blog.moeomu.com/posts/problems-encountered-in-installing-arch-on-roglaptop/</link><pubDate>Tue, 09 Nov 2021 09:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/problems-encountered-in-installing-arch-on-roglaptop/</guid><description>&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/problems-encountered-in-installing-arch-on-roglaptop/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="no-display-after-installing-nvidia-graphics-card">No display after installing NVIDIA graphics card&lt;/h2>
+&lt;h3 id="installed-packages">Installed packages&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>xf86-video-intel&lt;/code>&lt;/li>
+&lt;li>&lt;code>mesa&lt;/code>&lt;/li>
+&lt;li>&lt;code>nvidia&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="solution">Solution&lt;/h3>
+&lt;ul>
+&lt;li>remove package: &lt;code>sudo pacman -R xf86-video-intel&lt;/code>&lt;/li>
+&lt;li>remove xconfig: &lt;code>sudo rm /etc/X11/xorg.conf&lt;/code>&lt;/li>
+&lt;li>edit xconfig: &lt;code>sudo vim /etc/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>10-nvidia-drm-outputclass.conf&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">Section &amp;#34;OutputClass&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Identifier &amp;#34;intel&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MatchDriver &amp;#34;i915&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Driver &amp;#34;modesetting&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndSection
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Section &amp;#34;OutputClass&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Identifier &amp;#34;nvidia&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MatchDriver &amp;#34;nvidia-drm&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Driver &amp;#34;nvidia&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Option &amp;#34;AllowEmptyInitialConfiguration&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Option &amp;#34;PrimaryGPU&amp;#34; &amp;#34;yes&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ModulePath &amp;#34;/usr/lib/nvidia/xorg&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ModulePath &amp;#34;/usr/lib/xorg/modules&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndSection
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>reboot&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>More references: &lt;a class="link" href="https://wiki.archlinux.org/title/PRIME" target="_blank" rel="noopener"
+>ArchWiki-PRIME&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="no-sound">No sound&lt;/h2>
+&lt;ul>
+&lt;li>edit file:&lt;code>sudo vim /etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>alsa-base.conf&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">options snd-hda-intel model=asus-zenbook
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Problems that still exist: The volume can only be 0% or 100%, but the application volume can be adjusted individually.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>More references: &lt;a class="link" href="https://askubuntu.com/questions/1276428/no-sound-alc294-asus-rog-strix-512-ubuntu-20-04-01" target="_blank" rel="noopener"
+>No sound ALC294 Asus ROG Strix 512 Ubuntu 20.04.01&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="the-wireless-network-is-unstable">The wireless network is unstable&lt;/h2>
+&lt;h3 id="installed-packages-1">Installed packages&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>dhcpcd&lt;/code>&lt;/li>
+&lt;li>&lt;code>NetworkManager&lt;/code>&lt;/li>
+&lt;li>&lt;code>iwd&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="solution-1">Solution&lt;/h3>
+&lt;ul>
+&lt;li>stop and disable service:
+&lt;ul>
+&lt;li>&lt;code>sudo systemctl stop dhcpcd&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo systemctl disable dhcpcd&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo systemctl stop iwd&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo systemctl disable iwd&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>remove package: &lt;code>sudo pacman -R dhcpcd&lt;/code>&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ul>
+&lt;h3 id="fundamental-problem">Fundamental problem&lt;/h3>
+&lt;p>The fundamental problem is that dhcpcd conflicts with NetworkManager.&lt;/p></description></item><item><title>Virtual machine hardware acceleration causes Electron application white screen problem</title><link>https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/</link><pubDate>Tue, 12 Oct 2021 19:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="problem-reproducible">Problem Reproducible&lt;/h2>
+&lt;ul>
+&lt;li>Reproducible: Yes&lt;/li>
+&lt;li>Host system: macOS BigSur 11.6&lt;/li>
+&lt;li>Virtual machine system: Ubuntu Desktop 20.04.3&lt;/li>
+&lt;li>Parallels Virtual Machine version: 17.0.1&lt;/li>
+&lt;li>Description of the problem: After installing or running NodeJS-based applications, especially Electron, the application will take up 1/4 of the white screen and 3/4 of the black screen with abnormal display, which cannot be used normally&lt;/li>
+&lt;li>Typical application failure.
+&lt;ul>
+&lt;li>VSCode&lt;/li>
+&lt;li>Motrix&lt;/li>
+&lt;li>Typora&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/WvksDr9PTQFi3ut.png"
+loading="lazy"
+alt="vscode"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/bRWZPJSQqjhFUNG.png"
+loading="lazy"
+alt="typora"
+>&lt;/p>
+&lt;h2 id="solutions">Solutions&lt;/h2>
+&lt;h3 id="solution-1">Solution 1&lt;/h3>
+&lt;p>Add a startup parameter &lt;code>-disable-gpu&lt;/code> to each Electron application&lt;/p>
+&lt;blockquote>
+&lt;p>Add: This can be achieved by creating a shortcut on the desktop, using vscode as an example, with the following content&lt;/p>
+&lt;p>code.desktop&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Entry&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>Visual Studio Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Comment&lt;/span>&lt;span class="o">=&lt;/span>Code Editing. Redefined.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">GenericName&lt;/span>&lt;span class="o">=&lt;/span>Text Editor
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --unity-launch %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Type&lt;/span>&lt;span class="o">=&lt;/span>Application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupNotify&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupWMClass&lt;/span>&lt;span class="o">=&lt;/span>Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Categories&lt;/span>&lt;span class="o">=&lt;/span>Utility&lt;span class="p">;&lt;/span>TextEditor&lt;span class="p">;&lt;/span>Development&lt;span class="p">;&lt;/span>IDE&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">MimeType&lt;/span>&lt;span class="o">=&lt;/span>text/plain&lt;span class="p">;&lt;/span>inode/directory&lt;span class="p">;&lt;/span>application/x-code-workspace&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Actions&lt;/span>&lt;span class="o">=&lt;/span>new-empty-window&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Keywords&lt;/span>&lt;span class="o">=&lt;/span>vscode&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Desktop-File-Install-Version&lt;span class="o">=&lt;/span>0.24
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Action new-empty-window&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>New Empty Window
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --new-window %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="solution-2">Solution 2&lt;/h3>
+&lt;p>Turn off the graphics-hardware acceleration for Parallels/other virtualization software - this virtual machine, as shown below&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/vSLmaJbtXiBd3xR.png"
+loading="lazy"
+alt="close"
+>&lt;/p>
+&lt;h2 id="additional-information">Additional Information&lt;/h2>
+&lt;p>The official developers of Electron mention on &lt;a class="link" href="https://github.com/electron/electron/issues/5257#issuecomment-213890151" target="_blank" rel="noopener"
+>Github&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>You can probably disable GPU acceleration to work around this, or just use another visual machine software. Basically the GPU acceleration of Linux in virtual machines is a mess, depending on the software of visual machine, the version and distribution of Linux, and the version of Chromium, you can get various results and bugs.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Linux&amp;rsquo;s virtual machine hardware acceleration is a mess, so it&amp;rsquo;s normal for this to happen&lt;/li>
+&lt;/ul></description></item><item><title>NodeJS mirror source configuration</title><link>https://blog.moeomu.com/posts/nodejs-mirror-source-configuration/</link><pubDate>Mon, 27 Sep 2021 13:56:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/nodejs-mirror-source-configuration/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/nodejs-mirror-source-configuration/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="installation">Installation&lt;/h2>
+&lt;blockquote>
+&lt;p>Debain(Ubuntu, etc.)&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">apt install node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install yarn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>macOS&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew install node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install yarn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="configure-mirror-source">Configure mirror source&lt;/h2>
+&lt;h3 id="set-as-taobao-mirror-source">Set as Taobao mirror source&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm config &lt;span class="nb">set&lt;/span> registry https://registry.npm.taobao.org/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yarn config &lt;span class="nb">set&lt;/span> registry https://registry.npm.taobao.org/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="reset-to-official-mirror-source">Reset to official mirror source&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm config &lt;span class="nb">set&lt;/span> registry https://registry.npmjs.org/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yarn config &lt;span class="nb">set&lt;/span> registry https://registry.yarnpkg.com/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>macOS Turn off built-in screen</title><link>https://blog.moeomu.com/posts/macos-turn-off-built-in-screen/</link><pubDate>Thu, 16 Sep 2021 17:00:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/macos-turn-off-built-in-screen/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/macos-turn-off-built-in-screen/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="the-magnet-trick">The magnet trick&lt;/h2>
+&lt;p>Find two magnets and place them near the audio of the MacBook to trick the system into closing the lid to turn off the built-in screen.&lt;/p>
+&lt;h2 id="nvram-boot-setup-method">NVRAM boot setup method&lt;/h2>
+&lt;blockquote>
+&lt;p>This method enables the screen to be displayed separately on the external screen from the driver level.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="enable">Enable&lt;/h3>
+&lt;ul>
+&lt;li>Reboot, press and hold &lt;code>Command+R&lt;/code> key&lt;/li>
+&lt;li>Enter the password to boot setup - terminal&lt;/li>
+&lt;li>Enter the command &lt;code>nvram boot-args=&amp;quot;niog=1&amp;quot;&lt;/code>&lt;/li>
+&lt;li>Connect the external monitor, connect the power supply and reboot&lt;/li>
+&lt;li>Close the cover immediately after booting by entering the user password, then see the external screen with a screen, open the cover of the MacBook, success&lt;/li>
+&lt;/ul>
+&lt;h3 id="restore">Restore&lt;/h3>
+&lt;ul>
+&lt;li>Reboot, press and hold &lt;code>Command+R&lt;/code> key&lt;/li>
+&lt;li>Enter the password to boot setup - terminal&lt;/li>
+&lt;li>Enter the command &lt;code>nvram -d boot-args&lt;/code>&lt;/li>
+&lt;li>Reboot&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsTools error on high version Kali</title><link>https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/</link><pubDate>Tue, 06 Jul 2021 15:55:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="first-update-the-kali-source">First update the kali source&lt;/h2>
+&lt;ul>
+&lt;li>Ali cloud source is as follows&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="error-report-content">Error report content&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">An error occurred &lt;span class="k">while&lt;/span> installing the following packages:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- libelf-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- linux-headers-5.10.0-kali9-amd64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Install these packages manually and start the Parallels Tools installation again.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="solution">Solution&lt;/h2>
+&lt;ul>
+&lt;li>Install the missing package&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt intall libelf-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>Pitfall record.&lt;br>
+Kali 2021&amp;rsquo;s default &lt;code>xfce&lt;/code> desktop environment will cause a white screen after installing ParallelsTools, so switch the desktop environment to &lt;code>gnome&lt;/code> in advance or deselect &lt;code>xface&lt;/code> and select &lt;code>gnome&lt;/code> when installing kali&lt;/p>
+&lt;/blockquote></description></item><item><title>Signing Git Commit with GPG on Windows</title><link>https://blog.moeomu.com/posts/signing-git-commit-with-gpg-on-windows/</link><pubDate>Sat, 05 Jun 2021 08:50:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/signing-git-commit-with-gpg-on-windows/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/signing-git-commit-with-gpg-on-windows/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="download-gpg4win">Download GPG4WIN&lt;/h2>
+&lt;p>Download link: &lt;a class="link" href="https://www.gpg4win.org/thanks-for-download.html" target="_blank" rel="noopener"
+>gpg4win&lt;/a>&lt;/p>
+&lt;h2 id="create-and-apply-gpg-key">Create and apply GPG key&lt;/h2>
+&lt;h3 id="create-gpg-key">Create GPG key&lt;/h3>
+&lt;ul>
+&lt;li>Create: &lt;code>gpg --full-generate-key&lt;/code>&lt;/li>
+&lt;li>Key length: &lt;code>4096&lt;/code>&lt;/li>
+&lt;li>Enter username, email&lt;/li>
+&lt;li>List all keys: &lt;code>gpg --list-secret-keys --keyid-format=long&lt;/code>&lt;/li>
+&lt;li>Export keys according to keyid: &lt;code>gpg --armor --export KEYID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="apply-the-key">Apply the key&lt;/h3>
+&lt;ul>
+&lt;li>Import the key into Github and Gitee&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-git-windows">Configure Git Windows&lt;/h2>
+&lt;ul>
+&lt;li>Configure the default username and email, which needs to be the same as the values set when creating GPG
+&lt;ul>
+&lt;li>&lt;code>git config --global user.name USERNAME&lt;/code>&lt;/li>
+&lt;li>&lt;code>git config --global user.email EMAIL&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Configure the key
+&lt;ul>
+&lt;li>&lt;code>git config --global user.signingKey KEYID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Enable global cryptographic signatures
+&lt;ul>
+&lt;li>&lt;code>git config --global commit.gpgSign true&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Using GPG to sign Git Commit under macOS</title><link>https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/</link><pubDate>Tue, 25 May 2021 07:55:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="about-github-gpg-key-verification">About GitHub GPG Key Verification&lt;/h2>
+&lt;h3 id="enabling-commit-signing">Enabling Commit Signing&lt;/h3>
+&lt;p>GitHub has a new &amp;ldquo;Vigilance Mode&amp;rdquo; that requires a GPG key to sign a certified commit before it will show &amp;ldquo;Verity&amp;rdquo;.&lt;/p>
+&lt;ul>
+&lt;li>First create a GPG key (&lt;a class="link" href="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/" target="_blank" rel="noopener"
+>GitHub Official Docs&lt;/a> generating-a-new-gpg-key) has details on how to do this, so I won&amp;rsquo;t go over it again)&lt;/li>
+&lt;li>List the GPG key&amp;rsquo;s signature: &lt;code>gpg -K --keyid-format LONG&lt;/code>, which will &lt;strong>keyid&lt;/strong> record&lt;/li>
+&lt;li>Tell git to use this GPG key: &lt;code>git config user.signingkey your_keyid&lt;/code>&lt;/li>
+&lt;li>The local git username and email need to be the same as the ones filled in when the GPG key was generated: &lt;code>git config user.name name&lt;/code>, &lt;code>git config user.email email email&lt;/code>&lt;/li>
+&lt;li>Enable commit signing for local git: &lt;code>git config commit.gpgsign true&lt;/code>&lt;/li>
+&lt;li>Add the -S option to the Commit signature: &lt;code>git commit -S -m message&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="fatal-error-occurred---unable-to-commit-macos">Fatal error occurred - unable to commit-macOS&lt;/h3>
+&lt;h4 id="the-problem-is-as-follows-reproduced-in-macos-1131">The problem is as follows, reproduced in macOS 11.3.1&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">error: gpg failed to sign the data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">fatal: failed to write commit object
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="solution-in-macos">solution in macOS&lt;/h4>
+&lt;ul>
+&lt;li>Update &amp;amp; Install&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew upgrade gnupg &lt;span class="c1"># This has a make step which takes a while&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew link --overwrite gnupg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install pinentry-mac
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;pinentry-program /usr/local/bin/pinentry-mac&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.gnupg/gpg-agent.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">killall gpg-agent
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global gpg.program gpg &lt;span class="c1"># perhaps you had this already? On linux maybe gpg2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global commit.gpgsign &lt;span class="nb">true&lt;/span> &lt;span class="c1"># if you want to sign every commit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Sign again&lt;/li>
+&lt;li>Check the status of the commit: &lt;code>git log --show-signature -1&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>Summary of the problem of writing python with vscode under Windows</title><link>https://blog.moeomu.com/posts/summary-of-the-problem-of-writing-python-with-vscode-under-windows/</link><pubDate>Tue, 19 Jan 2021 17:48:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/summary-of-the-problem-of-writing-python-with-vscode-under-windows/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/summary-of-the-problem-of-writing-python-with-vscode-under-windows/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="vscode-python-venv-powershell-unsigned-environment-cant-be-activated">VSCode-Python-Venv-PowerShell unsigned environment can&amp;rsquo;t be activated&lt;/h2>
+&lt;blockquote>
+&lt;p>I&amp;rsquo;ve been looking for a solution for a while, but the solution is to change the Windows security policy to a signed one, as follows&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>set-executionpolicy remotesigned&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>I found that this is a 2018 problem and there is no good solution, but I still found a good policy that changes the current user&amp;rsquo;s signature policy to require remote signing, while other users are still blocked&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>You can then view the policy changes with the following code&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Get-ExecutionPolicy -LIST&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="python-change-pip-source">Python change PIP source&lt;/h2>
+&lt;blockquote>
+&lt;p>It&amp;rsquo;s too much trouble to search for the source every time, so why not just take a note and back it up locally?&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;p>&lt;code>%HOMEPATH%/pip/pip.ini&lt;/code>&lt;/p>
+&lt;h3 id="linux--macos">Linux &amp;amp; macOS&lt;/h3>
+&lt;p>&lt;code>~/.pip/pip.conf&lt;/code>&lt;/p>
+&lt;h3 id="edit-format">Edit format&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[global]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[install]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">trusted-host=pypi.tuna.tsinghua.edu.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="pip-source">pip source&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Site&lt;/th>
+&lt;th>Source&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Tsinghua&lt;/td>
+&lt;td>&lt;a class="link" href="https://pypi.tuna.tsinghua.edu.cn/simple" target="_blank" rel="noopener"
+>https://pypi.tuna.tsinghua.edu.cn/simple&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Ali Cloud&lt;/td>
+&lt;td>&lt;a class="link" href="http://mirrors.aliyun.com/pypi/simple/" target="_blank" rel="noopener"
+>http://mirrors.aliyun.com/pypi/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>USTC&lt;/td>
+&lt;td>&lt;a class="link" href="https://pypi.mirrors.ustc.edu.cn/simple/" target="_blank" rel="noopener"
+>https://pypi.mirrors.ustc.edu.cn/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>HUT&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.hustunique.com/" target="_blank" rel="noopener"
+>http://pypi.hustunique.com/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SUT&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.sdutlinux.org/" target="_blank" rel="noopener"
+>http://pypi.sdutlinux.org/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DouBan&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.douban.com/simple/" target="_blank" rel="noopener"
+>http://pypi.douban.com/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="pip-module-not-found-error">pip module not found error&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>python -m ensurepip&lt;/code>&lt;/li>
+&lt;li>&lt;code>python -m pip install --upgrade pip&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsDesktop16 repair network</title><link>https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/</link><pubDate>Wed, 16 Dec 2020 13:42:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="prelude">Prelude&lt;/h2>
+&lt;ul>
+&lt;li>Works under macOS Big Sur&lt;/li>
+&lt;li>Previously it was an imperfect solution using command start, which would also lead to a series of permission problems, but now it is finally perfect&lt;/li>
+&lt;/ul>
+&lt;h2 id="solution">Solution&lt;/h2>
+&lt;ul>
+&lt;li>Edit the file &lt;code>/Library/Preferences/Parallels/network.desktop.xml&lt;/code> with highest privileges&lt;/li>
+&lt;li>Change the value of the &lt;code>UseKextless&lt;/code> field from &lt;code>-1&lt;/code> to &lt;code>0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Note: This value may not be -1 for everyone, and may not be 0 for everyone, so be brave and try!&lt;/p>
+&lt;/blockquote></description></item><item><title>Homebrew and Brewcask installation</title><link>https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/</guid><description>&lt;p>Please note the timeliness:&lt;strong>This article was written on 2020/11/10&lt;/strong>&amp;amp;&amp;amp;&lt;strong>This article was updated on 2021/07/02&lt;/strong>&lt;/p>
+&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="install-git">Install git&lt;/h2>
+&lt;ul>
+&lt;li>Method 1: Install XCode Terminal:&lt;code>xcode-select --install&lt;/code>&lt;/li>
+&lt;li>Method 2: Go directly to the git website and download the macOS installer for git&lt;/li>
+&lt;/ul>
+&lt;h2 id="install-homebrew">Install HomeBrew&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>First download the original &lt;a class="link" href="https://cdn.jsdelivr.net/gh/Homebrew/install@master/install.sh" target="_blank" rel="noopener"
+>installer.sh&lt;/a> jsDelivr CDN image&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run it by entering the following command.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/homebrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/homebrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/linuxbrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/linuxbrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/brew.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/brew&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod +x install.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">HOMEBREW_BOTTLE_DOMAIN&lt;/span>&lt;span class="o">=&lt;/span>https://mirrors.ustc.edu.cn/homebrew-bottles ./install.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Cloning the Homebrew-Cask project via USTC&amp;rsquo;s git repository&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>cd /usr/local/Homebrew/Library/Taps/homebrew&lt;/code>&lt;/li>
+&lt;li>&lt;code>git clone https://mirrors.ustc.edu.cn/homebrew-cask.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="check-source-configuration">Check source configuration&lt;/h2>
+&lt;ul>
+&lt;li>Checking the brew mirror source: &lt;code>git -C &amp;quot;$(brew --repo)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>View homebrew-core mirror source: &lt;code>git -C &amp;quot;$(brew --repo homebrew/core)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>View homebrew-cask mirror sources: &lt;code>git -C &amp;quot;$(brew --repo homebrew/cask)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>The qualifying criteria is that the addresses of these sources are all USTC URLs&lt;/li>
+&lt;/ul>
+&lt;h2 id="update">Update&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>brew update&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="install-oh-my-zsh-not-required">Install Oh-My-Zsh (not required)&lt;/h2>
+&lt;ul>
+&lt;li>Update zsh: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>git clone oh-my-zsh project: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>Rename the project: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Copy the template to the home directory named .zshrc: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;li>Exit Terminal, start Terminal, success&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-terminal-not-required">Configure Terminal (not required)&lt;/h2>
+&lt;ul>
+&lt;li>Preferences-On startup, open-New window with description file-Homebrew&lt;/li>
+&lt;li>Preferences-Description File-Homebrew-Text-Font-14 points&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-terminal-agent-not-required">Configure Terminal agent (not required)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>OhMyZsh Installation Guide</title><link>https://blog.moeomu.com/posts/ohmyzsh-installation-guide/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/ohmyzsh-installation-guide/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/ohmyzsh-installation-guide/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="install-zsh">Install zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="clone-git-repo">Clone git repo&lt;/h2>
+&lt;ul>
+&lt;li>China mainland: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>Global: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="config-zsh">config zsh&lt;/h2>
+&lt;h3 id="set-as-default-shell">set as default shell&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="auto-suggestions-plugin">auto suggestions plugin&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

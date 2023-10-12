@@ -1,0 +1,1117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>KernelProgramming on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/categories/kernelprogramming/</link><description>Recent content in KernelProgramming on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 07 Jul 2021 11:20:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/categories/kernelprogramming/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux Kernel Programming study notes 001 Compiling and Booting Kernel</title><link>https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/</link><pubDate>Wed, 07 Jul 2021 11:20:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="prepare-the-environment">Prepare the environment&lt;/h2>
+&lt;ul>
+&lt;li>Ubuntu 20.04 LTS&lt;/li>
+&lt;li>Linux 4.9.229&lt;/li>
+&lt;li>Busybox 1.33.0&lt;/li>
+&lt;li>qemu&lt;/li>
+&lt;/ul>
+&lt;h3 id="download-kernel-source-code-and-file-system-source-code">Download kernel source code and file system source code&lt;/h3>
+&lt;ul>
+&lt;li>Download &lt;code>linux-4.9.229.tar.gz&lt;/code> at the site &lt;a class="link" href="https://www.kernel.org" target="_blank" rel="noopener"
+>Kernel.org&lt;/a>.&lt;/li>
+&lt;li>Download &lt;code>busybox-1.33.0.tar.bz2&lt;/code> from the site &lt;a class="link" href="https://www.busybox.net/downloads" target="_blank" rel="noopener"
+>Busybox.net&lt;/a>.&lt;/li>
+&lt;li>Install qemu via apt: &lt;code>sudo apt install qemu-system-x86&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h2 id="compilation">Compilation&lt;/h2>
+&lt;h3 id="compiling-the-kernel">Compiling the kernel&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>export ARCH=x86&lt;/code>。&lt;/li>
+&lt;li>&lt;code>make x86_64_defconfig&lt;/code>。&lt;/li>
+&lt;li>&lt;code>make menuconfig&lt;/code>。
+&lt;ul>
+&lt;li>Check &lt;code>General Settings -&amp;gt; Initial RAM file system and RAM disk (initramfs/initrd) support&lt;/code>.&lt;/li>
+&lt;li>Check &lt;code>Device Driver -&amp;gt; Block Devices -&amp;gt; RAM Block Device Support&lt;/code>.&lt;/li>
+&lt;li>Modify &lt;code>Device Driver -&amp;gt; Block Devices -&amp;gt; RAM Block Device Support -&amp;gt; (65536) default RAM disk size (kbytes)&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>If this step reports a &lt;code>fatal error: curses.h&lt;/code>, then install &lt;code>sudo apt install libncurses5-dev&lt;/code>.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>The compiled kernel is placed in the&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The compiled kernel is placed in the directory &lt;code>arch/x86/boot&lt;/code> under the file name &lt;code>bzImage&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="compile-busybox">Compile busybox&lt;/h3>
+&lt;ul>
+&lt;li>Compile busybox
+&lt;ul>
+&lt;li>Check &amp;ldquo;Settings -&amp;gt; Build Options -&amp;gt; [*] Build Busybox as a static binary (no fragmented libraries)&amp;rdquo;.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>make &amp;amp;&amp;amp; make install&lt;/code>。&lt;/li>
+&lt;/ul>
+&lt;h2 id="packaged-file-system">Packaged file system&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>mkdir etc dev mnt&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p proc sys tmp&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p etc/init.d&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/fstab&lt;/code>。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">proc /proc proc defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs /tmp tmpfs defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysfs /sys sysfs defaults 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Welcome to Moeomu Linux&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/mount -a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Remounting the root filesystem&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mount -o remount rw /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">moutn -t devpts devpts /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> /sbin/mdev &amp;gt; /proc/sys/kernel/hotplug
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mdev -s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/inittab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">::sysinit:/etc/init.d/rcS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::respawn:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::askfirst:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::cttlaltdel:/bin/umount -a -r
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/inittab&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>cd dev&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod console c 5 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod null c 1 3&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod tty1 c 4 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The following code is executed line by line in the busybox source code directory&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>rm -rf rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo rm -rf fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dd &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>/dev/zero &lt;span class="nv">of&lt;/span>&lt;span class="o">=&lt;/span>./rootfs.ext3 &lt;span class="nv">bs&lt;/span>&lt;span class="o">=&lt;/span>1M &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkfs.ext3 rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -o loop rootfs.ext3 ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -rf ./_install/* ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gzip --best -c rootfs.ext3 &amp;gt; rootfs.img.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>The final filesystem is generated: &lt;code>rootfs.img.gz&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="running-the-system-with-qemu">Running the system with QEMU&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>qemu-system-x86_64 -kernel ./linux-4.9.229/arch/x86_64/boot/bzImage -initrd ./busybox-1.33.1/rootfs.img.gz -append &amp;quot;root=/dev/ram init=/linuxrc&amp;quot; -serial file:output.txt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Previews are as follows&lt;/p>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/qemu.png"
+width="719"
+height="466"
+srcset="https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="RHildI.png"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>Windows Kernel Programming Study Notes 002 Basic Structure</title><link>https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-002-basic-structure/</link><pubDate>Fri, 18 Dec 2020 20:52:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-002-basic-structure/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-002-basic-structure/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="string-manipulation">String manipulation&lt;/h2>
+&lt;blockquote>
+&lt;p>The UNICODE_STRING structure is used in the kernel as the basic string structure. It should be noted that the lenth member of this structure is used to determine the string length, not &lt;code>'\0'&lt;/code>.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="string-initialization">String initialization&lt;/h3>
+&lt;ul>
+&lt;li>Function: &lt;code>RtlInitUnicodeString&lt;/code>&lt;/li>
+&lt;li>Parameters.
+&lt;ul>
+&lt;li>&lt;code>PUNICODE_STRING&lt;/code>: &lt;code>DestinationString&lt;/code>&lt;/li>
+&lt;li>&lt;code>PCWSTR&lt;/code>: &lt;code>SourceString&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Return value: None&lt;/li>
+&lt;li>IRQL: &lt;code>&amp;lt;=DISPATCH_LEVEL&lt;/code>&lt;/li>
+&lt;li>Explanation: Initialize a WCHAR string ending with 0, the first parameter is the input parameter and also the output parameter&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">uFirstString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">RtlInitUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;HelloWorld&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;String:%wZ&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>ps: it does not allocate space for buffer, but points directly to Source first address, so make sure Source is always valid, otherwise it is invalid access&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="string-copy">String Copy&lt;/h3>
+&lt;ul>
+&lt;li>Function: &lt;code>RtlUnicodeStringCopyString&lt;/code>&lt;/li>
+&lt;li>Parameters
+&lt;ul>
+&lt;li>&lt;code>PUNICODE_STRING&lt;/code>: &lt;code>DestinationString&lt;/code>&lt;/li>
+&lt;li>&lt;code>NTSTRSAFE_PCWSTR&lt;/code>: &lt;code>pszSrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Return value: &lt;code>NTSTAUTS&lt;/code>
+&lt;ul>
+&lt;li>Successful execution returns &lt;code>STATUS_SUCCESS&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>IRQL: &lt;code>=PASSIVE_LEVEL&lt;/code>&lt;/li>
+&lt;li>Explanation: Copy a copy of src to dest&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">WCHAR&lt;/span> &lt;span class="n">strBuf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">128&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">uFirstString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">RtlInitEmptyUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strBuf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strBuf&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">RtlUnicodeStringCopyString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;Hello Kernel&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;String: %wZ&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>PS: In order to use the RtlUnicodeStringCopyString function, you should add the header file &lt;code>Ntstrsafe.h&lt;/code>; you can&amp;rsquo;t copy to the String with fixed length buf, otherwise you will blue screen report memory read/write error&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="chain-table">Chain table&lt;/h2>
+&lt;h3 id="definition-of-a-linked-table">Definition of a linked table&lt;/h3>
+&lt;blockquote>
+&lt;p>The following is the definition of a linked table in wdk&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_LIST_ENTRY&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">_LIST_ENTRY&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 后节点
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_LIST_ENTRY&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">Blink&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 前节点
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">LIST_ENTRY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PLIST_ENTRY&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="using-linked-tables">Using linked tables&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_TestListEntry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData3&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData4&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Generally, for ease of operation, a header node of a chain table is defined, containing nothing but a LIST_ENTRY structure.&lt;/li>
+&lt;/ul>
+&lt;h3 id="header-node-initialization">Header node initialization&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">ListHeader&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InitializeListHead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="node-insertion">Node insertion&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">ListHeader&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">TestListEntry&lt;/span> &lt;span class="n">Entry1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">TestListEntry&lt;/span> &lt;span class="n">Entry2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">TestListEntry&lt;/span> &lt;span class="n">Entry3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Entry1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ulData1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sc">&amp;#39;A&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Entry2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ulData1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sc">&amp;#39;B&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Entry3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ulData1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sc">&amp;#39;C&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InitializeListHead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InsertHeadList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Entry2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InsertHeadList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Entry1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InsertTailList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Entry3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="link-table-traversal">Link table traversal&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">PLIST_ENTRY&lt;/span> &lt;span class="n">pListEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">pListEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ListHeader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pListEntry&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PTestListEntry&lt;/span> &lt;span class="n">pTestEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">CONTAINING_RECORD&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">TestListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ListPtr=%p, Entry=%p, Tag=%c&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pTestEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">CHAR&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">pTestEntry&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">m_ulData1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pListEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pListEntry&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>The role of &lt;code>CONTAINING_RECORD&lt;/code> is to convert the address of &lt;code>m_ListEntry&lt;/code> to the first address of the structure &lt;code>TestListEntry&lt;/code>.&lt;/li>
+&lt;li>&lt;code>CONTAINING_RECORD&lt;/code> usage: &lt;code>CONTAINING_RECORD(PCHAR Address, TYPE Type, PCHAR Field)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="node-removal">Node Removal&lt;/h3>
+&lt;ul>
+&lt;li>Remove the first node: &lt;code>PLIST_ENTRY RemoveHeadList(PLIST_ENTRY ListHead)&lt;/code>&lt;/li>
+&lt;li>Remove the tail node: &lt;code>PLIST_ENTRY RemoveTailList(PLIST_ENTRY ListHead)&lt;/code>&lt;/li>
+&lt;li>If successful, both of the above functions will return the address of the head of the chain, or NULL if they cannot be removed&lt;/li>
+&lt;li>To remove a specific node.
+&lt;ul>
+&lt;li>&lt;code>BOOLEAN RemoveEntryList(PLIST_ENTRY Entry)&lt;/code>&lt;/li>
+&lt;li>If the chain becomes empty after removal, then TRUE will be returned, if it is not empty, then FALSE will be returned&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="determine-the-state-of-the-linked-list">Determine the state of the linked list&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>BOOLEAN IsListEmpty(const LIST_ENTRY *ListHead)&lt;/code>&lt;/li>
+&lt;li>It returns TRUE to indicate an empty linked table, otherwise it means the chain is non-empty&lt;/li>
+&lt;/ul>
+&lt;h2 id="spin-locks">Spin locks&lt;/h2>
+&lt;h3 id="using-spin-locks">Using spin locks&lt;/h3>
+&lt;blockquote>
+&lt;p>A spinlock is a high IRQL lock provided by the kernel to access a resource in a synchronous and exclusive manner&lt;/p>
+&lt;p>&lt;strong>Caution&lt;/strong>.&lt;/p>
+&lt;ul>
+&lt;li>The spinlock variable cannot be stored on the current function stack, otherwise it is the same as not initializing it every time you enter it&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;h3 id="initializingusing-spin-locks">Initializing/using spin locks&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Initialize Spin Lock WARN: not local var
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">KSPIN_LOCK&lt;/span> &lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">initLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeInitializeSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// it&amp;#39;s a safe function
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Acquire Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KIRQL&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// save old irql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Normal Spin Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">KeAcquireSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// TO DO
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">KeReleaseSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="spin-locks-are-used-in-bidirectional-linked-tables">Spin locks are used in bidirectional linked tables&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// it&amp;#39;s a safe function
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Enter...&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Acquire Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KIRQL&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// save old irql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Normal Spin Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">KeAcquireSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Test List
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_FILE_INFO&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">m_strFileName&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="n">FILE_INFO&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PFILE_INFO&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">listHead&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE_INFO&lt;/span> &lt;span class="n">my_file_info&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">RtlInitUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_file_info&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_strFileName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;TestName&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">InitializeListHead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">listHead&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExInterlockedInsertHeadList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">listHead&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_file_info&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeReleaseSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="queue-spinlock">Queue spinlock&lt;/h3>
+&lt;blockquote>
+&lt;p>Queue spinlock can have better performance on multi-CPU platforms, and also follows the first-wait-first-acquire spinlock principle.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>It is initialized in the same way as a normal spinlock, but the initialized spinlocks must not be mixed&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">KSPIN_LOCK&lt;/span> &lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">initLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeInitializeSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// it&amp;#39;s a safe function
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Acquire Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KIRQL&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// save old irql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Queue Spin Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KLOCK_QUEUE_HANDLE&lt;/span> &lt;span class="n">my_lock_queue_handle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeAcquireInStackQueuedSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_lock_queue_handle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeReleaseInStackQueuedSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_lock_queue_handle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="memory-allocation">Memory allocation&lt;/h2>
+&lt;h3 id="general-memory-allocation">General memory allocation&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncMem&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">buffer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocatePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NonPagedPoolNx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">512&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">tag1&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">tag1&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Pool Operate Success!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Allocate Pool Failed!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="lookaside-memory-allocation">Lookaside Memory Allocation&lt;/h3>
+&lt;blockquote>
+&lt;p>Benefits: High frequency of memory requests and releases from the system, using Lookaside allocation will greatly improve performance&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Note: In some places it is called &amp;ldquo;LookAside&amp;rdquo;.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;span class="lnt">67
+&lt;/span>&lt;span class="lnt">68
+&lt;/span>&lt;span class="lnt">69
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncMemLookaside&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PNPAGED_LOOKASIDE_LIST&lt;/span> &lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BOOLEAN&lt;/span> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BOOLEAN&lt;/span> &lt;span class="n">bInit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PNPAGED_LOOKASIDE_LIST&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="nf">ExAllocatePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NonPagedPoolNx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NPAGED_LOOKASIDE_LIST&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">memset&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NPAGED_LOOKASIDE_LIST&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// init
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ExInitializeNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">128&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bInit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// start allocate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocateFromNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocateFromNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] First Address:%p, Second Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pSeocdeMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// free first
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ExFreeToNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// reallocate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocateFromNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Re-Allocate First Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FALSE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreeToNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreeToNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pSeocdeMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">bInit&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExDeleteNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bInit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="objects-and-handles">Objects and handles&lt;/h2>
+&lt;blockquote>
+&lt;p>Objects created in the kernel, destroyed in the kernel, and managed and maintained by the kernel are called kernel objects&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncObject&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BOOLEAN&lt;/span> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">OBJECT_ATTRIBUTES&lt;/span> &lt;span class="n">ObjAttr&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">uNameString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">RtlInitUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uNameString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\\&lt;/span>&lt;span class="s">BaseNamedObjects&lt;/span>&lt;span class="se">\\&lt;/span>&lt;span class="s">TestEvent&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">InitializeObjectAttributes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ObjAttr&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uNameString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">OBJ_KERNEL_HANDLE&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">OBJ_CASE_INSENSITIVE&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ZwCreateEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ObjAttr&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">SynchronizationEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// get point
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ObReferenceObjectByHandle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">ExEventObjectType&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">KernelMode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// open obj with attribute:name
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ZwOpenEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ObjAttr&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ObReferenceObjectByHandle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">ExEventObjectType&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">KernelMode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Create Handle:%p, Create Object Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pCreateEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Open Handle:%p, Open Object Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pOpenEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FALSE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ObDereferenceObject&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ZwClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ObDereferenceObject&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ZwClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>PS: there is a conflict when importing header files: &lt;code>ntddk.h&lt;/code> and &lt;code>ntifs.h&lt;/code>, the solution is to put &lt;code>ntifs.h&lt;/code> in front of &lt;code>ntddk.h&lt;/code> and import it, so there is no conflict&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="registry">Registry&lt;/h2>
+&lt;blockquote>
+&lt;p>The registry is actually the configuration storage structure of Windows, storing most of the system configuration information, most of the files are stored in the SYSTEM32\CONFIG directory under the system disk, these files are stored in the kernel space in a memory-mapped way, and then organized in the way of &amp;ldquo;HIVE&amp;rdquo;. The registry API actually manipulates the HIVE memory data, which is eventually written back to the corresponding file in the config directory&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="open-and-close">Open and close&lt;/h3>
+&lt;ul>
+&lt;li>To be continued&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Windows Kernel Programming Study Notes 001 Environment Building</title><link>https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/</link><pubDate>Fri, 18 Dec 2020 18:52:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="windows-kernel-development-environment-configuration">Windows kernel development environment configuration&lt;/h2>
+&lt;h3 id="download">Download&lt;/h3>
+&lt;blockquote>
+&lt;p>Development Machine&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Windows 10 20H2 x64&lt;/li>
+&lt;li>Visual Studio 2019&lt;/li>
+&lt;li>Windows Driver Kit - Windows 10.0.19041.685 (Windows 10 2004)&lt;/li>
+&lt;li>WinDbg Preview&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Test Machine&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Windows 10 2004 x64&lt;/li>
+&lt;li>DbgView&lt;/li>
+&lt;/ul>
+&lt;h3 id="test-driver">Test driver&lt;/h3>
+&lt;blockquote>
+&lt;p>Let&amp;rsquo;s start with the classic HelloWorld&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;ntddk.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">VOID&lt;/span> &lt;span class="nf">DriverUnload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Unload, Driver Object Address: %p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">NTSTATUS&lt;/span> &lt;span class="nf">DriverEntry&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PUNICODE_STRING&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Hello Kernel World!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">DriverObject&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Object Address: %p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DriverObject&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">DriverUnload&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DriverUnload&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">RegistryPath&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Registry Path: %wZ&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">STATUS_SUCCESS&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="test-debugging">Test debugging&lt;/h3>
+&lt;blockquote>
+&lt;p>Refer to &lt;a class="link" href="https://blog.moeomu.com/posts/Windows%E5%86%85%E6%A0%B8%E8%B0%83%E8%AF%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" >Windows kernel debugging&lt;/a> article to set up the debugging environment, except that the place of Windows 7 can be changed to Windows 10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="contextual-environment-analysis">Contextual environment analysis&lt;/h2>
+&lt;blockquote>
+&lt;p>Context refers to the environment and state that the CPU is in when executing the code and changing the code.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="experiment-psgetcurrentprocessid">Experiment: PsGetCurrentProcessId&lt;/h3>
+&lt;blockquote>
+&lt;p>The purpose of the experiment is to find out in which &amp;ldquo;process&amp;rdquo; the written driver module is executed&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;ntddk.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">VOID&lt;/span> &lt;span class="nf">DriverUnload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Unload, Driver Object Address: %p, Current Process Id=0x%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">PsGetCurrentProcessId&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">NTSTATUS&lt;/span> &lt;span class="nf">DriverEntry&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PUNICODE_STRING&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Hello Kernel World, Current Process Id=0x%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">PsGetCurrentProcessId&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">DriverObject&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Object Address: %p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DriverObject&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">DriverUnload&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DriverUnload&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">RegistryPath&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Registry Path: %wZ&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">STATUS_SUCCESS&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>As shown&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown1.png"
+width="1161"
+height="477"
+srcset="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown1_hu56feb903f34a6c562b078d24280841de_92241_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown1_hu56feb903f34a6c562b078d24280841de_92241_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="rYh5BF.png"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="584px"
+>
+&lt;img src="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown2.png"
+width="829"
+height="208"
+srcset="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown2_huaf36572bc8d9ea9a3ec9f5032d2b20c5_23447_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown2_huaf36572bc8d9ea9a3ec9f5032d2b20c5_23447_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="rYhq91.png"
+class="gallery-image"
+data-flex-grow="398"
+data-flex-basis="956px"
+>&lt;/p>
+&lt;h3 id="conclusion">Conclusion&lt;/h3>
+&lt;blockquote>
+&lt;p>Both the driver entry function and the driver uninstall callback function belong to the process with ID 4, and this process is the System process&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>System process is a process virtualized by the operating system, representing the system kernel&lt;/li>
+&lt;li>If process A is running in P1 virtual space and the current CPU context of the driver is P2 virtual space, then the accessed content should be unpredictable&lt;/li>
+&lt;/ul>
+&lt;h2 id="interrupt-request-level">Interrupt request level&lt;/h2>
+&lt;blockquote>
+&lt;p>Similar to the concept of priority of threads, the system scheduler schedules threads at the granularity of time slice, based on their priority, the higher the thread priority, the higher the chance of getting scheduled. And at the driver level, the CPU provides the concept of IRQL, which stipulates that code at high IRQL level can interrupt and preempt the execution process of code at low IRQL to execute.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="table-of-common-irql-interrupt-request-levels">Table of common IRQL interrupt request levels&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>IRQL&lt;/th>
+&lt;th>Value(x86, amd64, IA64)&lt;/th>
+&lt;th>Description&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>PASSIVE_LEVEL&lt;/td>
+&lt;td>0, 0, 0&lt;/td>
+&lt;td>Application layer threads and most kernel functions are in this IRQL, with unlimited access to all kernel APIs, paged and non-paged memory&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>APC_LEVEL&lt;/td>
+&lt;td>1, 1, 1&lt;/td>
+&lt;td>Asynchronous method calls (APC), or being in this IRQL on page errors, can use most of the kernel APIs and can access paged as well as non-paged memory&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DISPATCH_LEVEL&lt;/td>
+&lt;td>2, 2, 2&lt;/td>
+&lt;td>Deferred method calls (DPCs) are in this IRQL, can use specific kernel APIs, and can only access non-paged memory&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="determine-the-current-irql">Determine the current IRQL&lt;/h3>
+&lt;ul>
+&lt;li>At the driver entry point DriverEntry, IRQL is PASSIVE_LEVEL, which is guaranteed by the system&lt;/li>
+&lt;li>Get the current IRQL by calling KeGetCurrentIrql function&lt;/li>
+&lt;li>As shown in the figure, the IRQL are 0, against the above table, the level is PASSIVE_LEVEL&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown3.png"
+width="1160"
+height="483"
+srcset="https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown3_hu12321d81e81434672369422cb952ec6b_98914_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-001-environment-building/shown3_hu12321d81e81434672369422cb952ec6b_98914_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="rYHLIU.png"
+class="gallery-image"
+data-flex-grow="240"
+data-flex-basis="576px"
+>&lt;/p>
+&lt;h3 id="conclusion-1">Conclusion&lt;/h3>
+&lt;ul>
+&lt;li>Before calling a certain function first read the function description document and carefully observe what the IRQL level of the safe calling function is, so as to achieve safe programming&lt;/li>
+&lt;/ul>
+&lt;h2 id="driver-exceptions">Driver exceptions&lt;/h2>
+&lt;blockquote>
+&lt;p>When developing a driver, if the driver code is not written in compliance with the situation that triggers a system crash, manifested as a blue screen (BSOD).&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="common-causes">Common causes&lt;/h3>
+&lt;ul>
+&lt;li>High IRQL deadlock&lt;/li>
+&lt;li>Memory access violation&lt;/li>
+&lt;li>Function stack imbalance&lt;/li>
+&lt;/ul>
+&lt;h3 id="active-blue-screen-triggered">Active blue screen triggered&lt;/h3>
+&lt;ul>
+&lt;li>Blue screen can be triggered proactively using KeBugCheckEx function&lt;/li>
+&lt;/ul>
+&lt;h3 id="conclusion-2">Conclusion&lt;/h3>
+&lt;ul>
+&lt;li>Proactively raising a blue screen in case of unpredictable errors in code can reduce further expansion of the error&lt;/li>
+&lt;/ul></description></item></channel></rss>

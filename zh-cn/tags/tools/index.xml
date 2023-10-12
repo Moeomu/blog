@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tools on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/tools/</link><description>Recent content in Tools on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 21 Nov 2020 19:04:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/tools/index.xml" rel="self" type="application/rss+xml"/><item><title>逆向工具-Radare2和Cutter</title><link>https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/</link><pubDate>Sat, 21 Nov 2020 19:04:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e9%80%86%e5%90%91%e5%b7%a5%e5%85%b7-radare2%e5%92%8ccutter/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="介绍">介绍&lt;/h2>
+&lt;h3 id="radare2">Radare2&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>r2是对radare的一次重写，目的是提供一套处理二进制文件的库和工具。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Radare项目开始时是一个取证工具，一个能够打开磁盘文件的可编写的命令行十六进制编辑器，但后来增加了对分析二进制文件、反汇编代码、调试程序、附加到远程gdb服务器的支持。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>radare2是可移植的。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>要了解更多信息，你可以阅读官方的radare2书籍，源代码，或者浏览网络上的博客文章或r2con的演讲。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="cutter">Cutter&lt;/h3>
+&lt;ul>
+&lt;li>Cutter是一个由radare2驱动的免费和开源的逆向工程框架。它的目标是建立一个先进的、可定制的、FOSS的逆向工程平台，同时考虑到用户体验。Cutter是由逆向工程师为逆向工程师创建的。&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装">安装&lt;/h2>
+&lt;blockquote>
+&lt;p>由于Cutter是Radare2的GUI化程序，因此只需要下载Cutter即可&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>本次测试系统：macOS Catalina 10.15.7&lt;/li>
+&lt;li>Github下载链接：&lt;a class="link" href="https://github.com/radareorg/cutter/releases" target="_blank" rel="noopener"
+>github.com/radareorg/cutter/releases&lt;/a>&lt;/li>
+&lt;li>Moeomu网盘下载链接(可能不是最新)：&lt;a class="link" href="https://pan.moeomu.com/Software/macOS/Tools-Reverse_Pwn/Cutter-v1.12.0-x64.macOS.dmg" target="_blank" rel="noopener"
+>Cutter-v1.12.0-x64.dmg&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="macos-catalina无法运行cutter的原因">macOS Catalina无法运行Cutter的原因&lt;/h2>
+&lt;blockquote>
+&lt;p>不知道Windows怎么样，反正在macOS Catalina上安装后无法正常运行，解决方法如下&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>找出无法正常运行的原因&lt;/li>
+&lt;li>进入Cutter的文件夹：&lt;code>cd /Applications/Cutter.app/Contents/MacOS/&lt;/code>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder.png"
+width="637"
+height="152"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="CD-Cutter-Folder"
+class="gallery-image"
+data-flex-grow="419"
+data-flex-basis="1005px"
+>&lt;/li>
+&lt;li>直接运行Cutter查看原因：&lt;code>./Cutter&lt;/code>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder.png"
+width="637"
+height="152"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Cutter-Error-Message"
+class="gallery-image"
+data-flex-grow="419"
+data-flex-basis="1005px"
+>&lt;/li>
+&lt;li>安装&lt;code>gettext&lt;/code>解决问题：&lt;code>brew install gettext&lt;/code>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/install-gettext.png"
+width="889"
+height="131"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E9%80%86%E5%90%91%E5%B7%A5%E5%85%B7-radare2%E5%92%8Ccutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="install-gettext"
+class="gallery-image"
+data-flex-grow="678"
+data-flex-basis="1628px"
+>&lt;/li>
+&lt;/ul></description></item></channel></rss>

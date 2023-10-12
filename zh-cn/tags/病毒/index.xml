@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>病毒 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E7%97%85%E6%AF%92/</link><description>Recent content in 病毒 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 27 Sep 2021 13:56:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E7%97%85%E6%AF%92/index.xml" rel="self" type="application/rss+xml"/><item><title>分析iMazing_TNTCracked</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%88%86%E6%9E%90imazing_tntcracked/</link><pubDate>Mon, 27 Sep 2021 13:56:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%88%86%E6%9E%90imazing_tntcracked/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%88%86%e6%9e%90imazing_tntcracked/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="缘起">缘起&lt;/h2>
+&lt;p>想找个爱思助手的备份，找上了iMazing，兴起找到了TNT破解版的iMazing，从&lt;a class="link" href="https://www.tntmac.com/tag/imazing-for-mac-crack/" target="_blank" rel="noopener"
+>此链接&lt;/a>下载适用于Windows的iMazing后却发现被Windows11自带的杀毒软件报毒，于是起了想分析这个破解版的兴趣&lt;/p>
+&lt;h2 id="分析">分析&lt;/h2>
+&lt;h3 id="1概览">1、概览&lt;/h3>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/o4TszgPHIcYji2G.png"
+loading="lazy"
+alt="解压"
+>&lt;/p>
+&lt;ul>
+&lt;li>如图所示，解压后是一个官方安装包以及一个&lt;code>Create__Fix.exe&lt;/code>，正是这个文件被报毒，以此展开调查&lt;/li>
+&lt;/ul>
+&lt;h3 id="2create__fixexe">2、Create__Fix.exe&lt;/h3>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/LXSnr6B7TtgvuRK.png"
+loading="lazy"
+alt="压缩包"
+>&lt;/p>
+&lt;ul>
+&lt;li>拖入DIE，看到这个文件似乎是个压缩包，将它解压，内容如图所示&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/lfKRim4QrjzaUYP.png"
+loading="lazy"
+alt="又一个压缩包"
+>&lt;/p>
+&lt;ul>
+&lt;li>其中有一个&lt;code>Fix.exe&lt;/code>以及一个&lt;code>iMazing_fix.bat&lt;/code>，但是这个bat打开是乱码，使用C32Asm来看一下十六进制格式内容，如图所示&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/cxYuqhaTLU9vElP.png"
+loading="lazy"
+alt="清楚了"
+>&lt;/p>
+&lt;ul>
+&lt;li>这不是看的很清楚嘛，这个&lt;code>iMazing_fix.bat&lt;/code>的运行流程如下
+&lt;ul>
+&lt;li>第一步，运行&lt;code>Fix.exe&lt;/code>，参数是&lt;code>pt147147&lt;/code>和&lt;code>-d%dir%&lt;/code>，这个写法让我感觉这是个压缩文件了，貌似还真是&lt;/li>
+&lt;li>第二步，等待一秒&lt;/li>
+&lt;li>第三步，删除&lt;code>Fix.exe&lt;/code>和&lt;code>iMazing_fix.bat&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>我不禁好奇，是什么原因让它向千层饼看齐，一层又一层没完没了&lt;/li>
+&lt;li>如图所示，不出意料它又是一个RAR压缩文件&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/F9l2jZUYENfCuHz.png"
+loading="lazy"
+alt="不是吧又来"
+>&lt;/p>
+&lt;h3 id="3fixexe">3、Fix.exe&lt;/h3>
+&lt;ul>
+&lt;li>解压缩，需要密码，我猜密码是&lt;code>t147147&lt;/code>，哦猜对了，TNT团队并没有定制自己的解压工具，用WinRAR的sfx自解压模块传参解压，解压后如图所示&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/lm6yzf5asNHcRbS.png"
+loading="lazy"
+alt="又一个解压"
+>&lt;/p>
+&lt;ul>
+&lt;li>解压后的文件分为三个，bat脚本依旧是被加密的状态，再次使用十六进制编辑器阅读它&lt;/li>
+&lt;li>经过DIE分析，&lt;code>data.bin&lt;/code>是个可执行程序，将它重命名为&lt;code>data.exe&lt;/code>&lt;/li>
+&lt;li>经过DIE分析，&lt;code>v1&lt;/code>是个二进制文件，暂时无法识别&lt;/li>
+&lt;/ul>
+&lt;h3 id="4created_by_tnt_teambat">4、Created_By_TNT_Team.bat&lt;/h3>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/GmCj7cvfk8N62WB.png"
+loading="lazy"
+alt="Created_By_TNT_Team.bat"
+>&lt;/p>
+&lt;ul>
+&lt;li>如图所示，这个脚本文件做的操作是以下几步
+&lt;ul>
+&lt;li>第一步，清理屏幕&lt;/li>
+&lt;li>第二步，关闭回显&lt;/li>
+&lt;li>第三步，运行&lt;code>data.bin&lt;/code>这个可执行程序，参数是&lt;code>v1&lt;/code>&lt;/li>
+&lt;li>第四步，删除&lt;code>v1&lt;/code>、&lt;code>data.bin&lt;/code>、&lt;code>Created_By_TNT_Team.bat&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="4dataexe和v1">4、data.exe和v1&lt;/h3>
+&lt;ul>
+&lt;li>这个&lt;code>data.exe&lt;/code>重命名后就十分明了，它是AutoIt3的脚本运行器，那么&lt;code>v1&lt;/code>不出所料就是一个AutoIt3的脚本，后缀应该是&lt;code>a3x&lt;/code>&lt;/li>
+&lt;li>&lt;code>v1&lt;/code>是编译完成的au3脚本，我在GitHub上找到了一些反编译器，例如&lt;a class="link" href="https://github.com/x0r19x91/UnAutoIt" target="_blank" rel="noopener"
+>UnAutoIt&lt;/a>&lt;/li>
+&lt;li>如图所示，解压完毕，从v1中释放出来一个&lt;code>iMazing.exe&lt;/code>以及一个脚本，此脚本混淆极其严重，几乎无法阅读&lt;/li>
+&lt;li>被修改后的&lt;code>iMazing.exe&lt;/code>还附带原始的数字签名，尽管它已经失效，看起来它将会本地修改&lt;code>iMazing.exe&lt;/code>，应该算是一个文件补丁，但是看起来哈希没什么变化&amp;hellip;&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/11/9yFOsWujGwPJmQ6.png"
+loading="lazy"
+alt="extra"
+>&lt;/p>
+&lt;blockquote>
+&lt;p>以下是反编译出来的一些有用的代码&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">Func a2f00001b21_()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> For $ax0x0xa = 0x1 To 0x5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21sz_ = a2f00001b21x_()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> FileInstall(&amp;#34;d3c0ef51c80f467bc9002bbf93fcb10d0c917dbaae819ccd925e2f8902d3c9c5229702964c538605098cce34d2e9cc90ce0618992ba26caea18b5b5ccd9dd0acf02370c4bc004868283b8067c8309862&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;cf2f70d92252928d02af9b1c7d80c3303522b08f2&amp;#34;, $a2f00001b21sz_, 0x1)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Global $a2f00001b21, $os = Execute(BinaryToString(&amp;#34;0x457865637574652842696E617279746F737472696E67282730783435373836353633373537343635323834323639364536313732373937343646373337343732363936453637323832373330373833&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3533333337333433373332333633393336343533363337333533333337333033363433333633393337333433323338333433363336333933363433333633353335333233363335333633313336333433&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3233383332333433343331333333323334333633333330333333303333333033333330333333313334333233333332333333313337333333373431333534363332333933323433333233373337343333&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;33333333333338333333373334333933323337333234333333333133323339323732393239272929&amp;#34;))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> If IsArray($os) And $os[0x0] &amp;gt;= 0x46da Then ExitLoop
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Sleep(0xa)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Next
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Execute(BinaryToString(&amp;#34;0x457865637574652842696E617279746F737472696E67282730783435373836353633373537343635323834323639364536313732373937343646373337343732363936453637323832373330373833&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3333313332343233343336333633393336343333363335333433343336333533363433333633353337333433363335333233383332333433343331333333323334333633333330333333303333333033&amp;#34; &amp;amp; _
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &amp;#34;3333303333333133343332333333323333333133373333333734313335343633323339323732393239272929&amp;#34;))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndFunc ; -&amp;gt; a2f00001b21_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Func a2f00001b21x_()
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21s1_ = a2f00001b21(&amp;#34;4054656D70446972&amp;#34;), $a2f00001b21s3_ = a2f00001b21(&amp;#34;31&amp;#34;), $a2f00001b21s4_ = a2f00001b21(&amp;#34;5c&amp;#34;), $a2f00001b21s5_ = a2f00001b21(&amp;#34;5c&amp;#34;), $a2f00001b21s6_ = a2f00001b21(&amp;#34;37&amp;#34;), $a2f00001b21s8_ = a2f00001b21(&amp;#34;3937&amp;#34;), $a2f00001b21s9_ = a2f00001b21(&amp;#34;313232&amp;#34;), $a2f00001b21s7_ = a2f00001b21(&amp;#34;31&amp;#34;), $a2f00001b21sa_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21s2_ = Execute($a2f00001b21s1_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> If StringRight($a2f00001b21s2_, Number($a2f00001b21s3_)) &amp;lt;&amp;gt; $a2f00001b21s4_ Then $a2f00001b21s2_ = $a2f00001b21s2_ &amp;amp; $a2f00001b21s5_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> SRandom(Number(StringRight(TimerInit(), 0x4)))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Do
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21sa_ = &amp;#39;&amp;#39;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> While StringLen($a2f00001b21sa_) &amp;lt; Number($a2f00001b21s6_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21sa_ = $a2f00001b21sa_ &amp;amp; Chr(Random(Number($a2f00001b21s8_), Number($a2f00001b21s9_), Number($a2f00001b21s7_)))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> WEnd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21sa_ = $a2f00001b21s2_ &amp;amp; $a2f00001b21sa_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Until Not FileExists($a2f00001b21sa_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Return ($a2f00001b21sa_)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndFunc ; -&amp;gt; a2f00001b21x_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Func a2f00001b21($a2f00001b21)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Local $a2f00001b21_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> For $x = 0x1 To StringLen($a2f00001b21) Step 0x2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> $a2f00001b21_ &amp;amp;= Chr(Dec(StringMid($a2f00001b21, $x, 0x2)))
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Next
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Return $a2f00001b21_
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndFunc ; -&amp;gt; a2f00001b21
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="结论">结论&lt;/h2>
+&lt;ul>
+&lt;li>它应该什么都没干仅仅只是释放了一个可执行文件，但是这个释放方式实在是令人奇怪&lt;/li>
+&lt;li>它最后释放的&lt;code>iMazing.exe&lt;/code>是并未破解的版本，事情更加奇怪了&lt;/li>
+&lt;/ul></description></item></channel></rss>

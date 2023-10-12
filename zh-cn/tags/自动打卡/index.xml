@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>自动打卡 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E8%87%AA%E5%8A%A8%E6%89%93%E5%8D%A1/</link><description>Recent content in 自动打卡 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 24 May 2021 10:36:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E8%87%AA%E5%8A%A8%E6%89%93%E5%8D%A1/index.xml" rel="self" type="application/rss+xml"/><item><title>日记-2021-05-24</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%97%A5%E8%AE%B0-2021-05-24/</link><pubDate>Mon, 24 May 2021 10:36:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%97%A5%E8%AE%B0-2021-05-24/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%97%a5%e8%ae%b0-2021-05-24/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="mention">Mention&lt;/h2>
+&lt;p>稍微提及一下，山西校企通的自动打卡项目经过思考之后将它决定将它开源，这只是一段赶工出来的不成熟的代码，因此可能会有些阅读困难，但是使用不会有问题，也已经稳定运行了半年多，Readme中我写了所有的使用方法和注意事项，以下是开源地址&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/Misakaou/XQT-Clockin" target="_blank" rel="noopener"
+>[Github]-XQT-Auto-Clockin&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>特性
+&lt;ul>
+&lt;li>全自动打卡&lt;/li>
+&lt;li>多用户自动打卡（为了防止服务器被封IP设置了延时打卡）&lt;/li>
+&lt;li>不需要账户密码，只需要身份证号即可&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="my-way">My Way&lt;/h2>
+&lt;p>似乎会经常陷入抑郁状态，似乎越来越难以控制自己，也许应该去医院看看了&lt;/p></description></item></channel></rss>

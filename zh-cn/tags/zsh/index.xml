@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>zsh on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/zsh/</link><description>Recent content in zsh on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 10 Nov 2020 19:43:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/zsh/index.xml" rel="self" type="application/rss+xml"/><item><title>OhMyZsh安装指南</title><link>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/ohmyzsh%e5%ae%89%e8%a3%85%e6%8c%87%e5%8d%97/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装zsh">安装zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="克隆git仓库clone-git-repo">克隆Git仓库(clone git repo)&lt;/h2>
+&lt;ul>
+&lt;li>中国大陆: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>世界: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置zshconfig">配置zsh(config)&lt;/h2>
+&lt;h3 id="设置为默认shellset-default-shell">设置为默认shell(set default shell)&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="自动补全插件auto-suggestions-plugin">自动补全插件(auto suggestions plugin)&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

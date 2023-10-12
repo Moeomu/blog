@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ParallelsDesktop on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/parallelsdesktop/</link><description>Recent content in ParallelsDesktop on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 12 Oct 2021 19:22:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/parallelsdesktop/index.xml" rel="self" type="application/rss+xml"/><item><title>Virtual machine hardware acceleration causes Electron application white screen problem</title><link>https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/</link><pubDate>Tue, 12 Oct 2021 19:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="problem-reproducible">Problem Reproducible&lt;/h2>
+&lt;ul>
+&lt;li>Reproducible: Yes&lt;/li>
+&lt;li>Host system: macOS BigSur 11.6&lt;/li>
+&lt;li>Virtual machine system: Ubuntu Desktop 20.04.3&lt;/li>
+&lt;li>Parallels Virtual Machine version: 17.0.1&lt;/li>
+&lt;li>Description of the problem: After installing or running NodeJS-based applications, especially Electron, the application will take up 1/4 of the white screen and 3/4 of the black screen with abnormal display, which cannot be used normally&lt;/li>
+&lt;li>Typical application failure.
+&lt;ul>
+&lt;li>VSCode&lt;/li>
+&lt;li>Motrix&lt;/li>
+&lt;li>Typora&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/WvksDr9PTQFi3ut.png"
+loading="lazy"
+alt="vscode"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/bRWZPJSQqjhFUNG.png"
+loading="lazy"
+alt="typora"
+>&lt;/p>
+&lt;h2 id="solutions">Solutions&lt;/h2>
+&lt;h3 id="solution-1">Solution 1&lt;/h3>
+&lt;p>Add a startup parameter &lt;code>-disable-gpu&lt;/code> to each Electron application&lt;/p>
+&lt;blockquote>
+&lt;p>Add: This can be achieved by creating a shortcut on the desktop, using vscode as an example, with the following content&lt;/p>
+&lt;p>code.desktop&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Entry&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>Visual Studio Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Comment&lt;/span>&lt;span class="o">=&lt;/span>Code Editing. Redefined.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">GenericName&lt;/span>&lt;span class="o">=&lt;/span>Text Editor
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --unity-launch %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Type&lt;/span>&lt;span class="o">=&lt;/span>Application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupNotify&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupWMClass&lt;/span>&lt;span class="o">=&lt;/span>Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Categories&lt;/span>&lt;span class="o">=&lt;/span>Utility&lt;span class="p">;&lt;/span>TextEditor&lt;span class="p">;&lt;/span>Development&lt;span class="p">;&lt;/span>IDE&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">MimeType&lt;/span>&lt;span class="o">=&lt;/span>text/plain&lt;span class="p">;&lt;/span>inode/directory&lt;span class="p">;&lt;/span>application/x-code-workspace&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Actions&lt;/span>&lt;span class="o">=&lt;/span>new-empty-window&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Keywords&lt;/span>&lt;span class="o">=&lt;/span>vscode&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Desktop-File-Install-Version&lt;span class="o">=&lt;/span>0.24
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Action new-empty-window&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>New Empty Window
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --new-window %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="solution-2">Solution 2&lt;/h3>
+&lt;p>Turn off the graphics-hardware acceleration for Parallels/other virtualization software - this virtual machine, as shown below&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/vSLmaJbtXiBd3xR.png"
+loading="lazy"
+alt="close"
+>&lt;/p>
+&lt;h2 id="additional-information">Additional Information&lt;/h2>
+&lt;p>The official developers of Electron mention on &lt;a class="link" href="https://github.com/electron/electron/issues/5257#issuecomment-213890151" target="_blank" rel="noopener"
+>Github&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>You can probably disable GPU acceleration to work around this, or just use another visual machine software. Basically the GPU acceleration of Linux in virtual machines is a mess, depending on the software of visual machine, the version and distribution of Linux, and the version of Chromium, you can get various results and bugs.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Linux&amp;rsquo;s virtual machine hardware acceleration is a mess, so it&amp;rsquo;s normal for this to happen&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsTools error on high version Kali</title><link>https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/</link><pubDate>Tue, 06 Jul 2021 15:55:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="first-update-the-kali-source">First update the kali source&lt;/h2>
+&lt;ul>
+&lt;li>Ali cloud source is as follows&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="error-report-content">Error report content&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">An error occurred &lt;span class="k">while&lt;/span> installing the following packages:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- libelf-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- linux-headers-5.10.0-kali9-amd64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Install these packages manually and start the Parallels Tools installation again.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="solution">Solution&lt;/h2>
+&lt;ul>
+&lt;li>Install the missing package&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt intall libelf-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>Pitfall record.&lt;br>
+Kali 2021&amp;rsquo;s default &lt;code>xfce&lt;/code> desktop environment will cause a white screen after installing ParallelsTools, so switch the desktop environment to &lt;code>gnome&lt;/code> in advance or deselect &lt;code>xface&lt;/code> and select &lt;code>gnome&lt;/code> when installing kali&lt;/p>
+&lt;/blockquote></description></item><item><title>ParallelsDesktop16 repair network</title><link>https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/</link><pubDate>Wed, 16 Dec 2020 13:42:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="prelude">Prelude&lt;/h2>
+&lt;ul>
+&lt;li>Works under macOS Big Sur&lt;/li>
+&lt;li>Previously it was an imperfect solution using command start, which would also lead to a series of permission problems, but now it is finally perfect&lt;/li>
+&lt;/ul>
+&lt;h2 id="solution">Solution&lt;/h2>
+&lt;ul>
+&lt;li>Edit the file &lt;code>/Library/Preferences/Parallels/network.desktop.xml&lt;/code> with highest privileges&lt;/li>
+&lt;li>Change the value of the &lt;code>UseKextless&lt;/code> field from &lt;code>-1&lt;/code> to &lt;code>0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Note: This value may not be -1 for everyone, and may not be 0 for everyone, so be brave and try!&lt;/p>
+&lt;/blockquote></description></item></channel></rss>

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SecurityMechanisms on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/securitymechanisms/</link><description>Recent content in SecurityMechanisms on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sun, 25 Oct 2020 18:50:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/securitymechanisms/index.xml" rel="self" type="application/rss+xml"/><item><title>Exploit learning notes 011 other types of exploits and Windows Security Mechanisms</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-011-other-types-of-exploits-and-windows-security-mechanisms/</link><pubDate>Sun, 25 Oct 2020 18:50:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-011-other-types-of-exploits-and-windows-security-mechanisms/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-011-other-types-of-exploits-and-windows-security-mechanisms/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="formatting-string-vulnerability">Formatting string vulnerability&lt;/h2>
+&lt;h3 id="flaw-in-printf">Flaw in printf&lt;/h3>
+&lt;blockquote>
+&lt;p>Example&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;stdio.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">a&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">44&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">b&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">77&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;a=%d, b=%d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">b&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;a=%d, b=%d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>The second call in the above code is missing the list of variables for the output data&lt;/li>
+&lt;li>However, the second call does not cause a compilation error and the program executes normally&lt;/li>
+&lt;/ul>
+&lt;h3 id="reading-memory-data-with-printf">Reading memory data with printf&lt;/h3>
+&lt;blockquote>
+&lt;p>Example&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;stdio.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>When we pass a normal string to the program, we get a normal string&lt;/li>
+&lt;li>But if it comes with a format control character, you can read the data on the stack&lt;/li>
+&lt;/ul>
+&lt;h3 id="write-data-to-memory-with-printf">Write data to memory with printf&lt;/h3>
+&lt;blockquote>
+&lt;p>Example&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;stdio.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">**&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">len_print&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;before write: length=%d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">len_print&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Misaka:%d%n&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">len_print&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">len_print&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;after write: length=%d&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">len_print&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>The %n controller calculates the length of the output string and then writes it back to the len_print variable&lt;/li>
+&lt;/ul>
+&lt;h2 id="sql-injection-attack">SQL injection attack&lt;/h2>
+&lt;h3 id="principle">Principle&lt;/h3>
+&lt;ul>
+&lt;li>It stems from a flaw in PHP, ASP and other scripting languages when heaping user input data and parsing it&lt;/li>
+&lt;/ul>
+&lt;h3 id="it-is-not-a-binary-vulnerability-and-will-not-be-discussed-here">It is not a binary vulnerability and will not be discussed here&lt;/h3>
+&lt;h3 id="windows-security-mechanism">Windows security mechanism&lt;/h3>
+&lt;h3 id="flaw-in-turing-machine">Flaw in Turing machine&lt;/h3>
+&lt;ul>
+&lt;li>There is no clear distinction between code and data, so there are always problems&lt;/li>
+&lt;li>For example, stack overflow attacks, shelling and deshelling techniques, morphing virus techniques&lt;/li>
+&lt;li>Cross-site scripting attacks, SQL injection attacks are also caused by this flaw&lt;/li>
+&lt;/ul>
+&lt;h3 id="changes-in-windows">Changes in Windows&lt;/h3>
+&lt;h4 id="macro-changes">Macro changes&lt;/h4>
+&lt;ul>
+&lt;li>Windows Security Center was added&lt;/li>
+&lt;li>Added firewall to Windows&lt;/li>
+&lt;li>Web pop-ups and ActiveX control installation will be disabled without permission&lt;/li>
+&lt;li>IE7 added a feature to filter counterfeit websites&lt;/li>
+&lt;li>Added UAC (User Account Control) mechanism to prevent malicious software from being installed on the computer without permission or from making changes to the computer&lt;/li>
+&lt;li>Integrated Windows Defender to block, control and remove spyware and malware&lt;/li>
+&lt;/ul>
+&lt;h4 id="memory-security-changes">Memory security changes&lt;/h4>
+&lt;ul>
+&lt;li>Added &lt;code>SecurityCookie&lt;/code> before the function return address using GS compilation technology, which first detects whether &lt;code>SecurityCookie&lt;/code> is overwritten before the function returns and stack overflow becomes difficult&lt;/li>
+&lt;li>Added the security check mechanism of heap SEH to effectively prevent most of the attacks of rewriting SEH and hijacking the process.&lt;/li>
+&lt;li>Heap security mechanisms such as &lt;code>Heap Cookie&lt;/code> and &lt;code>Safe Unlinking&lt;/code> have been added to the heap, and the heap overflow is more restricted.&lt;/li>
+&lt;li>&lt;code>DEP(Data Execution Protection)&lt;/code> Data Execution Protection marks data sections as non-executable, preventing the execution of attack code in the stack, heap and data sections&lt;/li>
+&lt;li>&lt;code>ASLR(Address Space Layout Randomization)&lt;/code>Load address randomization technique disables classical stack overflow techniques by randomizing key addresses in the heap system&lt;/li>
+&lt;li>&lt;code>SEHOP(Structured Exception Handler Overwrite Protection)&lt;/code>SEH overwrite protection complements the heap SEH security mechanism by raising the SEH protection to the system level, making the SEH protection mechanism more effective&lt;/li>
+&lt;/ul>
+&lt;h4 id="summary-of-windows-security-mechanisms">Summary of Windows security mechanisms&lt;/h4>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>Windows XP&lt;/th>
+&lt;th>Windows 2003&lt;/th>
+&lt;th>Windows Vista&lt;/th>
+&lt;th>Windows 2008&lt;/th>
+&lt;th>Windows 7&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>&lt;strong>GS&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Security Cookies&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Variable rearrangement&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Safety SEH&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SEH handle validation&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>Heap Protection&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Safe disassembly&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Safety Fast Meter&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Heap Cookie&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Metadata Encryption&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>DEP&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>NX Support&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Permanent DEP&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Default OptOut&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>×&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>ASLR&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PEB, TEB&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Heap&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Stack&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Image&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;strong>SEHOP&lt;/strong>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>SEH chain validation&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>×&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;td>√&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table></description></item></channel></rss>

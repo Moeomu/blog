@@ -1,0 +1,1117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>内核编程 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/categories/%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B/</link><description>Recent content in 内核编程 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 07 Jul 2021 11:20:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/categories/%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux内核编程学习笔记-001-编译和启动内核</title><link>https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/</link><pubDate>Wed, 07 Jul 2021 11:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/linux%e5%86%85%e6%a0%b8%e7%bc%96%e7%a8%8b%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-001-%e7%bc%96%e8%af%91%e5%92%8c%e5%90%af%e5%8a%a8%e5%86%85%e6%a0%b8/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="准备环境">准备环境&lt;/h2>
+&lt;ul>
+&lt;li>Ubuntu 20.04 LTS&lt;/li>
+&lt;li>Linux 4.9.229&lt;/li>
+&lt;li>Busybox 1.33.0&lt;/li>
+&lt;li>qemu&lt;/li>
+&lt;/ul>
+&lt;h3 id="下载内核源代码和文件系统源代码">下载内核源代码和文件系统源代码&lt;/h3>
+&lt;ul>
+&lt;li>在站点&lt;a class="link" href="https://www.kernel.org" target="_blank" rel="noopener"
+>Kernel.org&lt;/a>下载&lt;code>linux-4.9.229.tar.gz&lt;/code>&lt;/li>
+&lt;li>在站点&lt;a class="link" href="https://www.busybox.net/downloads" target="_blank" rel="noopener"
+>Busybox.net&lt;/a>下载&lt;code>busybox-1.33.0.tar.bz2&lt;/code>&lt;/li>
+&lt;li>通过apt安装qemu：&lt;code>sudo apt install qemu-system-x86&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="编译">编译&lt;/h2>
+&lt;h3 id="编译内核">编译内核&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>export ARCH=x86&lt;/code>&lt;/li>
+&lt;li>&lt;code>make x86_64_defconfig&lt;/code>&lt;/li>
+&lt;li>&lt;code>make menuconfig&lt;/code>
+&lt;ul>
+&lt;li>选中&lt;code>General Setup -&amp;gt; Initial RAM filesystem and RAM disk(initramfs/initrd) support&lt;/code>&lt;/li>
+&lt;li>选中&lt;code>Device Drivers -&amp;gt; Block devices -&amp;gt; RAM block device support&lt;/code>&lt;/li>
+&lt;li>修改&lt;code>Device Drivers -&amp;gt; Block devices -&amp;gt; RAM block device support -&amp;gt; (65536)default RAM disk size (kbytes)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>如果这一步报错&lt;code>fatal error: curses.h&lt;/code>，则安装一下&lt;code>sudo apt install libncurses5-dev&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>make&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>编译好的内核被放置在目录&lt;code>arch/x86/boot&lt;/code>下，文件名&lt;code>bzImage&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="编译busybox">编译busybox&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>make menuconfig&lt;/code>
+&lt;ul>
+&lt;li>选中&lt;code>Settings -&amp;gt; Build Options -&amp;gt; [*] Build Busybox as a static binary (no shard libs)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>make &amp;amp;&amp;amp; make install&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="打包文件系统">打包文件系统&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>mkdir etc dev mnt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p proc sys tmp&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p etc/init.d&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/fstab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">proc /proc proc defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs /tmp tmpfs defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysfs /sys sysfs defaults 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Welcome to Moeomu Linux&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/mount -a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Remounting the root filesystem&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mount -o remount rw /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">moutn -t devpts devpts /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> /sbin/mdev &amp;gt; /proc/sys/kernel/hotplug
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mdev -s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/inittab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">::sysinit:/etc/init.d/rcS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::respawn:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::askfirst:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::cttlaltdel:/bin/umount -a -r
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/inittab&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>cd dev&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod console c 5 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod null c 1 3&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod tty1 c 4 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>以下代码在busybox源码目录下逐行执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>rm -rf rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo rm -rf fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dd &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>/dev/zero &lt;span class="nv">of&lt;/span>&lt;span class="o">=&lt;/span>./rootfs.ext3 &lt;span class="nv">bs&lt;/span>&lt;span class="o">=&lt;/span>1M &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkfs.ext3 rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -o loop rootfs.ext3 ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -rf ./_install/* ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gzip --best -c rootfs.ext3 &amp;gt; rootfs.img.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>最终生成了文件系统：&lt;code>rootfs.img.gz&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="使用qemu运行系统">使用QEMU运行系统&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>qemu-system-x86_64 -kernel ./linux-4.9.229/arch/x86_64/boot/bzImage -initrd ./busybox-1.33.1/rootfs.img.gz -append &amp;quot;root=/dev/ram init=/linuxrc&amp;quot; -serial file:output.txt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>预览如下&lt;/p>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu.png"
+width="719"
+height="466"
+srcset="https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="RHildI.png"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>Windows内核编程学习笔记-002-基本结构</title><link>https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/</link><pubDate>Fri, 18 Dec 2020 20:52:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/windows%e5%86%85%e6%a0%b8%e7%bc%96%e7%a8%8b%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-002-%e5%9f%ba%e6%9c%ac%e7%bb%93%e6%9e%84/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="字符串操作">字符串操作&lt;/h2>
+&lt;blockquote>
+&lt;p>内核中使用UNICODE_STRING结构来作为基本的字符串结构，应该注意的是使用此结构中的lenth成员确定字符串长度，而不是&lt;code>'\0'&lt;/code>。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="字符串初始化">字符串初始化&lt;/h3>
+&lt;ul>
+&lt;li>函数：&lt;code>RtlInitUnicodeString&lt;/code>&lt;/li>
+&lt;li>参数：
+&lt;ul>
+&lt;li>&lt;code>PUNICODE_STRING&lt;/code>: &lt;code>DestinationString&lt;/code>&lt;/li>
+&lt;li>&lt;code>PCWSTR&lt;/code>: &lt;code>SourceString&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>返回值：无&lt;/li>
+&lt;li>IRQL：&lt;code>&amp;lt;=DISPATCH_LEVEL&lt;/code>&lt;/li>
+&lt;li>解释：初始化一个以0结尾的WCHAR字符串，第一个参数是输入参数也是输出参数&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">uFirstString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">RtlInitUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;HelloWorld&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;String:%wZ&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>坑：它并没有为buffer分配空间，而是直接指向Source首地址，因此要保证Source始终有效，否则就是无效访问&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="字符串拷贝">字符串拷贝&lt;/h3>
+&lt;ul>
+&lt;li>函数：&lt;code>RtlUnicodeStringCopyString&lt;/code>&lt;/li>
+&lt;li>参数：
+&lt;ul>
+&lt;li>&lt;code>PUNICODE_STRING&lt;/code>: &lt;code>DestinationString&lt;/code>&lt;/li>
+&lt;li>&lt;code>NTSTRSAFE_PCWSTR&lt;/code>: &lt;code>pszSrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>返回值：&lt;code>NTSTAUTS&lt;/code>
+&lt;ul>
+&lt;li>成功执行返回&lt;code>STATUS_SUCCESS&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>IRQL：&lt;code>=PASSIVE_LEVEL&lt;/code>&lt;/li>
+&lt;li>解释：将src复制一份到dest里面&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">WCHAR&lt;/span> &lt;span class="n">strBuf&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">128&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">uFirstString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">RtlInitEmptyUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strBuf&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strBuf&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">RtlUnicodeStringCopyString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;Hello Kernel&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;String: %wZ&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uFirstString&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>坑：为了使用RtlUnicodeStringCopyString函数，应该添加头文件&lt;code>Ntstrsafe.h&lt;/code>；不能copy到定长buf的String里，否则会蓝屏报内存读写错误&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="链表">链表&lt;/h2>
+&lt;h3 id="链表的定义">链表的定义&lt;/h3>
+&lt;blockquote>
+&lt;p>以下是wdk中链表的定义&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_LIST_ENTRY&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="n">_LIST_ENTRY&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 后节点
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_LIST_ENTRY&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">Blink&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 前节点
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span> &lt;span class="n">LIST_ENTRY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PLIST_ENTRY&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="使用链表">使用链表&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_TestListEntry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData3&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ULONG&lt;/span> &lt;span class="n">m_ulData4&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>一般而言，为了方便操作，会定义一个链表的头结点，不包含任何内容，只是一个LIST_ENTRY结构。&lt;/li>
+&lt;/ul>
+&lt;h3 id="头节点初始化">头节点初始化&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">ListHeader&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InitializeListHead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="节点插入">节点插入&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">ListHeader&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">TestListEntry&lt;/span> &lt;span class="n">Entry1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">TestListEntry&lt;/span> &lt;span class="n">Entry2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">TestListEntry&lt;/span> &lt;span class="n">Entry3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Entry1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ulData1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sc">&amp;#39;A&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Entry2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ulData1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sc">&amp;#39;B&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Entry3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ulData1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="sc">&amp;#39;C&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InitializeListHead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InsertHeadList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Entry2&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InsertHeadList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Entry1&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">InsertTailList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">Entry3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="链表遍历">链表遍历&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">PLIST_ENTRY&lt;/span> &lt;span class="n">pListEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">pListEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ListHeader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pListEntry&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ListHeader&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PTestListEntry&lt;/span> &lt;span class="n">pTestEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">CONTAINING_RECORD&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">TestListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ListPtr=%p, Entry=%p, Tag=%c&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pTestEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">CHAR&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">pTestEntry&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">m_ulData1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pListEntry&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">pListEntry&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">Flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>&lt;code>CONTAINING_RECORD&lt;/code>的作用是将&lt;code>m_ListEntry&lt;/code>地址转为结构体&lt;code>TestListEntry&lt;/code>首地址&lt;/li>
+&lt;li>&lt;code>CONTAINING_RECORD&lt;/code>用法：&lt;code>CONTAINING_RECORD(PCHAR Address, TYPE Type, PCHAR Field)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="节点移除">节点移除&lt;/h3>
+&lt;ul>
+&lt;li>移除首节点：&lt;code>PLIST_ENTRY RemoveHeadList(PLIST_ENTRY ListHead)&lt;/code>&lt;/li>
+&lt;li>移除尾节点：&lt;code>PLIST_ENTRY RemoveTailList(PLIST_ENTRY ListHead)&lt;/code>&lt;/li>
+&lt;li>如果成功，上面两个函数都将返回链首地址，如果无法移除，则返回NULL&lt;/li>
+&lt;li>移除特定节点：
+&lt;ul>
+&lt;li>&lt;code>BOOLEAN RemoveEntryList(PLIST_ENTRY Entry)&lt;/code>&lt;/li>
+&lt;li>若移除后变成空链表，那么将返回TRUE，如果非空，则返回FALSE&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="判断链表状态">判断链表状态&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>BOOLEAN IsListEmpty(const LIST_ENTRY *ListHead)&lt;/code>&lt;/li>
+&lt;li>它返回TRUE时表示为空链表，否则表示链表非空&lt;/li>
+&lt;/ul>
+&lt;h2 id="自旋锁">自旋锁&lt;/h2>
+&lt;h3 id="使用自旋锁">使用自旋锁&lt;/h3>
+&lt;blockquote>
+&lt;p>自旋锁是内核提供的一种高IRQL锁，用同步以及独占的方式访问某个资源&lt;/p>
+&lt;p>&lt;strong>注意事项&lt;/strong>：&lt;/p>
+&lt;ul>
+&lt;li>自旋锁变量不能存放在当前函数栈中，否则每次进入初始化一遍跟不初始化一样&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;h3 id="初始化使用自旋锁">初始化/使用自旋锁&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Initialize Spin Lock WARN: not local var
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">KSPIN_LOCK&lt;/span> &lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">initLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeInitializeSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// it&amp;#39;s a safe function
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Acquire Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KIRQL&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// save old irql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Normal Spin Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">KeAcquireSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// TO DO
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">KeReleaseSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="自旋锁在双向链表中使用">自旋锁在双向链表中使用&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// it&amp;#39;s a safe function
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Enter...&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Acquire Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KIRQL&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// save old irql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Normal Spin Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">KeAcquireSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Test List
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">typedef&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="n">_FILE_INFO&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">m_strFileName&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="n">FILE_INFO&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">PFILE_INFO&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">LIST_ENTRY&lt;/span> &lt;span class="n">listHead&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE_INFO&lt;/span> &lt;span class="n">my_file_info&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">RtlInitUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_file_info&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_strFileName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;TestName&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">InitializeListHead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">listHead&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExInterlockedInsertHeadList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">listHead&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_file_info&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">m_ListEntry&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeReleaseSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="队列自旋锁">队列自旋锁&lt;/h3>
+&lt;blockquote>
+&lt;p>队列自旋锁可以在多CPU平台上有更好的性能，也遵循先等待先获取自旋锁的原则。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>它和普通自旋锁的初始化是一样的，但是初始化后的自旋锁绝不能混用&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="n">KSPIN_LOCK&lt;/span> &lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">initLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeInitializeSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncLock&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// it&amp;#39;s a safe function
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Acquire Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KIRQL&lt;/span> &lt;span class="n">irql&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// save old irql
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// Queue Spin Lock
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">KLOCK_QUEUE_HANDLE&lt;/span> &lt;span class="n">my_lock_queue_handle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeAcquireInStackQueuedSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_spin_lock&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_lock_queue_handle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">KeReleaseInStackQueuedSpinLock&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">my_lock_queue_handle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="内存分配">内存分配&lt;/h2>
+&lt;h3 id="常规内存分配">常规内存分配&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncMem&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">buffer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocatePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NonPagedPoolNx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">512&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">tag1&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">tag1&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Pool Operate Success!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Allocate Pool Failed!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="快表内存分配">快表内存分配&lt;/h3>
+&lt;blockquote>
+&lt;p>优点：高频率从系统中申请和释放内存，使用快表分配将大大提高性能&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>注意：有些地方称为“旁视列表”(LookAside)&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;span class="lnt">67
+&lt;/span>&lt;span class="lnt">68
+&lt;/span>&lt;span class="lnt">69
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncMemLookaside&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PNPAGED_LOOKASIDE_LIST&lt;/span> &lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BOOLEAN&lt;/span> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BOOLEAN&lt;/span> &lt;span class="n">bInit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PNPAGED_LOOKASIDE_LIST&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="nf">ExAllocatePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NonPagedPoolNx&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NPAGED_LOOKASIDE_LIST&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">memset&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">sizeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NPAGED_LOOKASIDE_LIST&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// init
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ExInitializeNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">128&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bInit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// start allocate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocateFromNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocateFromNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] First Address:%p, Second Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pSeocdeMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// free first
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ExFreeToNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// reallocate
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">ExAllocateFromNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Re-Allocate First Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FALSE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreeToNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pFirstMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pFirstMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreeToNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pSeocdeMemory&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pSeocdeMemory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">bInit&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExDeleteNPagedLookasideList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bInit&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ExFreePoolWithTag&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pLookAsideList&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="err">&amp;#39;&lt;/span>&lt;span class="n">test&lt;/span>&lt;span class="err">&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pLookAsideList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="对象与句柄">对象与句柄&lt;/h2>
+&lt;blockquote>
+&lt;p>在内核中创建，在内核中销毁，由内核管理与维护的对象称为内核对象&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">TestFuncObject&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BOOLEAN&lt;/span> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">do&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">OBJECT_ATTRIBUTES&lt;/span> &lt;span class="n">ObjAttr&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UNICODE_STRING&lt;/span> &lt;span class="n">uNameString&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">RtlInitUnicodeString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uNameString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="sa">L&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\\&lt;/span>&lt;span class="s">BaseNamedObjects&lt;/span>&lt;span class="se">\\&lt;/span>&lt;span class="s">TestEvent&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">InitializeObjectAttributes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ObjAttr&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uNameString&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">OBJ_KERNEL_HANDLE&lt;/span> &lt;span class="o">|&lt;/span> &lt;span class="n">OBJ_CASE_INSENSITIVE&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ZwCreateEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ObjAttr&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">SynchronizationEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FALSE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// get point
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ObReferenceObjectByHandle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">ExEventObjectType&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">KernelMode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// open obj with attribute:name
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="nf">ZwOpenEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">ObjAttr&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ObReferenceObjectByHandle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EVENT_ALL_ACCESS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">ExEventObjectType&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">KernelMode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Create Handle:%p, Create Object Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pCreateEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Open Handle:%p, Open Object Address:%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">pOpenEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bSucc&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">TRUE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FALSE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ObDereferenceObject&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pCreateEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pCreateEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ZwClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hCreateEvent&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hCreateEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ObDereferenceObject&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">pOpenEventObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pOpenEventObject&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">ZwClose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hOpenEvent&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hOpenEvent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>一个小小的坑：在导入头文件的时候发生冲突：&lt;code>ntddk.h&lt;/code>和&lt;code>ntifs.h&lt;/code>，解决办法是将&lt;code>ntifs.h&lt;/code>放到&lt;code>ntddk.h&lt;/code>的前面导入，这样就没有冲突了&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="注册表">注册表&lt;/h2>
+&lt;blockquote>
+&lt;p>注册表其实是Windows的配置存储结构，存储着系统绝大部分的配置信息，其中大多数文件存储在系统盘下SYSTEM32\CONFIG目录下，这些文件以内存映射方式存储在内核空间中，然后以“HIVE”的方式组织起来，注册表API实际上操作的是HIVE内存数据，最终会写回到config目录下对应的文件中去&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="打开与关闭">打开与关闭&lt;/h3>
+&lt;ul>
+&lt;li>未完待续&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Windows内核编程学习笔记-001-环境搭建</title><link>https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</link><pubDate>Fri, 18 Dec 2020 18:52:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/windows%e5%86%85%e6%a0%b8%e7%bc%96%e7%a8%8b%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-001-%e7%8e%af%e5%a2%83%e6%90%ad%e5%bb%ba/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="windows内核开发环境配置">Windows内核开发环境配置&lt;/h2>
+&lt;h3 id="下载">下载&lt;/h3>
+&lt;blockquote>
+&lt;p>开发机&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Windows 10 20H2 x64&lt;/li>
+&lt;li>Visual Studio 2019&lt;/li>
+&lt;li>Windows Driver Kit - Windows 10.0.19041.685(Windows 10 2004)&lt;/li>
+&lt;li>WinDbg Preview&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>测试机&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Windows 10 2004 x64&lt;/li>
+&lt;li>DbgView&lt;/li>
+&lt;/ul>
+&lt;h3 id="测试驱动程序">测试驱动程序&lt;/h3>
+&lt;blockquote>
+&lt;p>还是使用最经典的HelloWorld来作为开始吧&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;ntddk.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">VOID&lt;/span> &lt;span class="nf">DriverUnload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Unload, Driver Object Address: %p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">NTSTATUS&lt;/span> &lt;span class="nf">DriverEntry&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PUNICODE_STRING&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Hello Kernel World!&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">DriverObject&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Object Address: %p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DriverObject&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">DriverUnload&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DriverUnload&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">RegistryPath&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Registry Path: %wZ&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">STATUS_SUCCESS&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="测试调试">测试调试&lt;/h3>
+&lt;blockquote>
+&lt;p>参考&lt;a class="link" href="https://blog.moeomu.com/posts/Windows%E5%86%85%E6%A0%B8%E8%B0%83%E8%AF%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" >Windows内核调试&lt;/a>一文来布置调试环境，只不过将Windows7的地方改成Windows10即可&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="上下文环境解析">上下文环境解析&lt;/h2>
+&lt;blockquote>
+&lt;p>上下文指的是CPU在执行代码时，改代码所处的环境与状态。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="实验psgetcurrentprocessid">实验：PsGetCurrentProcessId&lt;/h3>
+&lt;blockquote>
+&lt;p>实验目的是为了找出所写出的驱动模块究竟在哪个“进程”中执行&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-C" data-lang="C">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;ntddk.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">VOID&lt;/span> &lt;span class="nf">DriverUnload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Unload, Driver Object Address: %p, Current Process Id=0x%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">PsGetCurrentProcessId&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">NTSTATUS&lt;/span> &lt;span class="nf">DriverEntry&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">PDRIVER_OBJECT&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PUNICODE_STRING&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Hello Kernel World, Current Process Id=0x%p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nf">PsGetCurrentProcessId&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">DriverObject&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Object Address: %p&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DriverObject&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DriverObject&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">DriverUnload&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DriverUnload&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">RegistryPath&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">DbgPrint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;[%ws] Driver Registry Path: %wZ&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">__FUNCTIONW__&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">RegistryPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">STATUS_SUCCESS&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>如图&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown1.png"
+width="1161"
+height="477"
+srcset="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown1_hu56feb903f34a6c562b078d24280841de_92241_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown1_hu56feb903f34a6c562b078d24280841de_92241_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="rYh5BF.png"
+class="gallery-image"
+data-flex-grow="243"
+data-flex-basis="584px"
+>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown2.png"
+width="829"
+height="208"
+srcset="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown2_huaf36572bc8d9ea9a3ec9f5032d2b20c5_23447_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown2_huaf36572bc8d9ea9a3ec9f5032d2b20c5_23447_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="rYhq91.png"
+class="gallery-image"
+data-flex-grow="398"
+data-flex-basis="956px"
+>&lt;/p>
+&lt;h3 id="结论">结论&lt;/h3>
+&lt;blockquote>
+&lt;p>无论是驱动入口函数还是驱动卸载回调函数都隶属于ID为4的进程，此进程为System进程&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>System进程是操作系统虚拟出来的一个进程，代表系统内核&lt;/li>
+&lt;li>驱动和应用层上下文应当严格区分，若进程A运行在P1虚拟空间内，而驱动当前的CPU上下文是P2的虚拟空间，那么访问到的内容应当是不可预料的&lt;/li>
+&lt;/ul>
+&lt;h2 id="中断请求级别">中断请求级别&lt;/h2>
+&lt;blockquote>
+&lt;p>与线程的优先级的概念类似，系统调度器以时间片为粒度调度，根据线程的优先级来调度线程，线程优先级越高，获得调度的机会越大。而在驱动层，CPU提供了IRQL的概念，规定高IRQL级别的代码可以中断、抢占低IRQL的代码的执行过程，从而执行。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="常见的irql中断请求级别表">常见的IRQL中断请求级别表&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>IRQL&lt;/th>
+&lt;th>数值(x86, amd64, IA64)&lt;/th>
+&lt;th>描述&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>PASSIVE_LEVEL&lt;/td>
+&lt;td>0, 0, 0&lt;/td>
+&lt;td>应用层线程以及大部分内核函数处于该IRQL，可与无限制使用所有内核API，可以访问分页以及非分页内存&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>APC_LEVEL&lt;/td>
+&lt;td>1, 1, 1&lt;/td>
+&lt;td>异步方法调用(APC)，或者页错误时处于该IRQL，可以使用大部分内核API，可以访问分页以及非分页内存&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>DISPATCH_LEVEL&lt;/td>
+&lt;td>2, 2, 2&lt;/td>
+&lt;td>延迟方法调用(DPC)时处于该IRQL，可以使用特定的内核API，只能访问非分页内存&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="判断当前irql">判断当前IRQL&lt;/h3>
+&lt;ul>
+&lt;li>在驱动程序入口点DriverEntry，IRQL为PASSIVE_LEVEL，这是系统保证的&lt;/li>
+&lt;li>通过调用KeGetCurrentIrql函数来获取当前的IRQL&lt;/li>
+&lt;li>如图所示，IRQL都是0，对照上表，级别是PASSIVE_LEVEL&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown3.png"
+width="1160"
+height="483"
+srcset="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown3_hu12321d81e81434672369422cb952ec6b_98914_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/shown3_hu12321d81e81434672369422cb952ec6b_98914_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="rYHLIU.png"
+class="gallery-image"
+data-flex-grow="240"
+data-flex-basis="576px"
+>&lt;/p>
+&lt;h3 id="结论-1">结论&lt;/h3>
+&lt;ul>
+&lt;li>在调用某个函数之前首先看清楚函数说明文档，仔细观察安全调用函数的IRQL级别是什么，以此来实现安全编程&lt;/li>
+&lt;/ul>
+&lt;h2 id="驱动异常">驱动异常&lt;/h2>
+&lt;blockquote>
+&lt;p>开发驱动时，若驱动程序代码编写不合规引发系统崩溃的情况，表现为蓝屏(BSOD)。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="常见原因">常见原因&lt;/h3>
+&lt;ul>
+&lt;li>高IRQL死锁&lt;/li>
+&lt;li>内存访问违规&lt;/li>
+&lt;li>函数堆栈不平衡&lt;/li>
+&lt;/ul>
+&lt;h3 id="主动引发蓝屏">主动引发蓝屏&lt;/h3>
+&lt;ul>
+&lt;li>可以使用KeBugCheckEx函数主动引发蓝屏&lt;/li>
+&lt;/ul>
+&lt;h3 id="结论-2">结论&lt;/h3>
+&lt;ul>
+&lt;li>在代码发生不可预知错误时，主动引发蓝屏可以减少进一步扩大错误&lt;/li>
+&lt;/ul></description></item></channel></rss>

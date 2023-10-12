@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>端对端加密 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E7%AB%AF%E5%AF%B9%E7%AB%AF%E5%8A%A0%E5%AF%86/</link><description>Recent content in 端对端加密 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 28 Jun 2022 08:58:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E7%AB%AF%E5%AF%B9%E7%AB%AF%E5%8A%A0%E5%AF%86/index.xml" rel="self" type="application/rss+xml"/><item><title>更安全的PGP使用方法</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%9B%B4%E5%AE%89%E5%85%A8%E7%9A%84pgp%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</link><pubDate>Tue, 28 Jun 2022 08:58:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%9B%B4%E5%AE%89%E5%85%A8%E7%9A%84pgp%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%9b%b4%e5%ae%89%e5%85%a8%e7%9a%84PGP%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="gnupg介绍">GnuPG介绍&lt;/h2>
+&lt;h3 id="官方介绍">官方介绍&lt;/h3>
+&lt;blockquote>
+&lt;p>来源：&lt;a class="link" href="https://www.gnupg.org/" target="_blank" rel="noopener"
+>GnuPG&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>GnuPG是RFC4880所定义的OpenPGP标准（也称为PGP）的完整和免费的实现。GnuPG允许你对你的数据和通信进行加密和签名；它有一个多功能的密钥管理系统，同时还有各种公钥目录的访问模块。GnuPG，也被称为GPG，是一个命令行工具，具有易于与其他应用程序集成的功能。有大量的前端应用程序和库可用。GnuPG还提供对S/MIME和安全外壳（ssh）的支持。&lt;/p>
+&lt;p>自1997年推出以来，GnuPG是自由软件（意味着它尊重你的自由）。它可以在GNU通用公共许可证的条款下自由使用、修改和发布。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;em>争辩说你不关心隐私权，因为你没有什么可隐藏的，这与说你不关心言论自由，因为你没有什么可说的没有什么区别。&lt;/em>&lt;br>
+&lt;em>&amp;ndash;爱德华·斯诺登&lt;/em>&lt;/p>
+&lt;/blockquote>
+&lt;p>使用加密技术有助于保护你的隐私和与你交流的人的隐私。加密使大量监控系统的生活变得困难。GnuPG是斯诺登用来揭开NSA秘密的工具之一。&lt;/p>
+&lt;p>请访问&lt;a class="link" href="https://emailselfdefense.fsf.org/en/" target="_blank" rel="noopener"
+>电子邮件自卫&lt;/a>网站，了解如何以及为什么你应该使用GnuPG进行电子通信。&lt;/p>
+&lt;h3 id="所以呢">所以呢？&lt;/h3>
+&lt;h4 id="q1-为什么要使用gnupg">Q1: 为什么要使用GnuPG？&lt;/h4>
+&lt;ul>
+&lt;li>因为它是自由软件，可以自由使用、修改和发布。&lt;/li>
+&lt;li>使用它，你的通讯信息将是加密的、安全的。&lt;/li>
+&lt;li>PGP能保证一条信息是你相信的人发的，除了你俩之外别人无法解密，而且这条消息在传送时中间没有经过任何哪怕是一个标点一个字节的修改。&lt;/li>
+&lt;li>经过PGP签名加密的消息可以在任何一条不可信信道上传输，而且中途无法被任何人篡改、解密。&lt;/li>
+&lt;/ul>
+&lt;h4 id="q2-我明明不怕审查身正不怕影子歪你还有什么理由推荐gnupg">Q2: 我明明不怕审查，身正不怕影子歪，你还有什么理由推荐GnuPG？&lt;/h4>
+&lt;ul>
+&lt;li>您的隐私由您决定，大多数的人们都不希望生活在监控之下。&lt;/li>
+&lt;li>如果温和的批评也不被允许，沉默将被认为居心叵测。如果沉默也不再允许，赞扬不够卖力将是一种罪行。如果只允许一种声音存在，那么，唯一存在的那个声音就是谎言。&lt;/li>
+&lt;li>如果更加不幸地生活在极权主义国家，加密通讯能保护自己，保护自己所在乎的朋友们。&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装">安装&lt;/h2>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;blockquote>
+&lt;p>推荐使用Gpg4win，它的套件齐全，有个容易使用的GUI。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>从&lt;a class="link" href="https://gpg4win.org/download.html" target="_blank" rel="noopener"
+>Gpg4win&lt;/a>下载适用于您计算机的版本。一般而言，如果您没有特殊需求，直接点击绿色的下载按钮即可。&lt;/li>
+&lt;/ul>
+&lt;h3 id="macos">macOS&lt;/h3>
+&lt;blockquote>
+&lt;p>推荐使用GPGSuite&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>从&lt;a class="link" href="https://gpgtools.org" target="_blank" rel="noopener"
+>GPGSuite&lt;/a>下载适用于您计算机的版本。一般而言，如果您没有特殊需求，直接点击红色的下载按钮即可。&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>提醒：GPGSuite套件中的GPGMail是付费软件，如果您需要用它自动加密电子邮件，那么您需要购买GPGMail。但是请放心，文本和文件的加密签名完全是免费的。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="linux">Linux&lt;/h3>
+&lt;blockquote>
+&lt;p>推荐使用GnuPG&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>大多数Linux发行版都已经预置了GnuPG，您不需要安装任何软件。但是推荐您安装一个GUI管理界面&lt;code>GPA&lt;/code>，因为它更加方便用户使用。&lt;/li>
+&lt;/ul>
+&lt;h2 id="生成密钥">生成密钥&lt;/h2>
+&lt;blockquote>
+&lt;p>本节内容请先试验，熟练之后再生成自己主要使用的密钥。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="生成主密钥">生成主密钥&lt;/h3>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg -expert --full-gen-key&lt;/code>&lt;/li>
+&lt;li>选择密钥类型：默认&lt;/li>
+&lt;li>输入密钥长度：4096&lt;/li>
+&lt;li>输入密钥过期时间：&lt;code>2y&lt;/code>（表示两年，可以输入0表示永不过期，您可以随时更改密钥到期时间），输入y以确认。&lt;/li>
+&lt;li>输入您的名字，这是个可选项，可以输入网名甚至可以不输入。&lt;/li>
+&lt;li>输入您的电子邮件，这是个可选项，甚至可以不输入。如果您希望使用电子邮件加密，那您必须输入。&lt;/li>
+&lt;li>输入备注，可以留空。&lt;/li>
+&lt;li>输入O确认信息无误，随后您需要输入一个密钥密码，开始生成密钥。&lt;/li>
+&lt;/ul>
+&lt;h3 id="生成撤销证书">生成撤销证书&lt;/h3>
+&lt;blockquote>
+&lt;p>如果您丢失了主密钥（或者被夺取），您可以使用撤销证书来证明它不再使用。如果您没有撤销证书，那么您必须一个个通知朋友们。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg --gen-revoke -ao revoke.pgp email@email.com #uid 或者key id&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="查看子密钥">查看子密钥&lt;/h3>
+&lt;blockquote>
+&lt;p>主密钥日常不应该使用，日常您应该使用生成的子密钥。这样做的好处就是如果您泄漏了某个子密钥，您可以立即吊销这个子密钥，而不用废弃整个密钥对。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>列出所有公钥、子公钥：&lt;code>--list-keys&lt;/code>或者&lt;code>gpg -k&lt;/code>&lt;/li>
+&lt;li>列出所有密钥、子密钥：&lt;code>--list-secret-keys&lt;/code>或者&lt;code>gpg -K&lt;/code>&lt;/li>
+&lt;li>如果要查看密钥指纹信息，可以加上&lt;code>--fingerprint&lt;/code>参数，比如&lt;code>gpg --list-secret-keys --fingerprint&lt;/code>&lt;/li>
+&lt;li>如果要查看密钥ID信息，可以加上&lt;code>--keyid-format long&lt;/code>参数，比如&lt;code>gpg --list-secret-keys --keyid-format long&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="导出密钥">导出密钥&lt;/h2>
+&lt;blockquote>
+&lt;p>既然日常使用要使用子密钥，那么主密钥不应该存在于同一个地方，GPG无法删除密钥，只能导出后只倒入需要的子密钥。&lt;/p>
+&lt;p>注意：密钥ID后的感叹号不可缺少，否则将会导出所有密钥&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="导出公钥">导出公钥&lt;/h3>
+&lt;ul>
+&lt;li>导出公钥：&lt;code>gpg -ao public-key --export 主密钥ID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="导出主密钥">导出主密钥&lt;/h3>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg -ao master-key --export-secret-key 主密钥ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="导出子密钥">导出子密钥&lt;/h3>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg -ao sub-key --export-secret-subkeys 子密钥ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="导入密钥">导入密钥&lt;/h2>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg --import 文件名&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="和朋友们安全交流">和朋友们安全交流&lt;/h2>
+&lt;ul>
+&lt;li>您现在已经大功告成，养成日常使用PGP加密签名的习惯之后，相信您也很难离开它了&lt;/li>
+&lt;/ul>
+&lt;h2 id="发布到公钥服务器">发布到公钥服务器&lt;/h2>
+&lt;p>&amp;hellip;未完待续&amp;hellip;&lt;/p>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（上）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8a/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-上/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（中）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%ad/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-中/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（下）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8b/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-下/&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

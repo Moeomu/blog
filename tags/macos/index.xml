@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>macOS on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/macos/</link><description>Recent content in macOS on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 12 Oct 2021 19:22:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/macos/index.xml" rel="self" type="application/rss+xml"/><item><title>Virtual machine hardware acceleration causes Electron application white screen problem</title><link>https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/</link><pubDate>Tue, 12 Oct 2021 19:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/virtual-machine-hardware-acceleration-causes-electron-application-white-screen-problem/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="problem-reproducible">Problem Reproducible&lt;/h2>
+&lt;ul>
+&lt;li>Reproducible: Yes&lt;/li>
+&lt;li>Host system: macOS BigSur 11.6&lt;/li>
+&lt;li>Virtual machine system: Ubuntu Desktop 20.04.3&lt;/li>
+&lt;li>Parallels Virtual Machine version: 17.0.1&lt;/li>
+&lt;li>Description of the problem: After installing or running NodeJS-based applications, especially Electron, the application will take up 1/4 of the white screen and 3/4 of the black screen with abnormal display, which cannot be used normally&lt;/li>
+&lt;li>Typical application failure.
+&lt;ul>
+&lt;li>VSCode&lt;/li>
+&lt;li>Motrix&lt;/li>
+&lt;li>Typora&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/WvksDr9PTQFi3ut.png"
+loading="lazy"
+alt="vscode"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/bRWZPJSQqjhFUNG.png"
+loading="lazy"
+alt="typora"
+>&lt;/p>
+&lt;h2 id="solutions">Solutions&lt;/h2>
+&lt;h3 id="solution-1">Solution 1&lt;/h3>
+&lt;p>Add a startup parameter &lt;code>-disable-gpu&lt;/code> to each Electron application&lt;/p>
+&lt;blockquote>
+&lt;p>Add: This can be achieved by creating a shortcut on the desktop, using vscode as an example, with the following content&lt;/p>
+&lt;p>code.desktop&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Entry&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>Visual Studio Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Comment&lt;/span>&lt;span class="o">=&lt;/span>Code Editing. Redefined.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">GenericName&lt;/span>&lt;span class="o">=&lt;/span>Text Editor
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --unity-launch %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Type&lt;/span>&lt;span class="o">=&lt;/span>Application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupNotify&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupWMClass&lt;/span>&lt;span class="o">=&lt;/span>Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Categories&lt;/span>&lt;span class="o">=&lt;/span>Utility&lt;span class="p">;&lt;/span>TextEditor&lt;span class="p">;&lt;/span>Development&lt;span class="p">;&lt;/span>IDE&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">MimeType&lt;/span>&lt;span class="o">=&lt;/span>text/plain&lt;span class="p">;&lt;/span>inode/directory&lt;span class="p">;&lt;/span>application/x-code-workspace&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Actions&lt;/span>&lt;span class="o">=&lt;/span>new-empty-window&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Keywords&lt;/span>&lt;span class="o">=&lt;/span>vscode&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Desktop-File-Install-Version&lt;span class="o">=&lt;/span>0.24
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Action new-empty-window&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>New Empty Window
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --new-window %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="solution-2">Solution 2&lt;/h3>
+&lt;p>Turn off the graphics-hardware acceleration for Parallels/other virtualization software - this virtual machine, as shown below&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/vSLmaJbtXiBd3xR.png"
+loading="lazy"
+alt="close"
+>&lt;/p>
+&lt;h2 id="additional-information">Additional Information&lt;/h2>
+&lt;p>The official developers of Electron mention on &lt;a class="link" href="https://github.com/electron/electron/issues/5257#issuecomment-213890151" target="_blank" rel="noopener"
+>Github&lt;/a>&lt;/p>
+&lt;blockquote>
+&lt;p>You can probably disable GPU acceleration to work around this, or just use another visual machine software. Basically the GPU acceleration of Linux in virtual machines is a mess, depending on the software of visual machine, the version and distribution of Linux, and the version of Chromium, you can get various results and bugs.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Linux&amp;rsquo;s virtual machine hardware acceleration is a mess, so it&amp;rsquo;s normal for this to happen&lt;/li>
+&lt;/ul></description></item><item><title>macOS Turn off built-in screen</title><link>https://blog.moeomu.com/posts/macos-turn-off-built-in-screen/</link><pubDate>Thu, 16 Sep 2021 17:00:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/macos-turn-off-built-in-screen/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/macos-turn-off-built-in-screen/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="the-magnet-trick">The magnet trick&lt;/h2>
+&lt;p>Find two magnets and place them near the audio of the MacBook to trick the system into closing the lid to turn off the built-in screen.&lt;/p>
+&lt;h2 id="nvram-boot-setup-method">NVRAM boot setup method&lt;/h2>
+&lt;blockquote>
+&lt;p>This method enables the screen to be displayed separately on the external screen from the driver level.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="enable">Enable&lt;/h3>
+&lt;ul>
+&lt;li>Reboot, press and hold &lt;code>Command+R&lt;/code> key&lt;/li>
+&lt;li>Enter the password to boot setup - terminal&lt;/li>
+&lt;li>Enter the command &lt;code>nvram boot-args=&amp;quot;niog=1&amp;quot;&lt;/code>&lt;/li>
+&lt;li>Connect the external monitor, connect the power supply and reboot&lt;/li>
+&lt;li>Close the cover immediately after booting by entering the user password, then see the external screen with a screen, open the cover of the MacBook, success&lt;/li>
+&lt;/ul>
+&lt;h3 id="restore">Restore&lt;/h3>
+&lt;ul>
+&lt;li>Reboot, press and hold &lt;code>Command+R&lt;/code> key&lt;/li>
+&lt;li>Enter the password to boot setup - terminal&lt;/li>
+&lt;li>Enter the command &lt;code>nvram -d boot-args&lt;/code>&lt;/li>
+&lt;li>Reboot&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsTools error on high version Kali</title><link>https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/</link><pubDate>Tue, 06 Jul 2021 15:55:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/parallelstools-error-on-high-version-kali/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="first-update-the-kali-source">First update the kali source&lt;/h2>
+&lt;ul>
+&lt;li>Ali cloud source is as follows&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="error-report-content">Error report content&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">An error occurred &lt;span class="k">while&lt;/span> installing the following packages:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- libelf-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- linux-headers-5.10.0-kali9-amd64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Install these packages manually and start the Parallels Tools installation again.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="solution">Solution&lt;/h2>
+&lt;ul>
+&lt;li>Install the missing package&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt intall libelf-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>Pitfall record.&lt;br>
+Kali 2021&amp;rsquo;s default &lt;code>xfce&lt;/code> desktop environment will cause a white screen after installing ParallelsTools, so switch the desktop environment to &lt;code>gnome&lt;/code> in advance or deselect &lt;code>xface&lt;/code> and select &lt;code>gnome&lt;/code> when installing kali&lt;/p>
+&lt;/blockquote></description></item><item><title>Using GPG to sign Git Commit under macOS</title><link>https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/</link><pubDate>Tue, 25 May 2021 07:55:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="about-github-gpg-key-verification">About GitHub GPG Key Verification&lt;/h2>
+&lt;h3 id="enabling-commit-signing">Enabling Commit Signing&lt;/h3>
+&lt;p>GitHub has a new &amp;ldquo;Vigilance Mode&amp;rdquo; that requires a GPG key to sign a certified commit before it will show &amp;ldquo;Verity&amp;rdquo;.&lt;/p>
+&lt;ul>
+&lt;li>First create a GPG key (&lt;a class="link" href="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/" target="_blank" rel="noopener"
+>GitHub Official Docs&lt;/a> generating-a-new-gpg-key) has details on how to do this, so I won&amp;rsquo;t go over it again)&lt;/li>
+&lt;li>List the GPG key&amp;rsquo;s signature: &lt;code>gpg -K --keyid-format LONG&lt;/code>, which will &lt;strong>keyid&lt;/strong> record&lt;/li>
+&lt;li>Tell git to use this GPG key: &lt;code>git config user.signingkey your_keyid&lt;/code>&lt;/li>
+&lt;li>The local git username and email need to be the same as the ones filled in when the GPG key was generated: &lt;code>git config user.name name&lt;/code>, &lt;code>git config user.email email email&lt;/code>&lt;/li>
+&lt;li>Enable commit signing for local git: &lt;code>git config commit.gpgsign true&lt;/code>&lt;/li>
+&lt;li>Add the -S option to the Commit signature: &lt;code>git commit -S -m message&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="fatal-error-occurred---unable-to-commit-macos">Fatal error occurred - unable to commit-macOS&lt;/h3>
+&lt;h4 id="the-problem-is-as-follows-reproduced-in-macos-1131">The problem is as follows, reproduced in macOS 11.3.1&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">error: gpg failed to sign the data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">fatal: failed to write commit object
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="solution-in-macos">solution in macOS&lt;/h4>
+&lt;ul>
+&lt;li>Update &amp;amp; Install&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew upgrade gnupg &lt;span class="c1"># This has a make step which takes a while&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew link --overwrite gnupg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install pinentry-mac
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;pinentry-program /usr/local/bin/pinentry-mac&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.gnupg/gpg-agent.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">killall gpg-agent
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global gpg.program gpg &lt;span class="c1"># perhaps you had this already? On linux maybe gpg2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global commit.gpgsign &lt;span class="nb">true&lt;/span> &lt;span class="c1"># if you want to sign every commit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Sign again&lt;/li>
+&lt;li>Check the status of the commit: &lt;code>git log --show-signature -1&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsDesktop16 repair network</title><link>https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/</link><pubDate>Wed, 16 Dec 2020 13:42:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/parallelsdesktop16-repair-network/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="prelude">Prelude&lt;/h2>
+&lt;ul>
+&lt;li>Works under macOS Big Sur&lt;/li>
+&lt;li>Previously it was an imperfect solution using command start, which would also lead to a series of permission problems, but now it is finally perfect&lt;/li>
+&lt;/ul>
+&lt;h2 id="solution">Solution&lt;/h2>
+&lt;ul>
+&lt;li>Edit the file &lt;code>/Library/Preferences/Parallels/network.desktop.xml&lt;/code> with highest privileges&lt;/li>
+&lt;li>Change the value of the &lt;code>UseKextless&lt;/code> field from &lt;code>-1&lt;/code> to &lt;code>0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Note: This value may not be -1 for everyone, and may not be 0 for everyone, so be brave and try!&lt;/p>
+&lt;/blockquote></description></item><item><title>macOS-pkg file reverse analysis</title><link>https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/</link><pubDate>Tue, 24 Nov 2020 12:56:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="cause">Cause&lt;/h2>
+&lt;p>I couldn&amp;rsquo;t download the ed2k link with motrix, so I was going to download a lite version of Xunlei, and suddenly I found a pkg installer, which piqued my interest.&lt;/p>
+&lt;h2 id="after">After&lt;/h2>
+&lt;h3 id="unpacking">Unpacking&lt;/h3>
+&lt;ul>
+&lt;li>I&amp;rsquo;ve always wondered what pkg actually runs and what it does, so I started the first step, unpacking&lt;/li>
+&lt;li>Unpacking only requires one command: &lt;code>pkgutil --expand the pkg.pkg that needs to be unpacked Custom unpacking folder name&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h3 id="view">View&lt;/h3>
+&lt;ul>
+&lt;li>I found a Res file with no suffix, so I checked the format with file and found that it was compressed, so I uncompressed it with the unar command and came out with a file of the same name, but with a bigger size&lt;/li>
+&lt;li>right click in finder - open way - archive utility - app was extracted directly&lt;/li>
+&lt;li>Drag this app into /Application and found that it can be used directly, thus completing the task&lt;/li>
+&lt;li>Looked at the other files, there is a Unix executable for opening web pages, probably a promotion, no rogue behavior&lt;/li>
+&lt;/ul>
+&lt;h2 id="result">Result&lt;/h2>
+&lt;ul>
+&lt;li>Finish the task&lt;/li>
+&lt;/ul>
+&lt;h2 id="adding">Adding&lt;/h2>
+&lt;h3 id="ios-app-installer-exploration">iOS app installer exploration&lt;/h3>
+&lt;ul>
+&lt;li>After updating the BigSur system, I found that there is such a thing as &lt;code>iOS app installer&lt;/code> in the system, but it doesn&amp;rsquo;t work, so I explored it&lt;/li>
+&lt;/ul>
+&lt;p>I explored it&lt;img src="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/System.png"
+width="698"
+height="444"
+srcset="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/System_hu1723c87326acaa09803205f4af5ea488_142422_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/System_hu1723c87326acaa09803205f4af5ea488_142422_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="System"
+class="gallery-image"
+data-flex-grow="157"
+data-flex-basis="377px"
+>&lt;/p>
+&lt;ul>
+&lt;li>Check the location of this software, and check the type, it&amp;rsquo;s good, generic, means maybe Intel will be supported in the future?&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/locate.png"
+width="1015"
+height="714"
+srcset="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/locate_hu8e3f40d9df7aabcf533074ca7dd16b08_261770_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/locate_hu8e3f40d9df7aabcf533074ca7dd16b08_261770_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Locate"
+class="gallery-image"
+data-flex-grow="142"
+data-flex-basis="341px"
+>&lt;/p>
+&lt;ul>
+&lt;li>Open Terminal, go to this folder, run the software, error is reported, suggesting that dependency files are needed, as shown in the picture&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/2.png"
+width="1017"
+height="773"
+srcset="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/2_hu138e5b67613118e6da8b5c4a82a21cc0_178049_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/2_hu138e5b67613118e6da8b5c4a82a21cc0_178049_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="2"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="315px"
+>&lt;/p>
+&lt;ul>
+&lt;li>Find the location of the dependency file and find that there seems to be nothing, probably because only the ARM version of the dependency program is available&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/3.png"
+width="1017"
+height="773"
+srcset="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/3_hu1bfda4401b2d5aed3657dd62ff969cbc_138990_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/3_hu1bfda4401b2d5aed3657dd62ff969cbc_138990_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="3"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="315px"
+>&lt;/p>
+&lt;h3 id="parallels-desktop-cannot-be-networked-solution">Parallels Desktop cannot be networked solution&lt;/h3>
+&lt;ul>
+&lt;li>Still the same problem with BigSur, PD16 is not networked again, so I have no choice but to find a compromise solution&lt;/li>
+&lt;li>Run the command &lt;code>sudo -b /Applications/Parallels\ Desktop.app/Contents/MacOS/prl_client_app&lt;/code> and it will open PD16, so you will be able to connect to the Internet!&lt;/li>
+&lt;li>This command means to run the program with administrator privileges, but in fact, BigSur should have tightened the privileges again, causing problems with PD16 cracking&lt;/li>
+&lt;li>You can write this command in a .command file on your desktop, so that you can double-click it to open it&lt;/li>
+&lt;/ul>
+&lt;h3 id="problem-with--symbol-in-ls--l">Problem with @ symbol in ls -l&lt;/h3>
+&lt;ul>
+&lt;li>Recently, I found that some folders/files are marked with the @ symbol, so I wondered what it meant, so I briefly explored it.&lt;/li>
+&lt;li>Since this phenomenon is caused by the ls program, I asked the system&amp;rsquo;s documentation and commanded &lt;code>man ls&lt;/code>.&lt;/li>
+&lt;li>It was quick, and it came out with a snap, as shown in the picture&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/man-ls.png"
+width="1017"
+height="773"
+srcset="https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/man-ls_hu5bdc2da4a7cca823f76be9b81b532952_188342_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/macos-pkg-file-reverse-analysis/man-ls_hu5bdc2da4a7cca823f76be9b81b532952_188342_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="man-ls"
+class="gallery-image"
+data-flex-grow="131"
+data-flex-basis="315px"
+>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-s" data-lang="s">&lt;span class="line">&lt;span class="cl">&lt;span class="o">-@&lt;/span> &lt;span class="n">Display&lt;/span> &lt;span class="n">extended&lt;/span> &lt;span class="n">attribute&lt;/span> &lt;span class="n">keys&lt;/span> &lt;span class="n">and&lt;/span> &lt;span class="n">sizes&lt;/span> &lt;span class="n">in&lt;/span> &lt;span class="nf">long &lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="n">l&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">output.&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>It is very clear that such file/folder has an extended attribute which can be viewed with the &lt;code>xattr -l&lt;/code> command&lt;/li>
+&lt;li>This attribute can also be cleaned up completely with &lt;code>xattr -c&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>Homebrew and Brewcask installation</title><link>https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/</guid><description>&lt;p>Please note the timeliness:&lt;strong>This article was written on 2020/11/10&lt;/strong>&amp;amp;&amp;amp;&lt;strong>This article was updated on 2021/07/02&lt;/strong>&lt;/p>
+&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/homebrew-and-brewcask-installation/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="install-git">Install git&lt;/h2>
+&lt;ul>
+&lt;li>Method 1: Install XCode Terminal:&lt;code>xcode-select --install&lt;/code>&lt;/li>
+&lt;li>Method 2: Go directly to the git website and download the macOS installer for git&lt;/li>
+&lt;/ul>
+&lt;h2 id="install-homebrew">Install HomeBrew&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>First download the original &lt;a class="link" href="https://cdn.jsdelivr.net/gh/Homebrew/install@master/install.sh" target="_blank" rel="noopener"
+>installer.sh&lt;/a> jsDelivr CDN image&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Run it by entering the following command.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/homebrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/homebrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/linuxbrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/linuxbrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/brew.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/brew&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod +x install.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">HOMEBREW_BOTTLE_DOMAIN&lt;/span>&lt;span class="o">=&lt;/span>https://mirrors.ustc.edu.cn/homebrew-bottles ./install.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Cloning the Homebrew-Cask project via USTC&amp;rsquo;s git repository&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>cd /usr/local/Homebrew/Library/Taps/homebrew&lt;/code>&lt;/li>
+&lt;li>&lt;code>git clone https://mirrors.ustc.edu.cn/homebrew-cask.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="check-source-configuration">Check source configuration&lt;/h2>
+&lt;ul>
+&lt;li>Checking the brew mirror source: &lt;code>git -C &amp;quot;$(brew --repo)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>View homebrew-core mirror source: &lt;code>git -C &amp;quot;$(brew --repo homebrew/core)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>View homebrew-cask mirror sources: &lt;code>git -C &amp;quot;$(brew --repo homebrew/cask)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>The qualifying criteria is that the addresses of these sources are all USTC URLs&lt;/li>
+&lt;/ul>
+&lt;h2 id="update">Update&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>brew update&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="install-oh-my-zsh-not-required">Install Oh-My-Zsh (not required)&lt;/h2>
+&lt;ul>
+&lt;li>Update zsh: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>git clone oh-my-zsh project: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>Rename the project: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Copy the template to the home directory named .zshrc: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;li>Exit Terminal, start Terminal, success&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-terminal-not-required">Configure Terminal (not required)&lt;/h2>
+&lt;ul>
+&lt;li>Preferences-On startup, open-New window with description file-Homebrew&lt;/li>
+&lt;li>Preferences-Description File-Homebrew-Text-Font-14 points&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-terminal-agent-not-required">Configure Terminal agent (not required)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>OhMyZsh Installation Guide</title><link>https://blog.moeomu.com/posts/ohmyzsh-installation-guide/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/ohmyzsh-installation-guide/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/ohmyzsh-installation-guide/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="install-zsh">Install zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="clone-git-repo">Clone git repo&lt;/h2>
+&lt;ul>
+&lt;li>China mainland: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>Global: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="config-zsh">config zsh&lt;/h2>
+&lt;h3 id="set-as-default-shell">set as default shell&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="auto-suggestions-plugin">auto suggestions plugin&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

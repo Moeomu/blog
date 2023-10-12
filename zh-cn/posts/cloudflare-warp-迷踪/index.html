@@ -1,0 +1,655 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Cloudflare的Warp服务似乎很容易就能被刷成无限量，本文旨在探讨原理。"><title>Cloudflare Warp 迷踪</title><link rel=canonical href=https://blog.moeomu.com/zh-cn/posts/cloudflare-warp-%E8%BF%B7%E8%B8%AA/><link rel=stylesheet href=/scss/style.min.abbd69b2908fdfcd5179898beaafd374514a86538d81639ddd2c58c06ae54e40.css><meta property="og:title" content="Cloudflare Warp 迷踪"><meta property="og:description" content="Cloudflare的Warp服务似乎很容易就能被刷成无限量，本文旨在探讨原理。"><meta property="og:url" content="https://blog.moeomu.com/zh-cn/posts/cloudflare-warp-%E8%BF%B7%E8%B8%AA/"><meta property="og:site_name" content="Misaka的秘密花园"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Cloudflare"><meta property="article:tag" content="Warp"><meta property="article:published_time" content="2023-10-09T14:29:43+08:00"><meta property="article:modified_time" content="2023-10-09T14:29:43+08:00"><meta property="og:image" content="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/webpageheadimageCloudflare_54117147.6hbl4terqlj4.webp"><meta name=twitter:title content="Cloudflare Warp 迷踪"><meta name=twitter:description content="Cloudflare的Warp服务似乎很容易就能被刷成无限量，本文旨在探讨原理。"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/webpageheadimageCloudflare_54117147.6hbl4terqlj4.webp"><script async src=https://umami.moeomu.com/Prototype data-website-id=da63d88b-4c19-4ee6-93cc-e12bd941eb81></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/zh-cn><img src=/img/avatar_hu5c4b01d6d06a4818a5284ca6e51e5ac9_24136_300x0_resize_q75_box.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a>
+<span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/zh-cn>Misaka的秘密花园</a></h1><h2 class=site-description>In the gardens embrace, a celestial sprite dances.</h2></div></header><ol class=social-menu><li><a href=https://github.com/Misakaou target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/zh-cn/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>主页</span></a></li><li><a href=/zh-cn/%E5%BD%92%E6%A1%A3/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>归档</span></a></li><li><a href=/zh-cn/%E6%90%9C%E7%B4%A2/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>搜索</span></a></li><li><a href=/zh-cn/%E9%93%BE%E6%8E%A5/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg><span>链接</span></a></li><li><a href=/zh-cn/%E7%95%99%E8%A8%80%E6%9D%BF/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg><span>留言板</span></a></li><li><a href=/zh-cn/%E5%85%B3%E4%BA%8E/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>关于</span></a></li><div class=menu-bottom-section><li id=i18n-switch><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><select name=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://blog.moeomu.com/>English</option><option value=https://blog.moeomu.com/zh-cn/ selected>中文</option></select></li><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>暗色模式</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#起因>起因</a></li><li><a href=#文件>文件</a></li><li><a href=#wpplusreplitsh>wpplusreplit.sh</a></li><li><a href=#cfwarpsh>CFwarp.sh</a></li><li><a href=#warpplussh>warpplus.sh</a><ol><li><a href=#查看基本信息>查看基本信息</a></li><li><a href=#pydata>pydata</a></li><li><a href=#网络分析>网络分析</a></li><li><a href=#剧透>剧透</a></li><li><a href=#分析过程>分析过程</a></li><li><a href=#warpplus-trafficcapture-httpstream>WarpPlus TrafficCapture HTTPStream</a></li></ol></li><li><a href=#总结>总结</a></li><li><a href=#参考文献>参考文献</a></li></ol></nav></div></section></aside><main class="main full-width"><article class="has-image main-article"><header class=article-header><div class=article-image><a href=/zh-cn/posts/cloudflare-warp-%E8%BF%B7%E8%B8%AA/><img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/webpageheadimageCloudflare_54117147.6hbl4terqlj4.webp loading=lazy alt="Featured image of post Cloudflare Warp 迷踪"></a></div><div class=article-details><header class=article-category><a href=/zh-cn/categories/%E9%80%86%E5%90%91%E5%88%86%E6%9E%90/>逆向分析</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/zh-cn/posts/cloudflare-warp-%E8%BF%B7%E8%B8%AA/>Cloudflare Warp 迷踪</a></h2><h3 class=article-subtitle>Cloudflare的Warp服务似乎很容易就能被刷成无限量，本文旨在探讨原理。</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Oct 09, 2023</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>阅读时长: 5 分钟</time></div></footer><footer class=article-translations><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://blog.moeomu.com/posts/cloudflare-warp-trace/ class=link>English</a></div></footer></div></header><section class=article-content><p>本文来源: <a class=link href=/zh-cn/posts/cloudflare-warp-%e8%bf%b7%e8%b8%aa/>MoeomuBlog</a></p><blockquote><p>本文所有提及的代码和相关文件可从此链接<a class=link href=./cloudflare-warp-analyze.zip>cloudflare-warp-analyze.zip</a>下载。</p><p>如果您身处中国，此博客的图片可能会加载不出来，请勇敢跨越中国国家防火墙。</p></blockquote><h2 id=起因>起因</h2><p>在网上闲逛时，发现一个这样的项目：<a class=link href=https://replit.com/@ygkkkk/WarpKey-Register-PRO target=_blank rel=noopener>一键生成2000多万GB的warp+密钥，你懂的</a>。不管你懂了没有，反正笔者是没看懂。它为什么能产生这么多的密钥？也许是有一个列表，然后每次运行的时候随机抽一个？</p><h2 id=文件>文件</h2><p>既然来都来了，不fork一下说不过去啊。看到这里有几个文件，首先是<code>replit.nix</code>里写明了这个项目入口是<code>wpplusreplit.sh</code>，那就先从它看起。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>&gt; file *
+</span></span><span class=line><span class=cl>README.md:       UTF-8 text
+</span></span><span class=line><span class=cl>replit.nix:      ASCII text
+</span></span><span class=line><span class=cl>warpplus.sh:     ELF executable, 64-bit LSB x86-64, dynamic (/lib64/ld-linux-x86-64.so.2), BuildID=3dfe013b3027047470d1aac10a3504baf6969725, stripped
+</span></span><span class=line><span class=cl>wpplusreplit.sh: ASCII text
+</span></span></code></pre></td></tr></table></div></div><h2 id=wpplusreplitsh>wpplusreplit.sh</h2><p><code>wpplusreplit.sh</code>代码被混淆了，不出所料。</p><p><img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/1-fork-min.1wiu2onj1if4.webp loading=lazy alt=Fork></p><p>只是区区简单的变量名混淆，稍微有点常识就知道用<code>bash -x</code>调试一下代码就行，结果如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>bash -c <span class=s1>&#39;bash -c &#34;$(base64 -d &lt;&lt;&lt; &#34;\
+</span></span></span><span class=line><span class=cl><span class=s1>YmFzaCAtYyAiJChiYXNlNjQgLWQgPDw8ICJcClltRnphQ0F0WXlBaUpDaGlZWE5sTmpRZ0xXUWdQ
+</span></span></span><span class=line><span class=cl><span class=s1>RHc4SUNKY0NsbHRSbnBoUTBGMFdYbEJhVXBEYUdsWldFNXNUbXBSWjB4WFVXZFEKUkhjNFNVTktZ
+</span></span></span><span class=line><span class=cl><span class=s1>ME5zYkhSU2JuQm9VVEJHTUZkWWJFSmhWWEJFWVVkc1dsZEZOWE5VYlhCU1dqQjRXRlZYWkZFS1Vr
+</span></span></span><span class=line><span class=cl><span class=s1>aGpORk5WVGt0WgpNRTV6WWtoU1UySnVRbTlWVkVKSFRVWmtXV0pGU21oV1dFSkZXVlZrYzFkc1pF
+</span></span></span><span class=line><span class=cl><span class=s1>Wk9XRTVWWWxoQ1UxZHFRalJYUmxaWVdrWkZTMVZyCmFHcE9SazVXVkd0MFdncE5SVFY2V1d0b1Ux
+</span></span></span><span class=line><span class=cl><span class=s1>VXlTblZSYlRsV1ZrVktTRlJWV210WFYwcEdVMjFvVjFkRlNrWlhWbFpyWXpGa2MxcEYKV2s5WFJU
+</span></span></span><span class=line><span class=cl><span class=s1>VldXV3hvUTFVeFpIRlJhbEpZVW14YVdWZHJXa1pUTVZaeUNtRkhjRTlTYXpWWFZrZDBNRmRuY0U1
+</span></span></span><span class=line><span class=cl><span class=s1>U1ZGWTJWMWQwYjFVeApWWGxUYmxaU1lsUnNWMVpyVmt0VFJsSldWMjEwV0ZZd2NFZFZNakZ2VmpG
+</span></span></span><span class=line><span class=cl><span class=s1>a1JsTnJXbGhXYkZweVdYcEdhMk14Y0VZS1YyczVXRkpVClZsZFhWM2h2VVRGVmVGcElSbEpoYkVw
+</span></span></span><span class=line><span class=cl><span class=s1>WlZXMTRZVmRXWkhKWGExcFVUVlphZVVOdFJraGpSVGxUWVhwV1dGWnJaREJOUm1SdVkwVTEKVTFa
+</span></span></span><span class=line><span class=cl><span class=s1>R1dUSldNV1F3WWpGVmVBcFdXR3hVWW14YVUxbHNVbk5XTVZweVZtdDBWRkpzU2xkV01qRXdWMFpa
+</span></span></span><span class=line><span class=cl><span class=s1>ZDJORlpGWk5ha1oyVm1wRwphMUpzVG5KWGJHaFhZa1p3ZVZkWWNFZGhNazE0WTBWWlMxWXljelZY
+</span></span></span><span class=line><span class=cl><span class=s1>UmtwVkNsWnNaRmhXTTJoMlZWUkdWbVZHY0VsU2JFcG9Za1Z3CldsWlhNVFJaVm1SWFdraEtXR0V4
+</span></span></span><span class=line><span class=cl><span class=s1>Y0ZWVVZscGhaVlZPZEZKcmFHcFNWR3hVV1Zod1YxZEdXbkphUkVKT1VtMVNkVmt3VlRFS1ZURmEK
+</span></span></span><span class=line><span class=cl><span class=s1>UjFkVVJsZE5WMUYzVmxSR1dtVkJjRmRYUjJob1ZXeGtVMk5XVm5GUmJVWmFWbTE0ZVZkcldrdFVi
+</span></span></span><span class=line><span class=cl><span class=s1>RXB6VTJ4b1YwMXVhRkJXVkVaaApZMnMxV1dKSFJsTldNVW95Vm14U1FncGxSa3BYVTJ4V1UySkhV
+</span></span></span><span class=line><span class=cl><span class=s1>azlaYlhSTFVsWmFSMVp0Um1wTlZtdzBWMnRhY2xNeFpISldWRlpZClVtdHdNVU5zUm5SaFJtaFha
+</span></span></span><span class=line><span class=cl><span class=s1>V3RKTUZac1VrSmtNbFpJVTJ0c1ZHSkhhSEJaVkU1RENtVnNXblJqUlU1YVZtczFlbFl4YUhOaE1V
+</span></span></span><span class=line><span class=cl><span class=s1>NUgKWTBaV1ZWWnNjR2hXYlhSUFl6RktkVkpzV21sWFJrcDNWbTE0VTFZd05VZFhXR3hyVWpOQ2Mx
+</span></span></span><span class=line><span class=cl><span class=s1>VnFRbUZWTVd0M1draE5TMWxWVlhnSwpWMVpHY2sxV1pHaE5XRUpWVmxSS2VtVkdaRUpqUm1ScFVq
+</span></span></span><span class=line><span class=cl><span class=s1>RktiMVpYTUhoaU1WWkhWMjVLVjJKdFVuRlphMlEwVm14VmVXTkZPVlZpClZYQkpXbFZhWVZZeFNY
+</span></span></span><span class=line><span class=cl><span class=s1>cGhTRXBYWVRKU1RBcFdha1pQWTFaR2MxWnJOVmRoTTBKT1ZtMXdTbVZCY0ZOTmF6VjVWR3hhVjFW
+</span></span></span><span class=line><span class=cl><span class=s1>dFNrbFIKYmtKV1lsaFNNMXBXV21Ga1IxWklaRVpTVGxZeFNrcFdiVEV3WTJ4TmVHSklTbGhoZW14
+</span></span></span><span class=line><span class=cl><span class=s1>WENsUlZVa05PUlU1elUyNUdWbUpIVWxoVgpiRkpXWld4YWNsVnJkRlZOVld3MVZURm9kMWxXU1hw
+</span></span></span><span class=line><span class=cl><span class=s1>VmJGSlZWbnBXZGtOdFVuTlhibEpxVWxoU1YxUldXa3RYUmxsNFlVYzVXbFpyCk5VY0tXVEJhVjFa
+</span></span></span><span class=line><span class=cl><span class=s1>V1duTlhiR2hWWWtaYVVGa3ljekZXTVdSMFpFWk9UazFWY0ZaV2JURjNWREpKZUZOdVRsaGhNbEpa
+</span></span></span><span class=line><span class=cl><span class=s1>V1d4U2MyTlcKVWxkYVJGSldUVmQwTTFkcll6UlRNVnB4VW0xRlN3cFdNR1JUVG14T2MxcEhhR2hO
+</span></span></span><span class=line><span class=cl><span class=s1>V0VKMlZqRmtkMUl4VW5SV2JFcHFVbXh3V1ZWcQpUbTlXTVdSWFZXdDBhVTFyTVRSV2JUVkxWakpL
+</span></span></span><span class=line><span class=cl><span class=s1>VmxkdVJsZGlWRlpFVmpCYVlWZEhWa2hrUmxaT0NtRXpRa3BYYkZaaFlURmFkRk5zClZsZGlhM0JZ
+</span></span></span><span class=line><span class=cl><span class=s1>VldwT1QwNUJjRmROUmxVeFZteGFZV014Y0VoaVJtaFRWbGhDUjFadGVGTlRNRFZDWTBaT1RsSkdX
+</span></span></span><span class=line><span class=cl><span class=s1>alpXVkVreFZERlcKZEZOclpGUUtZa2RvV0ZsWGRHRlVSbEpZWlVkR1UwMVdjREJhUlZwaFZHeGFW
+</span></span></span><span class=line><span class=cl><span class=s1>VlpzYkZkV2VrRjRWbTE0VG1WSFJYcGFSbWhvVFVSVwpka05zVm5SbFNHUlVWbFUxZWxscVRuZGhW
+</span></span></span><span class=line><span class=cl><span class=s1>a3AwVldzNVdncGlXRkpNVmtaYWExZFhUa1pUYlhoVFlYcFdTVlpyWXpGVE1rWkhVMjVLClQxZEZT
+</span></span></span><span class=line><span class=cl><span class=s1>bGhaVjNNeFpHdE9jMVZZYUdGU2JXaHpWVzE0ZDFReFduTlZhMlJzWWtkNGVWbFZWVFZXTVZwekNt
+</span></span></span><span class=line><span class=cl><span class=s1>TkZaMHRXYWtreFZERloKZVZKdVNsaGhNbWhXV1d0YVlWVkdjRVpYYkdScVlsVmFSMVF4V210VWF6
+</span></span></span><span class=line><span class=cl><span class=s1>RjBZVVp3VjJFeGNISmFWM040VTBaYWMxcEdhR2xTTVVwWQpWMVpTUWsxV2JGY0tWMjVPVm1FeGNI
+</span></span></span><span class=line><span class=cl><span class=s1>TlphMlF3VFRGWmVVNVhjRlJOVm13elZqSjBlbE4zY0ZkTlZuQklWakZrVDFJeGNFZFViR1JPClls
+</span></span></span><span class=line><span class=cl><span class=s1>ZGplRlpxU2pCVk1VMTRWbGhzVm1Fd2NIRlZiWGhoWTBac2NncFdibVJYVm0xU1dGZHJhSGRVYkZw
+</span></span></span><span class=line><span class=cl><span class=s1>elUyNXdWMVl6YUhaWlYzaEwKVjBaV2RWRnNWbGRpVmtWM1ZtcENZV0V4WkZoVWExcFZZbGRvVDBO
+</span></span></span><span class=line><span class=cl><span class=s1>dFJYcFJiR2hYVWpOb1dGbDZSbUZXYXpGWENtRkhhRk5XYTNCbwpWbTB3ZUZVeFVrSmpSbkJzWVRG
+</span></span></span><span class=line><span class=cl><span class=s1>d1RWZFVSbUZVTWxKSFUyNU9WV0pGTlZsVmJGWjNVekZhY1ZOcVVscFdNRmw2V1RCYVYxUnNXbFZX
+</span></span></span><span class=line><span class=cl><span class=s1>CmJHeFhWbnBCZUZacVJtRUtWMFpPYzJKR1dVdFphMlEwVmpGc2NsZHJkRk5OV0VKWFZqSXhNRmRH
+</span></span></span><span class=line><span class=cl><span class=s1>V1hkT1ZXUmhVbGRTZWxsV1drdE8KYlVZMlVXeGtWMkpWTVRSV1ZtUTBWRzFXUjFac2JHaFNNRnBV
+</span></span></span><span class=line><span class=cl><span class=s1>Vld4V2R3cGhSVTV6VjI1U1RsWnJOVlZWYkZVeFRVWlZlV1JHWkZkUwpNSEJLVlZjMVExWjNjR2hO
+</span></span></span><span class=line><span class=cl><span class=s1>V0VKdlZtcEdZV0V4WkZoVWExcHJVbXhLVDFac2FFTlRWbHBZVFZSU2FrMXJXbGhWTWpWTENsZEhT
+</span></span></span><span class=line><span class=cl><span class=s1>bFZpClJtaGFZa1pLUjFwWGRFOWphekZXV2taa2FWSnNjRlpXYWtKcllqRmFjMVZzYUd0VFJUVlFW
+</span></span></span><span class=line><span class=cl><span class=s1>bTE0VjA1V2NGWlplbFpYWWtWd2VrTnQKU2tWWFZYUlhZa2RSZDFSVldtRUtZekZrY2xkck9WZGhl
+</span></span></span><span class=line><span class=cl><span class=s1>bFpYVm0xNFlWbFdWa2RoTTJ4T1ZsaFNWRmxzVm5kVFZsWjBaVVU1VldKVgpjRmxaVlZKVFZqQXhX
+</span></span></span><span class=line><span class=cl><span class=s1>RlJxVWxWV1ZuQlBXa1JCZUZOWFJraGlSbEpUVjBWS01ncFdiR04zWlVaVmVWUllaMHRaYTFwWFZs
+</span></span></span><span class=line><span class=cl><span class=s1>ZEtWV0pGCk9WZGlXR2d6VlRGYVUxWnNWbk5YYkZKT1ZteHdOVll5ZEZkaGJFNHpZMFprYVZKdVFs
+</span></span></span><span class=line><span class=cl><span class=s1>bFhWRVpoVkRKU1IxTnVUbFZpUlRWWkNsVnMKVm5kVE1WcHhVMnBTV2xZd1ZqUldWbWh2VmxkS1Jt
+</span></span></span><span class=line><span class=cl><span class=s1>TklSbFppV0ZJeldUQmFjMWRSY0dwU2JWSnpWbTE0ZDJWR1ZsaGxSMFpwVW10dwpWbFZ0ZUc5WGJV
+</span></span></span><span class=line><span class=cl><span class=s1>VjRVMjFvVjJFeVVrd0tWbXhhWVdNeFduUlNiR1JwVW01Qk1sWXlkRk5TTVZGNFdrVm9WR0V4Y0Za
+</span></span></span><span class=line><span class=cl><span class=s1>WmJHUnZWMFZPCmRGTnNiR2hTTUZwWVdWUktUMDB4VW5OWGF6bHFUVlZ3V2tOc2NFaGlSbEpUVjBW
+</span></span></span><span class=line><span class=cl><span class=s1>S1dRcFdiVEUwVm1zeFYxUnFUbXBTYkhCUFZGYzEKYjFSR1pGVlJiR1JxVFdzMVNGVnROVk5oVmtw
+</span></span></span><span class=line><span class=cl><span class=s1>MVVXeHNWbUpHU2xoVVYzaFdaVVphY2s5V1VtbFdWbXcyVjFSQ1lWTXhWbkpOVldocwpDbEpVUmxW
+</span></span></span><span class=line><span class=cl><span class=s1>V2FrbzBaVlpzVjFadVRVdFZNRnBQWkVkR1NHSXdkRlZXZWtaeVdXMTRUMWRIU2tkVWJFcFhWak5v
+</span></span></span><span class=line><span class=cl><span class=s1>TVZkWE5YWmtNa1pXClpFWlNWRll5VW1GWmJGWmhUbXhzVmxSclNtZ0tWbGhDUjFWV1pITlNSbkEy
+</span></span></span><span class=line><span class=cl><span class=s1>VFVSc1NtRlhkSEJUVldSTFlVZE5lVm95WkVwaFZrcEMKVTFka2RsQlRTWEJKYVVKcFdWaE9iMGxE
+</span></span></span><span class=line><span class=cl><span class=s1>U1d0UlEwbExJaWtpSUdKaGMyZ2dJaVJBSWdvPSIpIiBiYXNoICIkQCIK&#34;)&#34; bash &#34;$@&#34;&#39;</span> bash
+</span></span></code></pre></td></tr></table></div></div><p>继续用base64解码，最终得到如下的代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl><span class=cp>#!/bin/bash
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=nb>echo</span>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;请稍等，下载更新中……&#34;</span>
+</span></span><span class=line><span class=cl>rm -rf warpplus.sh
+</span></span><span class=line><span class=cl>wget -N https://gitlab.com/rwkgyg/CFwarp/-/raw/main/point/warpplus.sh &gt;/dev/null 2&gt;<span class=p>&amp;</span><span class=m>1</span>
+</span></span><span class=line><span class=cl>chmod +x warpplus.sh
+</span></span><span class=line><span class=cl>./warpplus.sh
+</span></span></code></pre></td></tr></table></div></div><p>什么？啊？啊？啊？就是更新一下然后启动<code>warpplus.sh</code>文件是吧？</p><h2 id=cfwarpsh>CFwarp.sh</h2><p>上文提到了一个项目<a class=link href=https://gitlab.com/rwkgyg/CFwar target=_blank rel=noopener>rwkgyg/CFwar</a>，似乎是这个脚本的作者存储这些脚本和更新的地方。在这里找到的CFwarp.sh再次使用上述方法解密后，得到如下代码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>...
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[[</span> <span class=nv>$cpu</span> <span class=o>=</span> amd64 <span class=o>]]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>curl -sSL -o warpplus.sh --insecure https://gitlab.com/rwkgyg/CFwarp/-/raw/main/point/warpplus.sh &gt;/dev/null 2&gt;<span class=p>&amp;</span><span class=m>1</span>
+</span></span><span class=line><span class=cl><span class=k>elif</span> <span class=o>[[</span> <span class=nv>$cpu</span> <span class=o>=</span> arm64 <span class=o>]]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>curl -sSL -o warpplus.sh --insecure https://gitlab.com/rwkgyg/CFwarp/-/raw/main/point/warpplusa.sh &gt;/dev/null 2&gt;<span class=p>&amp;</span><span class=m>1</span>
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span><span class=line><span class=cl>chmod +x warpplus.sh
+</span></span><span class=line><span class=cl>timeout 60s ./warpplus.sh
+</span></span><span class=line><span class=cl>...
+</span></span></code></pre></td></tr></table></div></div><p>这一部分代码和<code>wpplusreplit.sh</code>所展示的下载地址相同，由于笔者使用的是arm架构操作系统，因此下载新的<code>warpplusa.sh</code>，上述代码证明它的功能和<code>warpplus.sh</code>相同。</p><h2 id=warpplussh>warpplus.sh</h2><blockquote><p>这是一个Linux系统下的可执行文件，在<a class=link href=#%e6%96%87%e4%bb%b6>文件</a>中已经可以看出来，因此本节围绕此文件展开分析。</p></blockquote><h3 id=查看基本信息>查看基本信息</h3><p>使用Detect it easy检查一下此文件的详细信息，可惜并没有能得到什么有价值的内容。只能看出这个可执行文件是由GCC编译来的，语言可能是C/C++。</p><p><img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-15.28.01.ji9fj7ct4nk.webp loading=lazy alt=die></p><p>另外可以清晰看出，这个可执行程序内包含了python的一些代码，但这整个程序似乎都只是一个压缩包，需要解压缩。</p><p><img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-15.34.35.4jat5v0uops0.webp loading=lazy alt=py></p><p><img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-15.37.42.28nx0l4s89ts.webp loading=lazy alt=packed></p><h3 id=pydata>pydata</h3><p>如下图所示，这个巨大的pydata节就是此程序要解压的对象，将它转储出来之后也确实可以识别出它是zlib压缩后的文件，但笔者并没有尝试去解压缩分析这个巨大的文件内容，事实证明这是对的，后文将会提及原因。</p><p><img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-15.39.23.3tsqcacobdz4.webp loading=lazy alt=pydata></p><h3 id=网络分析>网络分析</h3><p>在笔者分析网络之前，也使用strace追踪了它调用的系统API，但是并没有得到什么有价值的信息，因此这些内容省略，但是strace的记录日志在附件中一并提供。</p><p>既然这个程序是使用网络请求获得WARP无限流量Key的，那么即使不看代码，只分析网络请求我们也能将原理猜到。</p><p>按照这个思路，首先安装了<code>burpsuite</code>。不幸的是，此软件将需要用到的证书内置其中，<code>burpsuite</code>的证书无法用于解密它的流量。</p><p>在运行过程中，笔者发现它会在<code>/tmp</code>文件夹下释放python运行环境库，这些文件共计14M。这也解释了上文的<code>pydata</code>中的内容。</p><p>至此，网络分析只剩下导出客户端密钥这一条路可以走。</p><ol><li><p>设置环境变量，在当前tty中导出SSLKEY到<code>WarpPlus-TrafficCapture-Key.log</code>文件中</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl><span class=nb>export</span> <span class=nv>SSLKEYLOGFILE</span><span class=o>=</span>WarpPlus-TrafficCapture-Key.log
+</span></span></code></pre></td></tr></table></div></div></li><li><p>使用root权限打开wireshark，监听网卡</p></li><li><p>在当前tty中运行<code>warpplus.sh</code>，等待它退出后停止wireshark监听</p></li><li><p>在wireshark中设置<code>TLS-(Pre)-Master-Secret log filename</code>为上文导出的文件，如题所示。
+<img src=https://cdn.statically.io/gh/Misakaou/imagestorage@master/20231009/Screenshot-2023-10-09-at-14.56.45.31guan99fpog.webp loading=lazy alt=wireshark-master-secret></p></li><li><p>在wireshark中打开http流分析，转储到文件中，内容请<a class=link href=#warpplus-trafficcapture-httpstream>点击这里查看</a></p></li></ol><h3 id=剧透>剧透</h3><blockquote><p>2023年10月10日增补内容</p></blockquote><p>根据<a class=link href=https://telegra.ph/How-to-get-free-12PB-to-Your-Warp-Key-BUG--BUFF-04-09 target=_blank rel=noopener>How to get free 12PB to Your Warp Key [BUG / BUFF]</a>所描述，符合以下操作就可以将空账户刷入另一个账户的推荐数量。</p><ol><li>备份当前设备所拥有的license。</li><li>使用一个账户中已有极多推荐数量的license替换到当前设备中。</li><li>重新启动WARP程序。</li><li>重新将曾经备份到license替换到当前设备中。</li></ol><p>这也解释了下文的请求过程，Cheers！</p><h3 id=分析过程>分析过程</h3><p><strong>为了您的脑子健康，我直接将下文的总结写在这里，本文到此结束。您可以不用看后文的详情。</strong></p><ol><li>客户端请求：<code>POST /v0a2223/reg</code>。解释：请求创建一个Cloudflare WARP的A账户。</li><li>服务端响应：JSON数据。解释：A账户目前是空账户。返回了代表客户端的设备ID和账户license。</li><li>客户端请求：<code>POST /v0a2223/reg</code>。解释：请求创建一个Cloudflare WARP的B账户。</li><li>服务端响应：JSON数据。解释：B账户目前是空账户。返回了代表客户端的设备ID和账户license。</li><li>客户端请求：<code>PATCH /v0a2223/reg/v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739</code>，携带的参数<code>963be82f-4a90-45a8-aaac-be558383fe44</code>是第4步中，B账户代表客户端的设备ID。解释：由于<code>0b831bf3-224d-4d45-869b-b59edd27e739</code>是A账户代表客户端的设备ID，因此这次请求中A账户成为了B账户的引荐人。</li><li>服务端响应：对比首次返回数据，删除<code>"usage":0</code>，增加<code>"referrer":"963be82f-4a90-45a8-aaac-be558383fe44"</code>。</li><li>客户端请求：<code>DELETE /v0a2223/reg/963be82f-4a90-45a8-aaac-be558383fe44</code>。解释：删除账户B链接的设备<code>963be82f-4a90-45a8-aaac-be558383fe44</code>。</li><li>服务端响应：<code>204 No Content</code>。解释：操作成功。</li><li>客户端请求：<code>PUT /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739/account</code>，携带参数为<code>{"license": "u7SOF218-6zQ092Od-95qVJ02k"}</code>。解释：更改A账户所链接的设备<code>0b831bf3-224d-4d45-869b-b59edd27e739</code>的license为<code>u7SOF218-6zQ092Od-95qVJ02k</code>。</li><li>服务端响应：<code>"id": "2b4d3261-ad36-4069-95ea-53520cd42a58"</code>。解释：授予此设备新的设备ID。</li><li>客户端请求：<code>PUT /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739/account</code>，携带参数为<code>{"license": "7O95xNh3-81E65Kce-W4ln892I"}</code>。解释：更改无WARP账户链接的设备<code>0b831bf3-224d-4d45-869b-b59edd27e739</code>的license为<code>7O95xNh3-81E65Kce-W4ln892I</code>。</li><li>服务端响应：<code>"id": "2b4d3261-ad36-4069-95ea-53520cd42a58","referral_count": 24598563</code>。解释：Cloudflare服务端似乎出现异常，无账户链接的设备<code>0b831bf3-224d-4d45-869b-b59edd27e739</code>引荐数量变成<code>24598563</code>。</li><li>客户端请求：<code>GET /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739/account</code>。解释：请求此无WARP账户链接的设备详细资料。</li><li>服务端响应：<code>"premium_data": 24598563000000000,"quota": 24598563000000000,"referral_count": 24598563</code>。解释：Cloudflare服务端似乎出现异常，一个无限WARP流量账户创建成功。</li><li>客户端请求：<code>DELETE /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739</code>。解释：删除此无WARP账户链接的设备。</li><li>服务端响应：<code>204 No Content</code>。解释：操作成功。</li></ol><h3 id=warpplus-trafficcapture-httpstream>WarpPlus TrafficCapture HTTPStream</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span><span class=lnt>140
+</span><span class=lnt>141
+</span><span class=lnt>142
+</span><span class=lnt>143
+</span><span class=lnt>144
+</span><span class=lnt>145
+</span><span class=lnt>146
+</span><span class=lnt>147
+</span><span class=lnt>148
+</span><span class=lnt>149
+</span><span class=lnt>150
+</span><span class=lnt>151
+</span><span class=lnt>152
+</span><span class=lnt>153
+</span><span class=lnt>154
+</span><span class=lnt>155
+</span><span class=lnt>156
+</span><span class=lnt>157
+</span><span class=lnt>158
+</span><span class=lnt>159
+</span><span class=lnt>160
+</span><span class=lnt>161
+</span><span class=lnt>162
+</span><span class=lnt>163
+</span><span class=lnt>164
+</span><span class=lnt>165
+</span><span class=lnt>166
+</span><span class=lnt>167
+</span><span class=lnt>168
+</span><span class=lnt>169
+</span><span class=lnt>170
+</span><span class=lnt>171
+</span><span class=lnt>172
+</span><span class=lnt>173
+</span><span class=lnt>174
+</span><span class=lnt>175
+</span><span class=lnt>176
+</span><span class=lnt>177
+</span><span class=lnt>178
+</span><span class=lnt>179
+</span><span class=lnt>180
+</span><span class=lnt>181
+</span><span class=lnt>182
+</span><span class=lnt>183
+</span><span class=lnt>184
+</span><span class=lnt>185
+</span><span class=lnt>186
+</span><span class=lnt>187
+</span><span class=lnt>188
+</span><span class=lnt>189
+</span><span class=lnt>190
+</span><span class=lnt>191
+</span><span class=lnt>192
+</span><span class=lnt>193
+</span><span class=lnt>194
+</span><span class=lnt>195
+</span><span class=lnt>196
+</span><span class=lnt>197
+</span><span class=lnt>198
+</span><span class=lnt>199
+</span><span class=lnt>200
+</span><span class=lnt>201
+</span><span class=lnt>202
+</span><span class=lnt>203
+</span><span class=lnt>204
+</span><span class=lnt>205
+</span><span class=lnt>206
+</span><span class=lnt>207
+</span><span class=lnt>208
+</span><span class=lnt>209
+</span><span class=lnt>210
+</span><span class=lnt>211
+</span><span class=lnt>212
+</span><span class=lnt>213
+</span><span class=lnt>214
+</span><span class=lnt>215
+</span><span class=lnt>216
+</span><span class=lnt>217
+</span><span class=lnt>218
+</span><span class=lnt>219
+</span><span class=lnt>220
+</span><span class=lnt>221
+</span><span class=lnt>222
+</span><span class=lnt>223
+</span><span class=lnt>224
+</span><span class=lnt>225
+</span><span class=lnt>226
+</span><span class=lnt>227
+</span><span class=lnt>228
+</span><span class=lnt>229
+</span><span class=lnt>230
+</span><span class=lnt>231
+</span><span class=lnt>232
+</span><span class=lnt>233
+</span><span class=lnt>234
+</span><span class=lnt>235
+</span><span class=lnt>236
+</span><span class=lnt>237
+</span><span class=lnt>238
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>POST /v0a2223/reg HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Content-Length: 0
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:13 GMT
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=utf-8
+</span></span><span class=line><span class=cl>Transfer-Encoding: chunked
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>CF-Ray: 813492d808d996c0-SJC
+</span></span><span class=line><span class=cl>CF-Cache-Status: DYNAMIC
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>x-cache-set: true
+</span></span><span class=line><span class=cl>x-envoy-upstream-service-time: 625
+</span></span><span class=line><span class=cl>Set-Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=; path=/; expires=Mon, 09-Oct-23 07:00:13 GMT; domain=.cloudflareclient.com; HttpOnly; Secure; SameSite=None
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=%2F8Gdnjhpm99lkfYYkpf9I%2B4wMlEDZtiQuhUK1tBiAk7TwjKtvEnrjr9fBFDSEja3O4YSdnT%2FHR2JFKbsW1zm7ITkDMUZDI8kwyTLScq8fvuHdpTSXyIN9aME%2BZAVjVxWRr5gdOXuMMfCcQ%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>Content-Encoding: gzip
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;0b831bf3-224d-4d45-869b-b59edd27e739&#34;,&#34;type&#34;:&#34;a&#34;,&#34;name&#34;:&#34;&#34;,&#34;account&#34;:{&#34;id&#34;:&#34;b55baa96-a450-4332-9f39-f3046b6ea86a&#34;,&#34;account_type&#34;:&#34;free&#34;,&#34;created&#34;:&#34;2023-10-09T06:30:12.823920679Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:12.823920679Z&#34;,&#34;premium_data&#34;:0,&#34;quota&#34;:0,&#34;usage&#34;:0,&#34;warp_plus&#34;:true,&#34;referral_count&#34;:0,&#34;referral_renewal_countdown&#34;:0,&#34;role&#34;:&#34;child&#34;,&#34;license&#34;:&#34;7O95xNh3-81E65Kce-W4ln892I&#34;},&#34;token&#34;:&#34;40ca084f-315e-45e2-9191-b59199c2331a&#34;,&#34;warp_enabled&#34;:false,&#34;waitlist_enabled&#34;:false,&#34;created&#34;:&#34;2023-10-09T06:30:12.509754043Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:12.509754043Z&#34;,&#34;place&#34;:0,&#34;locale&#34;:&#34;zh-CN&#34;,&#34;enabled&#34;:true,&#34;install_id&#34;:&#34;&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>POST /v0a2223/reg HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Content-Length: 0
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:14 GMT
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=utf-8
+</span></span><span class=line><span class=cl>Transfer-Encoding: chunked
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>CF-Ray: 813492de4daa96c0-SJC
+</span></span><span class=line><span class=cl>CF-Cache-Status: DYNAMIC
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>x-cache-set: true
+</span></span><span class=line><span class=cl>x-envoy-upstream-service-time: 803
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=rQULnzZb4N3TSVT6j8frTuQE01%2FJ4o58lJs4h9ROd%2F5EUN%2BhmxsjB%2BgU3%2B60wkEvCqNngwsddsIej6cIqS1nnZlTgM4mSFAvbSYwY4UurL3GOdMqNdqHCmpHkysd5UaV5l0uz3BCCNivKQ%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>Content-Encoding: gzip
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;963be82f-4a90-45a8-aaac-be558383fe44&#34;,&#34;type&#34;:&#34;a&#34;,&#34;name&#34;:&#34;&#34;,&#34;account&#34;:{&#34;id&#34;:&#34;ec26bf68-baa5-445a-b6b3-c8fb628509a2&#34;,&#34;account_type&#34;:&#34;free&#34;,&#34;created&#34;:&#34;2023-10-09T06:30:13.899453227Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:13.899453227Z&#34;,&#34;premium_data&#34;:0,&#34;quota&#34;:0,&#34;usage&#34;:0,&#34;warp_plus&#34;:true,&#34;referral_count&#34;:0,&#34;referral_renewal_countdown&#34;:0,&#34;role&#34;:&#34;child&#34;,&#34;license&#34;:&#34;2W07lo5d-90c2f7TE-sK7Tq803&#34;},&#34;token&#34;:&#34;379fc773-f8ab-45b2-a7cd-672dbf72e748&#34;,&#34;warp_enabled&#34;:false,&#34;waitlist_enabled&#34;:false,&#34;created&#34;:&#34;2023-10-09T06:30:13.501458226Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:13.501458226Z&#34;,&#34;place&#34;:0,&#34;locale&#34;:&#34;zh-CN&#34;,&#34;enabled&#34;:true,&#34;install_id&#34;:&#34;&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PATCH /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739 HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=UTF-8
+</span></span><span class=line><span class=cl>Authorization: Bearer 40ca084f-315e-45e2-9191-b59199c2331a
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>Content-Length: 52
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;referrer&#34;: &#34;963be82f-4a90-45a8-aaac-be558383fe44&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:16 GMT
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=utf-8
+</span></span><span class=line><span class=cl>Transfer-Encoding: chunked
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>CF-Ray: 813492e5ebdc96c0-SJC
+</span></span><span class=line><span class=cl>CF-Cache-Status: DYNAMIC
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>x-cache-set: true
+</span></span><span class=line><span class=cl>x-envoy-upstream-service-time: 1608
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=ftYufwYVFe9blsUVXEH%2Bx7GGcyvLZDeToO7yhv1zKvkVerVw4By89zAfkP58xBnwWinHJLlybAoipaUM7yej7lmQhlUHLV8KzAXfORubkpvtrxizutxWESQu8m9DfE0AcTJU%2F9%2FnNt7AOw%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>Content-Encoding: gzip
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;0b831bf3-224d-4d45-869b-b59edd27e739&#34;,&#34;type&#34;:&#34;a&#34;,&#34;name&#34;:&#34;&#34;,&#34;account&#34;:{&#34;id&#34;:&#34;b55baa96-a450-4332-9f39-f3046b6ea86a&#34;,&#34;account_type&#34;:&#34;free&#34;,&#34;created&#34;:&#34;2023-10-09T06:30:12.82392Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:12.82392Z&#34;,&#34;premium_data&#34;:0,&#34;quota&#34;:0,&#34;warp_plus&#34;:true,&#34;referral_count&#34;:0,&#34;referral_renewal_countdown&#34;:0,&#34;role&#34;:&#34;child&#34;,&#34;license&#34;:&#34;7O95xNh3-81E65Kce-W4ln892I&#34;},&#34;warp_enabled&#34;:false,&#34;waitlist_enabled&#34;:false,&#34;created&#34;:&#34;2023-10-09T06:30:12.509754Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:14.909577261Z&#34;,&#34;place&#34;:0,&#34;locale&#34;:&#34;zh-CN&#34;,&#34;enabled&#34;:true,&#34;install_id&#34;:&#34;&#34;,&#34;referrer&#34;:&#34;963be82f-4a90-45a8-aaac-be558383fe44&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>DELETE /v0a2223/reg/963be82f-4a90-45a8-aaac-be558383fe44 HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Authorization: Bearer 379fc773-f8ab-45b2-a7cd-672dbf72e748
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 204 No Content
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:17 GMT
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=Cp6WP7S5U1wpURnPmkVX9o5wdGZj0DpZF6i7XdLAoVmC%2BTMjdFRuU4r1uRXpPJgD9qtRI9g2FEuV4c9vO%2F%2BPDaCb6GQ%2F0gfQBLOC2gCoLXFXYSiE3C%2Fm82%2Bcli8PCFsavtchA6D3VumK4g%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>CF-RAY: 813492f20d3796c0-SJC
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PUT /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739/account HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=UTF-8
+</span></span><span class=line><span class=cl>Authorization: Bearer 40ca084f-315e-45e2-9191-b59199c2331a
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>Content-Length: 41
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;license&#34;: &#34;u7SOF218-6zQ092Od-95qVJ02k&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:21 GMT
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=utf-8
+</span></span><span class=line><span class=cl>Transfer-Encoding: chunked
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>CF-Ray: 813492f7c9a696c0-SJC
+</span></span><span class=line><span class=cl>CF-Cache-Status: DYNAMIC
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>x-envoy-upstream-service-time: 4098
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=Qy8emNDUPCJGcbD5y2yy04auosZBfIsuUKdFzv13Qu6YVCHItE%2BWjBtf6G2NBL9UcW2uaLGM6C0RJzmLg80ITaN0yKA%2BmiGPRBxU70VOfJIr1aZo7jurHbycP%2FiaKrc5tD2VBeOaesI90A%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>Content-Encoding: gzip
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;2b4d3261-ad36-4069-95ea-53520cd42a58&#34;,&#34;created&#34;:&#34;0001-01-01T00:00:00Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:20.041792568Z&#34;,&#34;premium_data&#34;:0,&#34;quota&#34;:0,&#34;warp_plus&#34;:true,&#34;referral_count&#34;:0,&#34;referral_renewal_countdown&#34;:0,&#34;role&#34;:&#34;child&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>PUT /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739/account HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=UTF-8
+</span></span><span class=line><span class=cl>Authorization: Bearer 40ca084f-315e-45e2-9191-b59199c2331a
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>Content-Length: 41
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;license&#34;: &#34;7O95xNh3-81E65Kce-W4ln892I&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:23 GMT
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=utf-8
+</span></span><span class=line><span class=cl>Transfer-Encoding: chunked
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>CF-Ray: 81349313896196c0-SJC
+</span></span><span class=line><span class=cl>CF-Cache-Status: DYNAMIC
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>x-envoy-upstream-service-time: 1211
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=0drwc3hjXQSCR2MN19A9gx%2BF3frLTlL76tvd1viYTqf3tTU0Js%2FdM3eoyqU%2FL0py%2FoPJYAJsZTemfGo%2BYsEuVLddoeEJ%2BzaE9RECqldUdGpuskVjquX3RMqoD5UtMAWdXsjtiR5mB7Wagw%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>Content-Encoding: gzip
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;b55baa96-a450-4332-9f39-f3046b6ea86a&#34;,&#34;created&#34;:&#34;0001-01-01T00:00:00Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:23.027025975Z&#34;,&#34;premium_data&#34;:24598563000000000,&#34;quota&#34;:24598563000000000,&#34;warp_plus&#34;:true,&#34;referral_count&#34;:24598563,&#34;referral_renewal_countdown&#34;:0,&#34;role&#34;:&#34;child&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>GET /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739/account HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Authorization: Bearer 40ca084f-315e-45e2-9191-b59199c2331a
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 200 OK
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:23 GMT
+</span></span><span class=line><span class=cl>Content-Type: application/json; charset=utf-8
+</span></span><span class=line><span class=cl>Transfer-Encoding: chunked
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>CF-Ray: 8134931d99d396c0-SJC
+</span></span><span class=line><span class=cl>CF-Cache-Status: DYNAMIC
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>x-envoy-upstream-service-time: 199
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=UUOYPQkNQWPKUfe6SGnsX8qgZ4yYrd%2FvoiX83NpDNYALCUunDdWYN9NL6SQHLhxzSCv%2FRyPWDEIL7q16wtOGVWrR39hbCZsKH4IA%2FFObYgmb7C6m0HHC3eCQxvn6eqxV9L77U7T8rumrBQ%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>Content-Encoding: gzip
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>{&#34;id&#34;:&#34;b55baa96-a450-4332-9f39-f3046b6ea86a&#34;,&#34;account_type&#34;:&#34;limited&#34;,&#34;created&#34;:&#34;2023-10-09T06:30:12.82392Z&#34;,&#34;updated&#34;:&#34;2023-10-09T06:30:23.027025Z&#34;,&#34;premium_data&#34;:24598563000000000,&#34;quota&#34;:24598563000000000,&#34;warp_plus&#34;:true,&#34;referral_count&#34;:24598563,&#34;referral_renewal_countdown&#34;:0,&#34;role&#34;:&#34;child&#34;,&#34;license&#34;:&#34;7O95xNh3-81E65Kce-W4ln892I&#34;}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>DELETE /v0a2223/reg/0b831bf3-224d-4d45-869b-b59edd27e739 HTTP/1.1
+</span></span><span class=line><span class=cl>Host: api.cloudflareclient.com
+</span></span><span class=line><span class=cl>Accept: */*
+</span></span><span class=line><span class=cl>CF-Client-Version: a-6.11-2223
+</span></span><span class=line><span class=cl>Connection: Keep-Alive
+</span></span><span class=line><span class=cl>Accept-Encoding: gzip
+</span></span><span class=line><span class=cl>User-Agent: okhttp/3.12.1
+</span></span><span class=line><span class=cl>Authorization: Bearer 40ca084f-315e-45e2-9191-b59199c2331a
+</span></span><span class=line><span class=cl>Cookie: __cf_bm=Fy2G.5O4ravUG7amYkVN3pFXyXviJwPUOkSrgy47_so-1696833013-0-AcoPy8M7MrOFuI+c74qOYNs875Cp/we0MEq6M/wdlySHgOigyzY5f3+52sIv12h9pB+WV55CalcoCwYkuN3VQSo=
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>HTTP/1.1 204 No Content
+</span></span><span class=line><span class=cl>Date: Mon, 09 Oct 2023 06:30:25 GMT
+</span></span><span class=line><span class=cl>Connection: keep-alive
+</span></span><span class=line><span class=cl>Report-To: {&#34;endpoints&#34;:[{&#34;url&#34;:&#34;https:\/\/a.nel.cloudflare.com\/report\/v3?s=0xOQ2ahaxjRl6A1krBHDAP33evulwaakRrFst09ItQ%2BIsWyQ7rkeTFyNhYd39BMFXc2wR6ULCRtVuRhbY8BhXZGv1XegNl%2Bm6d2%2Fz7%2FkMX6LhBtAJYb9Bz1GGdooOhWiKUy3GbIlK3bDjw%3D%3D&#34;}],&#34;group&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>NEL: {&#34;success_fraction&#34;:0,&#34;report_to&#34;:&#34;cf-nel&#34;,&#34;max_age&#34;:604800}
+</span></span><span class=line><span class=cl>Vary: Accept-Encoding
+</span></span><span class=line><span class=cl>Server: cloudflare
+</span></span><span class=line><span class=cl>CF-RAY: 813493218d1396c0-SJC
+</span></span></code></pre></td></tr></table></div></div><h2 id=总结>总结</h2><p>最后，感谢您的耐心观看，愿您生活愉悦。</p><h2 id=参考文献>参考文献</h2><ol><li><a class=link href=https://github.com/yonggekkk/warp-yg target=_blank rel=noopener>yonggekkk/warp-yg - Github</a></li><li><a class=link href=https://replit.com/@ygkkkk/WarpKey-Register-PRO target=_blank rel=noopener>WarpKey-Register-PRO - Replit</a></li><li><a class=link href=https://gitlab.com/rwkgyg/CFwarp target=_blank rel=noopener>rwkgyg/CFwarp - Gitlab</a></li><li><a class=link href=https://telegra.ph/How-to-get-free-12PB-to-Your-Warp-Key-BUG--BUFF-04-09 target=_blank rel=noopener>How to get free 12PB to Your Warp Key [BUG / BUFF]</a></li><li><a class=link href=https://replit.com/@SerdarAD/WarpKeyGen target=_blank rel=noopener>WarpKeyGen - Replit</a></li></ol></section><footer class=article-footer><section class=article-tags><a href=/zh-cn/tags/cloudflare/>Cloudflare</a>
+<a href=/zh-cn/tags/warp/>Warp</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/zh-cn/posts/%E5%88%86%E6%9E%90imazing_tntcracked/><div class=article-details><h2 class=article-title>分析iMazing_TNTCracked</h2></div></a></article><article><a href=/zh-cn/posts/macos-pkg%E6%96%87%E4%BB%B6%E9%80%86%E5%90%91%E8%A7%A3%E6%9E%90/><div class=article-details><h2 class=article-title>macOS-pkg文件逆向解析</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=Moeomu/blog data-repo-id=R_kgDOHHJl4A data-category=Announcements data-category-id=DIC_kwDOHHJl4M4CR7uM data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en crossorigin=anonymous async></script>
+<script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2023 Misaka的秘密花园</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.21.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

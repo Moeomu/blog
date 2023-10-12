@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/git/</link><description>Recent content in Git on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 26 Apr 2022 21:26:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Oh My Zsh Git Command Shortcuts</title><link>https://blog.moeomu.com/posts/oh-my-zsh-git-command-shortcuts/</link><pubDate>Tue, 26 Apr 2022 21:26:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/oh-my-zsh-git-command-shortcuts/</guid><description>&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/oh-my-zsh-git-command-shortcuts/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="git-command-shortcuts">Git Command Shortcuts&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">g&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gaa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gapa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --patch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gau&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gav&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --verbose&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git apply&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gapt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git apply --3way&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gba&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -a&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -d&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbda&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --no-color --merged | command grep -vE &amp;#34;^([+*]|\s*($(git_main_branch)|$(git_develop_branch))\s*$)&amp;#34; | command xargs git branch -d 2&amp;gt;/dev/null&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbD&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -D&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git blame -b -w&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbnm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --no-merged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --remote&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect bad&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect good&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect reset&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect start&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gc!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcn!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gca&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gca!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcan!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcans!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a -s --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcam&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcsm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcas&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcasm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout -b&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git config --list&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git clone --recurse-submodules&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gclean&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git clean -id&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpristine&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --hard &amp;amp;&amp;amp; git clean -dffx&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcmsg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gco&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcor&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout --recurse-submodules&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcount&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git shortlog -sn&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcpa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcpc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcssm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdca&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --cached&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdcw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --cached --word-diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdct&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git describe --tags $(git rev-list --tags --max-count=1)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gds&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --staged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff-tree --no-commit-id --name-only -r&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff @{upstream}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --word-diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># --jobs=&amp;lt;n&amp;gt; was added in git 2.8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">is-at-least 2.8 &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$git_version&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch --all --prune --jobs=10&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch --all --prune&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch origin&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git ls-files | grep&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git gui citool&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git gui citool --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpur&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;ggu&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpull&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull origin &amp;#34;$(git_current_branch)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpush&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push origin &amp;#34;$(git_current_branch)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggsup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --set-upstream-to=origin/$(git_current_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpsup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --set-upstream origin $(git_current_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ghh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git help&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gignore&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git update-index --assume-unchanged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gignored&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git ls-files -v | grep &amp;#34;^[[:lower:]]&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> git-svn-dcommit-push&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn dcommit &amp;amp;&amp;amp; git push github $(git_main_branch):svntrunk&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gk&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;\gitk --all --branches &amp;amp;!&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;\gitk --all $(git log -g --pretty=%h) &amp;amp;!&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --stat&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --stat -p&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph --decorate --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph --max-count=10&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glol&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glols&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --stat&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glod&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glods&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --date=short&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glola&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --all&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glog&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate --graph&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gloga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate --graph --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;_git_log_prettily&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmom&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge origin/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmtl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git mergetool --no-prompt&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmtlvim&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git mergetool --no-prompt --tool=vimdiff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmum&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge upstream/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gma&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --dry-run&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --force-with-lease&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gpf!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --force&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpoat&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push origin --all &amp;amp;&amp;amp; git push origin --tags&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push upstream&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gra&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote add&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grba&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbi&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase -i&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbom&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase origin/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --onto&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --skip&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grev&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git revert&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grhh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --hard&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">groh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset origin/$(git_current_branch) --hard&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rm&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grmc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rm --cached&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grmv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote rename&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grrm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote remove&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote set-url&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore --source&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore --staged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;cd &amp;#34;$(git rev-parse --show-toplevel || echo .)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gru&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status -sb&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn dcommit&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git show&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsi&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git submodule init&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsps&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git show --pretty=short --show-signature&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># use the default stash push on git 2.13 and newer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">is-at-least 2.13 &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$git_version&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsta&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash push&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsta&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash save&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstaa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash apply&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash clear&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash drop&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash list&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash pop&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsts&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash show --text&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;gsta --include-untracked&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstall&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git submodule update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch -c&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gts&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git tag -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gtv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git tag | sort -V&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gtl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;gtl(){ git tag --sort=-v:refname -n -l &amp;#34;${1}*&amp;#34; }; noglob gtl&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gunignore&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git update-index --no-assume-unchanged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gunwip&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log -n 1 | grep -q -c &amp;#34;\-\-wip\-\-&amp;#34; &amp;amp;&amp;amp; git reset HEAD~1&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase --autostash&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupav&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase --autostash -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glum&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull upstream $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gwch&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git whatchanged -p --abbrev-commit --pretty=medium&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gwip&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add -A; git rm $(git ls-files --deleted) 2&amp;gt; /dev/null; git commit --no-verify --no-gpg-sign -m &amp;#34;--wip-- [skip ci]&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gam&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gamc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gams&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --skip&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gama&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gamscp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --show-current-patch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>Signing Git Commit with GPG on Windows</title><link>https://blog.moeomu.com/posts/signing-git-commit-with-gpg-on-windows/</link><pubDate>Sat, 05 Jun 2021 08:50:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/signing-git-commit-with-gpg-on-windows/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/signing-git-commit-with-gpg-on-windows/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="download-gpg4win">Download GPG4WIN&lt;/h2>
+&lt;p>Download link: &lt;a class="link" href="https://www.gpg4win.org/thanks-for-download.html" target="_blank" rel="noopener"
+>gpg4win&lt;/a>&lt;/p>
+&lt;h2 id="create-and-apply-gpg-key">Create and apply GPG key&lt;/h2>
+&lt;h3 id="create-gpg-key">Create GPG key&lt;/h3>
+&lt;ul>
+&lt;li>Create: &lt;code>gpg --full-generate-key&lt;/code>&lt;/li>
+&lt;li>Key length: &lt;code>4096&lt;/code>&lt;/li>
+&lt;li>Enter username, email&lt;/li>
+&lt;li>List all keys: &lt;code>gpg --list-secret-keys --keyid-format=long&lt;/code>&lt;/li>
+&lt;li>Export keys according to keyid: &lt;code>gpg --armor --export KEYID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="apply-the-key">Apply the key&lt;/h3>
+&lt;ul>
+&lt;li>Import the key into Github and Gitee&lt;/li>
+&lt;/ul>
+&lt;h2 id="configure-git-windows">Configure Git Windows&lt;/h2>
+&lt;ul>
+&lt;li>Configure the default username and email, which needs to be the same as the values set when creating GPG
+&lt;ul>
+&lt;li>&lt;code>git config --global user.name USERNAME&lt;/code>&lt;/li>
+&lt;li>&lt;code>git config --global user.email EMAIL&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Configure the key
+&lt;ul>
+&lt;li>&lt;code>git config --global user.signingKey KEYID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Enable global cryptographic signatures
+&lt;ul>
+&lt;li>&lt;code>git config --global commit.gpgSign true&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>Using GPG to sign Git Commit under macOS</title><link>https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/</link><pubDate>Tue, 25 May 2021 07:55:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/using-gpg-to-sign-git-commit-under-macos/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="about-github-gpg-key-verification">About GitHub GPG Key Verification&lt;/h2>
+&lt;h3 id="enabling-commit-signing">Enabling Commit Signing&lt;/h3>
+&lt;p>GitHub has a new &amp;ldquo;Vigilance Mode&amp;rdquo; that requires a GPG key to sign a certified commit before it will show &amp;ldquo;Verity&amp;rdquo;.&lt;/p>
+&lt;ul>
+&lt;li>First create a GPG key (&lt;a class="link" href="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/" target="_blank" rel="noopener"
+>GitHub Official Docs&lt;/a> generating-a-new-gpg-key) has details on how to do this, so I won&amp;rsquo;t go over it again)&lt;/li>
+&lt;li>List the GPG key&amp;rsquo;s signature: &lt;code>gpg -K --keyid-format LONG&lt;/code>, which will &lt;strong>keyid&lt;/strong> record&lt;/li>
+&lt;li>Tell git to use this GPG key: &lt;code>git config user.signingkey your_keyid&lt;/code>&lt;/li>
+&lt;li>The local git username and email need to be the same as the ones filled in when the GPG key was generated: &lt;code>git config user.name name&lt;/code>, &lt;code>git config user.email email email&lt;/code>&lt;/li>
+&lt;li>Enable commit signing for local git: &lt;code>git config commit.gpgsign true&lt;/code>&lt;/li>
+&lt;li>Add the -S option to the Commit signature: &lt;code>git commit -S -m message&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="fatal-error-occurred---unable-to-commit-macos">Fatal error occurred - unable to commit-macOS&lt;/h3>
+&lt;h4 id="the-problem-is-as-follows-reproduced-in-macos-1131">The problem is as follows, reproduced in macOS 11.3.1&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">error: gpg failed to sign the data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">fatal: failed to write commit object
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="solution-in-macos">solution in macOS&lt;/h4>
+&lt;ul>
+&lt;li>Update &amp;amp; Install&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew upgrade gnupg &lt;span class="c1"># This has a make step which takes a while&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew link --overwrite gnupg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install pinentry-mac
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;pinentry-program /usr/local/bin/pinentry-mac&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.gnupg/gpg-agent.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">killall gpg-agent
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global gpg.program gpg &lt;span class="c1"># perhaps you had this already? On linux maybe gpg2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global commit.gpgsign &lt;span class="nb">true&lt;/span> &lt;span class="c1"># if you want to sign every commit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Sign again&lt;/li>
+&lt;li>Check the status of the commit: &lt;code>git log --show-signature -1&lt;/code>&lt;/li>
+&lt;/ul></description></item></channel></rss>

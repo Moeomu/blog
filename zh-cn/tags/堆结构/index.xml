@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>堆结构 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E7%BB%93%E6%9E%84/</link><description>Recent content in 堆结构 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 20 Oct 2020 23:10:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E7%BB%93%E6%9E%84/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-006-堆的入门</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-006-%E5%A0%86%E7%9A%84%E5%85%A5%E9%97%A8/</link><pubDate>Tue, 20 Oct 2020 23:10:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-006-%E5%A0%86%E7%9A%84%E5%85%A5%E9%97%A8/</guid><description>&lt;p>声明：实验环境为 Windows 2000&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-006-%e5%a0%86%e7%9a%84%e5%85%a5%e9%97%a8/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="堆的介绍">堆的介绍&lt;/h2>
+&lt;h3 id="与栈的区别">与栈的区别&lt;/h3>
+&lt;ul>
+&lt;li>堆是由程序员使用malloc等函数向操作系统申请的一块内存空间，它能否成功与操作系统的状态有极大的关系，与管理整齐的栈不同，它的管理以及分配算法都是非常奇特的&lt;/li>
+&lt;li>堆在释放时由程序员使用free或delete释放，而栈是系统自动释放的&lt;/li>
+&lt;li>堆的地址范围变化很大，而栈的内存地址总是&lt;code>0x0012XXXX&lt;/code>&lt;/li>
+&lt;li>堆的地址由低向高移动，栈的地址由高向低移动&lt;/li>
+&lt;/ul>
+&lt;h3 id="堆的安全">堆的安全&lt;/h3>
+&lt;ul>
+&lt;li>堆是杂乱无章的，所以它的利用相对于栈会困难很多，而堆的管理微软从未公开，研究有一定困难&lt;/li>
+&lt;li>在Windows2000 - Windows XP SP1，堆管理未考虑安全因素，容易利用&lt;/li>
+&lt;li>在Windows XP SP2 - Windows 2003，加入了块首的cookie，指针验证等&lt;/li>
+&lt;li>Windows Vista - Windows 7，堆管理的安全，稳定和效率都改变巨大&lt;/li>
+&lt;/ul>
+&lt;h3 id="堆的数据结构和管理策略">堆的数据结构和管理策略&lt;/h3>
+&lt;h4 id="两种堆结构">两种堆结构&lt;/h4>
+&lt;ul>
+&lt;li>堆块：堆区的内存按不同大小组织成块，以堆块为单位进行标识。
+&lt;ul>
+&lt;li>块首：本块的大小，是否占用&lt;/li>
+&lt;li>块身：数据区&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>堆表：位于堆区的起始位置，可索引堆区的所有重要信息，包括堆块的大小，位置，是否占用。堆表往往用不止一种数据结构来表示。&lt;/li>
+&lt;li>Windows中，占用态的堆块只有占用它的程序索引，堆表只索引空闲态的堆块。&lt;/li>
+&lt;li>Windows中重要的堆表：
+&lt;ul>
+&lt;li>空闲双向链表：(Freelist)(空表)
+&lt;ul>
+&lt;li>空表包含128个数组，第二个数组&lt;code>freelist[1]&lt;/code>标识8字节的空堆空间，之后每项逐个递增8字节&lt;/li>
+&lt;li>&lt;code>空闲堆块大小(包含堆首) = 索引项 * 8(字节)&lt;/code>&lt;/li>
+&lt;li>&lt;code>freelist[0]&lt;/code>标识了所有大小大于1024字节的堆块(小于等于512KB)，它们按从小到大的顺序依次升序排列&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>快速单向链表(Lookaside)(快表)
+&lt;ul>
+&lt;li>快表包含128条数据，组织结构与空表类似，但是单链表&lt;/li>
+&lt;li>总被初始化为空，每条快表最多4个节点&lt;/li>
+&lt;li>每个节点都被初始化为已占用，所以不会发生堆块合并现象&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="管理策略">管理策略&lt;/h4>
+&lt;ul>
+&lt;li>堆块分配
+&lt;ul>
+&lt;li>零号空表分配：按照大小升序链着大小不同的空闲块，从&lt;code>free[0]&lt;/code>反向查找最后一个块，再正向搜索最小能够满足要求的空闲堆块进行分配&lt;/li>
+&lt;li>普通空表分配：寻找最优空闲空间分配，其次找次优&lt;/li>
+&lt;li>快表分配：寻找大小匹配的表，从堆表卸下，返回一个指向堆块的指针给程序&lt;/li>
+&lt;li>当空表无法找到最优堆块时，一个稍大些的块会被用于分配，此为次优分配，会先从大块中按照请求的大小精确地割出一块进行分配，然后给剩下的部分重新标注块首，连入空表。&lt;/li>
+&lt;li>快表只有精确匹配时才会分配，所以不存在以上现象&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>堆块释放
+&lt;ul>
+&lt;li>将堆块状态改为空闲，链入相应的堆表。所有释放的块将链入堆表的末尾，分配的时候也先从堆表末尾拿。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>堆块合并
+&lt;ul>
+&lt;li>反复申请和释放堆区将产生很多内存碎片，为了合理有效地利用内存将合并一些堆块&lt;/li>
+&lt;li>这个操作包含两个块从空闲链表中卸下，合并堆块，调整合并后的大块的块首信息，将新块重新链入空闲链表&lt;/li>
+&lt;li>堆区还将进行内存紧缩(shrink the compact)由&lt;code>RtlCompactHeap&lt;/code>执行，将对整个堆进行调整，尽量合并可用的碎片&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>堆块分配和释放的策略
+&lt;ul>
+&lt;li>小块(SIZE&amp;lt;1KB)
+&lt;ul>
+&lt;li>分配
+&lt;ul>
+&lt;li>首先进行快表分配，机械能普通空表分配&lt;/li>
+&lt;li>若失败，使用堆缓存(heap cache)分配&lt;/li>
+&lt;li>若堆缓存分配失败，内存紧缩后尝试分配&lt;/li>
+&lt;li>若无法分配，返回NULL&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>释放
+&lt;ul>
+&lt;li>优先链入快表(只能链入4个空闲块)&lt;/li>
+&lt;li>若快表满，链入相应空表&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>大块(1KB&amp;lt;=SIZE&amp;lt;512KB)
+&lt;ul>
+&lt;li>分配
+&lt;ul>
+&lt;li>使用堆缓存分配&lt;/li>
+&lt;li>若堆缓存分配失败，使用free[0]中的大块进行分配&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>释放
+&lt;ul>
+&lt;li>优先将它放入堆缓存&lt;/li>
+&lt;li>若堆缓存满，将链入freelists[0]&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>巨块(SIZE&amp;gt;=512KB)
+&lt;ul>
+&lt;li>分配：虚分配(并非从堆区分配)&lt;/li>
+&lt;li>释放：直接释放，无堆表操作&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="实践">实践&lt;/h2>
+&lt;blockquote>
+&lt;p>血的教训：无论是空表还是快表，它&lt;code>Blink/Flink&lt;/code>指针指向的&lt;strong>永远&lt;/strong>是下/上一个节点的&lt;code>Blink/Flink&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="测试空表">测试空表&lt;/h3>
+&lt;h4 id="代码">代码&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h6&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h5&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">19&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h6&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">24&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//free block and prevent coaleses
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// free to freelist[2]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// free to freelist[2]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h5&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// free to freelist[4]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// coalese h3 h4 h5 link the large block to freelist[8]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="观察">观察&lt;/h4>
+&lt;h5 id="int异常调起调试器未运行">INT异常调起调试器，未运行&lt;/h5>
+&lt;ul>
+&lt;li>&lt;code>HeadCreate()&lt;/code>创建堆区后，将堆区指针交给EAX，观察到此时地址为&lt;code>0x360000&lt;/code>&lt;/li>
+&lt;li>查看内存区域&lt;code>0x360000&lt;/code>，依次向后的信息是(抄的，反正我也不知道这几个结构具体多大)段表索引(SegmentList)，虚表索引(VirtualAllocationList)，空表使用标识(freelist usage bitmap)和空表索引区&lt;/li>
+&lt;li>在偏移&lt;code>0x178&lt;/code>处找到了空表索引，其内容是&lt;code>0x00360688&lt;/code>，说明&lt;code>freelist[0]&lt;/code>指向了偏移为&lt;code>0x688&lt;/code>的地方，我们来康康这个地方存了什么&lt;/li>
+&lt;li>这个地方存了&lt;code>0x00360178&lt;/code>，妙啊，指向了&lt;code>freelist[0]&lt;/code>，绕了一圈指向了自己，而这个&lt;code>freelist[0]&lt;/code>看来指向的就是唯一一个空闲的堆区，一般称为“尾块”&lt;/li>
+&lt;li>根据堆块的结构(在下面嘞)易得，实际这个堆块开始于&lt;code>0x00360680&lt;/code>，看起来堆块指针越过了堆块块首，直接指向了数据区&lt;/li>
+&lt;li>&lt;code>0x1-0x2&lt;/code>字节是自身大小，此时这个值是&lt;code>0x0130&lt;/code>，说明这个堆的大小是&lt;code>0x130&lt;/code>个字节&lt;/li>
+&lt;li>&lt;code>0x3-0x4&lt;/code>字节是前一个堆块大小，这个值是&lt;code>0x08&lt;/code>(???不是说好了唯一???)&lt;/li>
+&lt;li>&lt;code>0x5&lt;/code>字节是索引，此时为0&lt;/li>
+&lt;li>&lt;code>0x6&lt;/code>字节是Flag，此时这是1&lt;/li>
+&lt;li>&lt;code>0x7&lt;/code>是保留字节，是0&lt;/li>
+&lt;li>&lt;code>0x8&lt;/code>字节是标签索引(调试态)，不知道干啥的，是0&lt;/li>
+&lt;li>&lt;code>0x9-0xC&lt;/code>(空堆块专属)字节是前一个空堆块的地址，是&lt;code>0x00360178&lt;/code>&lt;/li>
+&lt;li>&lt;code>0xD-0x10&lt;/code>(空堆块专属)字节是后一个空堆块的地址，同样是&lt;code>0x00360178&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h5 id="运行六次分配">运行六次分配&lt;/h5>
+&lt;ul>
+&lt;li>&lt;code>0x00360680-0x00360688&lt;/code>为h1块首，&lt;code>0x00360689-0x0036068F&lt;/code>是8个字节的块身，内容是&lt;code>00 00 00 00 78 01 36 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x00360690-0x00360698&lt;/code>为h2块首，&lt;code>0x00360699-0x0036069F&lt;/code>是8个字节的块身，内容是&lt;code>00 00 00 00 00 01 36 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606A0-0x003606A8&lt;/code>为h3块首，&lt;code>0x003606A9-0x003606AF&lt;/code>是8个字节的块身，内容是&lt;code>00 00 00 00 00 00 36 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606B0-0x003606B8&lt;/code>为h4块首，&lt;code>0x003606B9-0x003606BF&lt;/code>是8个字节的块身，内容是&lt;code>00 00 00 00 00 00 00 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606C0-0x003606C8&lt;/code>为h5块首，&lt;code>0x003606C9-0x003606DF&lt;/code>是24个字节的块身，内容是&lt;code>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606E0-0x003606E8&lt;/code>为h5块首，&lt;code>0x003606E9-0x003606FF&lt;/code>是24个字节的块身，内容是&lt;code>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h5 id="释放堆">释放堆&lt;/h5>
+&lt;ul>
+&lt;li>第一次释放的堆块大小为16字节的堆块，所以连接到了&lt;code>freeList[2]&lt;/code>，也就是&lt;code>0x188&lt;/code>的位置，此时内容为&lt;code>0x00360688&lt;/code>&lt;/li>
+&lt;li>第二次释放的堆同样连接到了&lt;code>freeList[2]&lt;/code>，细节不再描述&lt;/li>
+&lt;li>第三次释放的堆同样连接到了&lt;code>freeList[2]&lt;/code>，细节不再描述&lt;/li>
+&lt;li>第四次释放时，h3，h4，h5相邻，所以它们合并了，其中h3h4的大小各是2个堆单位，h5则是4个，那么它们合并后共计8个堆单位，除去要存放一个堆首，它们还剩7个堆单位，所以放入&lt;code>freeList[8]&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="结论">结论&lt;/h4>
+&lt;ul>
+&lt;li>堆表中包含的信息依次是段表索引(SegmentList)，虚表索引(VirtualAllocationList)，空表使用标识(freelist usage bitmap)和空表索引区&lt;/li>
+&lt;li>当一个堆刚刚被初始化时，它的堆块状况
+&lt;ul>
+&lt;li>只有一个空闲态的大块，这个块被称为“尾块”&lt;/li>
+&lt;li>之后是快表&lt;/li>
+&lt;li>Freelist[0]指向“尾块”&lt;/li>
+&lt;li>除了零号空表索引外，区域各项索引都指向自己，这意味着其余所有的空闲链表中都没有空闲块&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>占用态块首&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">Busy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">ExtraPresent&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FillPattern&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">VirtualAlloc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">LastEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">NoCoalesce&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">BusyHeapHeadBlock&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 8 Byte Head
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">SelfSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">PreviousChunkSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCHAR&lt;/span> &lt;span class="n">SegmentIndex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span> &lt;span class="n">Flags&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">UnusedBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">TagIndex_Debug&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Data After...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>空闲态块首&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">Busy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">ExtraPresent&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FillPattern&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">VirtualAlloc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">LastEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">NoCoalesce&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">BusyHeapHeadBlock&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 16 Byte Head
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">SelfSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">PreviousChunkSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCHAR&lt;/span> &lt;span class="n">SegmentIndex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span> &lt;span class="n">Flags&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">UnusedBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">TagIndex_Debug&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">FlinkInFreelist&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 下一个
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">BlinkInFreelist&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 上一个
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Empty Data After...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>堆块的分配
+&lt;ul>
+&lt;li>堆块的大小包括了块首，所以申请32字节将会分配40字节&lt;/li>
+&lt;li>堆块的单位是8字节，不足8字节的按照8字节分配，所以最少实际分配为16字节&lt;/li>
+&lt;li>初始状态下，快表和空表都为空，不存在精确分配，请求将使用次优块进行分配&lt;/li>
+&lt;li>由于次优分配的发生，分配函数将从尾块中切走一些小块，修改尾块块首的size，最后将&lt;code>freelist[0]&lt;/code>指向新的尾块&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="测试快表">测试快表&lt;/h3>
+&lt;h4 id="代码-1">代码&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">16&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">24&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">16&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="结论-1">结论&lt;/h4>
+&lt;ul>
+&lt;li>块首标识位为0x01&lt;/li>
+&lt;li>只存指向下一堆块的指针，不存在指向前一堆块的指针&lt;/li>
+&lt;li>偏移&lt;code>0x178&lt;/code>处的&lt;code>freeList[0]&lt;/code>的地址变为了&lt;code>0x00361E90&lt;/code>，原本的&lt;code>0x00360688&lt;/code>被快表霸占了&lt;/li>
+&lt;li>快表从&lt;code>0x688&lt;/code>开始，每个结构共&lt;code>0x30&lt;/code>个字节，前四个字节的内容是快表单链表&lt;/li>
+&lt;li>虽然0Day安全书中写道，8字节的堆区被插入&lt;code>lookaside[1]&lt;/code>，但是我似乎觉得，&lt;code>0x688&lt;/code>处的才是&lt;code>lookaside[0]&lt;/code>，&lt;code>0x6B8&lt;/code>处的才是&lt;code>lookaside[1]&lt;/code>，而&lt;code>0x0E8&lt;/code>处的可以被称为&lt;code>lookaside[2]&lt;/code>，它存放的堆块带上块首的大小一共16个字节&lt;/li>
+&lt;/ul></description></item></channel></rss>

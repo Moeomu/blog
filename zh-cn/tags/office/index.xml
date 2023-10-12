@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Office on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/office/</link><description>Recent content in Office on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sun, 22 May 2022 21:18:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/office/index.xml" rel="self" type="application/rss+xml"/><item><title>激活Office2021</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BF%80%E6%B4%BBoffice2021/</link><pubDate>Sun, 22 May 2022 21:18:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BF%80%E6%B4%BBoffice2021/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bf%80%e6%b4%bboffice2021/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="从office-tool-plus安装office">从Office Tool Plus安装office&lt;/h2>
+&lt;ul>
+&lt;li>下载&lt;a class="link" href="https://otp.landian.vip/" target="_blank" rel="noopener"
+>Office Tool Plus&lt;/a>&lt;/li>
+&lt;li>部署您希望的Office套件&lt;/li>
+&lt;/ul>
+&lt;h2 id="选择您的kms服务器">选择您的KMS服务器&lt;/h2>
+&lt;ul>
+&lt;li>主机: &lt;code>kms.loli.beer&lt;/code>&lt;/li>
+&lt;li>端口: &lt;code>80&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="选择您的kms密钥">选择您的KMS密钥&lt;/h2>
+&lt;!-- raw HTML omitted -->
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Version&lt;/th>
+&lt;th>KMS Key&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>Office Professional Plus 2021&lt;/td>
+&lt;td>&lt;code>FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Standard 2021&lt;/td>
+&lt;td>&lt;code>KDX7X-BNVR8-TXXGX-4Q7Y8-78VT3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Professional 2021&lt;/td>
+&lt;td>&lt;code>FTNWT-C6WBT-8HMGF-K9PRX-QV9H8&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Standard 2021&lt;/td>
+&lt;td>&lt;code>J2JDC-NJCYY-9RGQ4-YXWMH-T3D4T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Professional 2021&lt;/td>
+&lt;td>&lt;code>KNH8D-FGHT4-T8RK3-CTDYJ-K2HT4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Standard 2021&lt;/td>
+&lt;td>&lt;code>MJVNY-BYWPY-CWV6J-2RKRT-4M8QG&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Access 2021&lt;/td>
+&lt;td>&lt;code>WM8YG-YNGDD-4JHDC-PG3F4-FC4T4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Excel 2021&lt;/td>
+&lt;td>&lt;code>NWG3X-87C9K-TC7YY-BC2G7-G6RVC&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outlook 2021&lt;/td>
+&lt;td>&lt;code>C9FM6-3N72F-HFJXB-TM3V9-T86R9&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PowerPoint 2021&lt;/td>
+&lt;td>&lt;code>TY7XF-NFRBR-KJ44C-G83KF-GX27K&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Publisher 2021&lt;/td>
+&lt;td>&lt;code>2MW9D-N4BXM-9VBPG-Q7W6M-KFBGQ&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Skype for Business 2021&lt;/td>
+&lt;td>&lt;code>HWCXN-K3WBT-WJBKY-R8BD9-XK29P&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Word 2019&lt;/td>
+&lt;td>&lt;code>TN8H9-M34D3-Y64V9-TR72V-X79KV&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Professional Plus 2019&lt;/td>
+&lt;td>&lt;code>NMMKJ-6RK4F-KMJVX-8D9MJ-6MWKP&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Standard 2019&lt;/td>
+&lt;td>&lt;code>6NWWJ-YQWMR-QKGCB-6TMB3-9D9HK&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Professional 2019&lt;/td>
+&lt;td>&lt;code>B4NPR-3FKK7-T2MBV-FRQ4W-PKD2B&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Standard 2019&lt;/td>
+&lt;td>&lt;code>C4F7P-NCP8C-6CQPT-MQHV9-JXD2M&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Professional 2019&lt;/td>
+&lt;td>&lt;code>9BGNQ-K37YR-RQHF2-38RQ3-7VCBB&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Standard 2019&lt;/td>
+&lt;td>&lt;code>7TQNQ-K3YQQ-3PFH7-CCPPM-X4VQ2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Access 2019&lt;/td>
+&lt;td>&lt;code>9N9PT-27V4Y-VJ2PD-YXFMF-YTFQT&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Excel 2019&lt;/td>
+&lt;td>&lt;code>TMJWT-YYNMB-3BKTF-644FC-RVXBD&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outlook 2019&lt;/td>
+&lt;td>&lt;code>7HD7K-N4PVK-BHBCQ-YWQRW-XW4VK&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PowerPoint 2019&lt;/td>
+&lt;td>&lt;code>RRNCX-C64HY-W2MM7-MCH9G-TJHMQ&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Publisher 2019&lt;/td>
+&lt;td>&lt;code>G2KWX-3NW6P-PY93R-JXK2T-C9Y9V&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Skype for Business 2019&lt;/td>
+&lt;td>&lt;code>NCJ33-JHBBY-HTK98-MYCV8-HMKHJ&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Word 2019&lt;/td>
+&lt;td>&lt;code>PBX3G-NWMT6-Q7XBW-PYJGG-WXD33&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Professional Plus 2016&lt;/td>
+&lt;td>&lt;code>XQNVK-8JYDB-WJ9W3-YJ8YR-WFG99&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Mondo 2016&lt;/td>
+&lt;td>&lt;code>HFTND-W9MK4-8B7MJ-B6C4G-XQBR2&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Standard 2016&lt;/td>
+&lt;td>&lt;code>JNRGM-WHDWX-FJJG3-K47QV-DRTFM&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Professional 2016&lt;/td>
+&lt;td>&lt;code>YG9NW-3K39V-2T3HJ-93F3Q-G83KT&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Standard 2016&lt;/td>
+&lt;td>&lt;code>GNFHQ-F6YQM-KQDGJ-327XX-KQBVC&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Professional 2016&lt;/td>
+&lt;td>&lt;code>PD3PC-RHNGV-FXJ29-8JK7D-RJRJK&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Standard 2016&lt;/td>
+&lt;td>&lt;code>7WHWN-4T7MP-G96JF-G33KR-W8GF4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Access 2016&lt;/td>
+&lt;td>&lt;code>GNH9Y-D2J4T-FJHGG-QRVH7-QPFDW&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Excel 2016&lt;/td>
+&lt;td>&lt;code>9C2PK-NWTVB-JMPW8-BFT28-7FTBF&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OneNote 2016&lt;/td>
+&lt;td>&lt;code>DR92N-9HTF2-97XKM-XW2WJ-XW3J6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outlook 2016&lt;/td>
+&lt;td>&lt;code>R69KK-NTPKF-7M3Q4-QYBHW-6MT9B&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PowerPoint 2016&lt;/td>
+&lt;td>&lt;code>J7MQP-HNJ4Y-WJ7YM-PFYGF-BY6C6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Publisher 2016&lt;/td>
+&lt;td>&lt;code>F47MM-N3XJP-TQXJ9-BP99D-8K837&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Skype for Business 2016&lt;/td>
+&lt;td>&lt;code>869NQ-FJ69K-466HW-QYCP2-DDBV6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Word 2016&lt;/td>
+&lt;td>&lt;code>WXY84-JN2Q9-RBCCQ-3Q3J3-3PFJ6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Professional Plus 2013&lt;/td>
+&lt;td>&lt;code>YC7DK-G2NP3-2QQC3-J6H88-GVGXT&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Mondo 2013&lt;/td>
+&lt;td>&lt;code>42QTK-RN8M7-J3C4G-BBGYM-88CYV&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Standard 2013&lt;/td>
+&lt;td>&lt;code>KBKQT-2NMXY-JJWGP-M62JB-92CD4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Professional 2013&lt;/td>
+&lt;td>&lt;code>FN8TT-7WMH6-2D4X9-M337T-2342K&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Standard 2013&lt;/td>
+&lt;td>&lt;code>6NTH3-CW976-3G3Y2-JK3TX-8QHTT&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Professional 2013&lt;/td>
+&lt;td>&lt;code>C2FG9-N6J68-H8BTJ-BW3QX-RM3B3&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Standard 2013&lt;/td>
+&lt;td>&lt;code>J484Y-4NKBF-W2HMG-DBMJC-PGWR7&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Access 2013&lt;/td>
+&lt;td>&lt;code>NG2JY-H4JBT-HQXYP-78QH9-4JM2D&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Excel 2013&lt;/td>
+&lt;td>&lt;code>VGPNG-Y7HQW-9RHP7-TKPV3-BG7GB&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>InfoPath 2013&lt;/td>
+&lt;td>&lt;code>DKT8B-N7VXH-D963P-Q4PHY-F8894&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Lync 2013&lt;/td>
+&lt;td>&lt;code>2MG3G-3BNTT-3MFW9-KDQW3-TCK7R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OneNote 2013&lt;/td>
+&lt;td>&lt;code>TGN6P-8MMBC-37P2F-XHXXK-P34VW&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outlook 2013&lt;/td>
+&lt;td>&lt;code>QPN8Q-BJBTJ-334K3-93TGY-2PMBT&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PowerPoint 2013&lt;/td>
+&lt;td>&lt;code>4NT99-8RJFH-Q2VDH-KYG2C-4RD4F&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Publisher 2013&lt;/td>
+&lt;td>&lt;code>PN2WF-29XG2-T9HJ7-JQPJR-FCXK4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Word 2013&lt;/td>
+&lt;td>&lt;code>6Q7VD-NX8JD-WJ2VH-88V73-4GBJ7&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Professional Plus 2010&lt;/td>
+&lt;td>&lt;code>VYBBJ-TRJPB-QFQRF-QFT4D-H3GVB&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Mondo 2010&lt;/td>
+&lt;td>&lt;code>YBJTT-JG6MD-V9Q7P-DBKXJ-38W9R&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office Standard 2010&lt;/td>
+&lt;td>&lt;code>V7QKV-4XVVR-XYV4D-F7DFM-8R6BM&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Office SmallBusBasics 2010&lt;/td>
+&lt;td>&lt;code>D6QFG-VBYP2-XQHM7-J97RH-VVRCK&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Professional 2010&lt;/td>
+&lt;td>&lt;code>YGX6F-PGV49-PGW3J-9BTGG-VHKC6&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Project Standard 2010&lt;/td>
+&lt;td>&lt;code>4HP3K-88W3F-W2K3D-6677X-F9PGB&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Premium 2010&lt;/td>
+&lt;td>&lt;code>D9DWC-HPYVV-JGF4P-BTWQB-WX8BJ&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Professional 2010&lt;/td>
+&lt;td>&lt;code>7MCW8-VRQVK-G677T-PDJCM-Q8TCP&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Visio Standard 2010&lt;/td>
+&lt;td>&lt;code>767HD-QGMWX-8QTDB-9G3R2-KHFGJ&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Access 2010&lt;/td>
+&lt;td>&lt;code>V7Y44-9T38C-R2VJK-666HK-T7DDX&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Excel 2010&lt;/td>
+&lt;td>&lt;code>H62QG-HXVKF-PP4HP-66KMR-CW9BM&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Groove 2010&lt;/td>
+&lt;td>&lt;code>QYYW6-QP4CB-MBV6G-HYMCJ-4T3J4&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>InfoPath 2010&lt;/td>
+&lt;td>&lt;code>K96W8-67RPQ-62T9Y-J8FQJ-BT37T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>OneNote 2010&lt;/td>
+&lt;td>&lt;code>Q4Y4M-RHWJM-PY37F-MTKWH-D3XHX&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Outlook 2010&lt;/td>
+&lt;td>&lt;code>7YDC2-CWM8M-RRTJC-8MDVC-X3DWQ&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>PowerPoint 2010&lt;/td>
+&lt;td>&lt;code>RC8FX-88JRY-3PF7C-X8P67-P4VTT&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Publisher 2010&lt;/td>
+&lt;td>&lt;code>BFK7F-9MYHM-V68C7-DRQ66-83YTP&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Word 2010&lt;/td>
+&lt;td>&lt;code>HVHB3-C6FV7-KQX9W-YQG79-CRY7T&lt;/code>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;!-- raw HTML omitted -->
+&lt;h2 id="激活office">激活Office&lt;/h2>
+&lt;h3 id="使用otp激活">使用OTP激活&lt;/h3>
+&lt;ul>
+&lt;li>点击软件内激活即可&lt;/li>
+&lt;/ul>
+&lt;h3 id="使用命令行激活">使用命令行激活&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cscript &lt;span class="s2">&amp;#34;ospp.vbs&amp;#34;&lt;/span> /inpkey:XXXXX-XXXXX-XXXXX-XXXXX-XXXXX&lt;span class="o">(&lt;/span>KMS 密钥&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cscript &lt;span class="s2">&amp;#34;ospp.vbs&amp;#34;&lt;/span> /sethst:kms.loli.beer&lt;span class="o">(&lt;/span>KMS 服务器地址&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cscript &lt;span class="s2">&amp;#34;ospp.vbs&amp;#34;&lt;/span> /act
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="参考文档">参考文档&lt;/h2>
+&lt;ol>
+&lt;li>白, 小. (2018, November 1). 使用 KMS 激活 Microsoft 产品 - 犬&amp;rsquo;s Blog. Moedog. &lt;a class="link" href="https://moedog.org/1117.html" target="_blank" rel="noopener"
+>https://moedog.org/1117.html&lt;/a>&lt;/li>
+&lt;/ol></description></item></channel></rss>

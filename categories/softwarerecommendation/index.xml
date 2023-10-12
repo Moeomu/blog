@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>SoftwareRecommendation on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/categories/softwarerecommendation/</link><description>Recent content in SoftwareRecommendation on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Fri, 29 Sep 2023 16:32:43 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/categories/softwarerecommendation/index.xml" rel="self" type="application/rss+xml"/><item><title>Serverless Open Source Project Recommendations</title><link>https://blog.moeomu.com/posts/serverless-open-source-project-recommendations/</link><pubDate>Fri, 29 Sep 2023 16:32:43 +0800</pubDate><guid>https://blog.moeomu.com/posts/serverless-open-source-project-recommendations/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230929/webpageheadimageServerless_92298688.751yj4pxk328.webp" alt="Featured image of post Serverless Open Source Project Recommendations" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/serverless-open-source-project-recommendations/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="foreword">Foreword&lt;/h2>
+&lt;p>If you intend to use Vercel, please fork it first and then proceed with the deployment. On GitHub, you can easily update the upstream to your fork.&lt;/p>
+&lt;h2 id="rsshub">RSSHub&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/DIYgod/RSSHub" target="_blank" rel="noopener"
+>DIYgod/RSSHub&lt;/a>&lt;/p>
+&lt;h3 id="introduction">Introduction&lt;/h3>
+&lt;p>RSSHub is an open source, easy to use, and extensible RSS feed aggregator, it&amp;rsquo;s capable of generating RSS feeds from pretty much everything.&lt;/p>
+&lt;p>RSSHub delivers millions of contents aggregated from all kinds of sources, our vibrant open source community is ensuring the deliver of RSSHub&amp;rsquo;s new routes, new features and bug fixes.&lt;/p>
+&lt;h3 id="pros">Pros&lt;/h3>
+&lt;ul>
+&lt;li>Serverless deployment&lt;/li>
+&lt;li>No extra charge&lt;/li>
+&lt;li>Third-party full-text RSS fetching&lt;/li>
+&lt;li>Support a large number of websites&lt;/li>
+&lt;/ul>
+&lt;h3 id="my-view">My view&lt;/h3>
+&lt;p>If you want to stay updated with news and receive real-time updates from any platform, you can achieve it through this service. It is easy to set up and serves as the perfect choice for escaping information censorship and information silos.&lt;/p>
+&lt;blockquote>
+&lt;p>Stars: 9/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="umami">umami&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/umami-software/umami" target="_blank" rel="noopener"
+>umami-software/umami&lt;/a>&lt;/p>
+&lt;h3 id="introduction-1">Introduction&lt;/h3>
+&lt;p>Umami is a simple, fast, privacy-focused alternative to Google Analytics.&lt;/p>
+&lt;h3 id="pros-1">Pros&lt;/h3>
+&lt;ul>
+&lt;li>Serverless deployment&lt;/li>
+&lt;li>No extra charge&lt;/li>
+&lt;li>Protect guests&amp;rsquo; privacy from Google and other entities.&lt;/li>
+&lt;/ul>
+&lt;h3 id="cons">Cons&lt;/h3>
+&lt;ul>
+&lt;li>Require a database.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Solution: Use serverless database: &lt;a class="link" href="https://planetscale.com/" target="_blank" rel="noopener"
+>PlanetScale&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="my-view-1">My view&lt;/h3>
+&lt;p>Just as it is described, it is a convenient visitor analytics tool that is easy to deploy. After modifying the JavaScript file name, it can be inserted into any location.&lt;/p>
+&lt;blockquote>
+&lt;p>Star: 7/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="onedrive-index">Onedrive-Index&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/iRedScarf/onedrive-index" target="_blank" rel="noopener"
+>iRedScarf/onedrive-index&lt;/a>&lt;/p>
+&lt;h3 id="introduction-2">Introduction&lt;/h3>
+&lt;p>Showcase, share, preview, and download files inside your OneDrive with onedrive-vercel-index.&lt;/p>
+&lt;h3 id="pros-2">Pros&lt;/h3>
+&lt;ul>
+&lt;li>Serverless deployment&lt;/li>
+&lt;li>No extra charge&lt;/li>
+&lt;li>Share your file with others&lt;/li>
+&lt;/ul>
+&lt;h3 id="cons-1">Cons&lt;/h3>
+&lt;ul>
+&lt;li>No one actively maintains it&lt;/li>
+&lt;li>The original project has been archived&lt;/li>
+&lt;/ul>
+&lt;h3 id="my-view-2">My view&lt;/h3>
+&lt;p>Conveniently share files from OneDrive, once set up, you no longer need to worry about it, as it will run smoothly.&lt;/p>
+&lt;blockquote>
+&lt;p>Star: 6/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="picx">Picx&lt;/h2>
+&lt;p>Github: &lt;a class="link" href="https://github.com/Moeomu/picx" target="_blank" rel="noopener"
+>XPoet/picx&lt;/a>&lt;/p>
+&lt;h3 id="introduction-3">Introduction&lt;/h3>
+&lt;p>A CDN-accelerated image hosting management tool developed based on the GitHub API and jsDelivr. No need to download or install, it can be used online through the web browser. It&amp;rsquo;s free, stable, convenient, and lightning-fast.&lt;/p>
+&lt;h3 id="pros-3">Pros&lt;/h3>
+&lt;ul>
+&lt;li>Serverless deployment&lt;/li>
+&lt;li>No extra charge&lt;/li>
+&lt;li>Image storage&lt;/li>
+&lt;/ul>
+&lt;h3 id="cons-2">Cons&lt;/h3>
+&lt;ul>
+&lt;li>No English translation&lt;/li>
+&lt;/ul>
+&lt;h3 id="my-view-3">My view&lt;/h3>
+&lt;p>You can place your blog images here, and CDN acceleration is also available for free, ensuring a smooth and optimal experience.&lt;/p>
+&lt;blockquote>
+&lt;p>Star: 7/10&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="references">References&lt;/h2>
+&lt;ol>
+&lt;li>&lt;a class="link" href="https://docs.rsshub.app/" target="_blank" rel="noopener"
+>RSSHub - Docs&lt;/a>&lt;/li>
+&lt;/ol></description></item><item><title>Reverse Tools Radare2 and Cutter</title><link>https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/</link><pubDate>Sat, 21 Nov 2020 19:04:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;h3 id="radare2">Radare2&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>r2 is a rewrite from scratch of radare in order to provide a set of libraries and tools to work with binary files.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Radare project started as a forensics tool, a scriptable command-line hexadecimal editor able to open disk files, but later added support for analyzing binaries, disassembling code, debugging programs, attaching to remote gdb servers&amp;hellip;&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>radare2 is portable.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>To learn more you may read the official radare2 book, the source code, or browse the web for blog posts or presentations from r2con.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="cutter">Cutter&lt;/h3>
+&lt;ul>
+&lt;li>Cutter is a free and open-source reverse engineering framework powered by radare2 . Its goal is making an advanced, customizable and FOSS reverse-engineering platform while keeping the user experience at mind. Cutter is created by reverse engineers for reverse engineers.&lt;/li>
+&lt;/ul>
+&lt;h2 id="installation">Installation&lt;/h2>
+&lt;blockquote>
+&lt;p>Since Cutter is a GUI-based program for Radare2, you only need to download Cutter&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>This test system: macOS Catalina 10.15.7&lt;/li>
+&lt;li>Github download link: &lt;a class="link" href="https://github.com/radareorg/cutter/releases" target="_blank" rel="noopener"
+>github.com/radareorg/cutter/releases&lt;/a>&lt;/li>
+&lt;li>Moeomu netdisk download link (may not be the latest): &lt;a class="link" href="https://pan.moeomu.com/Software/macOS/Tools-Reverse_Pwn/Cutter-v1.12.0-x64.macOS.dmg" target="_blank" rel="noopener"
+>Cutter-v1.12.0-x64.dmg&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="the-reason-why-macos-catalina-cant-run-cutter">The reason why macOS Catalina can&amp;rsquo;t run Cutter&lt;/h2>
+&lt;blockquote>
+&lt;p>I don&amp;rsquo;t know about Windows, but it doesn&amp;rsquo;t work properly on macOS Catalina after installation anyway, the solution is as follows&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Find out the reason why it doesn&amp;rsquo;t work properly&lt;/li>
+&lt;li>Go to Cutter&amp;rsquo;s folder: &lt;code>cd /Applications/Cutter.app/Contents/MacOS/&lt;/code>
+&lt;img src="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/CD-Cutter-Folder.png"
+width="637"
+height="152"
+srcset="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/CD-Cutter-Folder_huba1c04643c35c6357cf2f19fbb5fdc59_65755_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="CD-Cutter-Folder"
+class="gallery-image"
+data-flex-grow="419"
+data-flex-basis="1005px"
+>&lt;/li>
+&lt;li>Run Cutter directly to see the cause: &lt;code>. /Cutter&lt;/code>
+&lt;img src="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/Cutter-Error-Message.png"
+width="888"
+height="151"
+srcset="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/Cutter-Error-Message_huefcda6fd9406bf4a20723838e3f4dd8f_93161_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/Cutter-Error-Message_huefcda6fd9406bf4a20723838e3f4dd8f_93161_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Cutter-Error-Message"
+class="gallery-image"
+data-flex-grow="588"
+data-flex-basis="1411px"
+>&lt;/li>
+&lt;li>Install &lt;code>gettext&lt;/code> to solve the problem: &lt;code>brew install gettext&lt;/code>
+&lt;img src="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/install-gettext.png"
+width="889"
+height="131"
+srcset="https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/reverse-tools-radare2-and-cutter/install-gettext_hu407bdc474147afd74a352420d09f52a4_77613_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="install-gettext"
+class="gallery-image"
+data-flex-grow="678"
+data-flex-basis="1628px"
+>&lt;/li>
+&lt;/ul></description></item></channel></rss>

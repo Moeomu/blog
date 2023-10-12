@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>HeapStructure on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/heapstructure/</link><description>Recent content in HeapStructure on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 20 Oct 2020 23:10:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/heapstructure/index.xml" rel="self" type="application/rss+xml"/><item><title>Exploit Learning Notes 006 Heap Start</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-006-heap-start/</link><pubDate>Tue, 20 Oct 2020 23:10:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-006-heap-start/</guid><description>&lt;p>Disclaimer: The experimental environment is Windows 2000&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-006-heap-start/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="introduction-to-heap">Introduction to heap&lt;/h2>
+&lt;h3 id="difference-with-stack">Difference with stack&lt;/h3>
+&lt;ul>
+&lt;li>A heap is a piece of memory space requested from the operating system by the programmer using functions such as malloc. Whether it succeeds or not has a great deal to do with the state of the operating system, unlike the neatly managed stack, its management and allocation algorithm are very peculiar&lt;/li>
+&lt;li>The heap is freed by the programmer using free or delete, while the stack is automatically freed by the system.&lt;/li>
+&lt;li>The address range of the heap varies greatly, while the memory address of the stack is always &lt;code>0x0012XXXX&lt;/code>.&lt;/li>
+&lt;li>Heap addresses move from low to high and stack addresses move from high to low&lt;/li>
+&lt;/ul>
+&lt;h3 id="heap-safety">Heap safety&lt;/h3>
+&lt;ul>
+&lt;li>The heap is cluttered, so its use will be much more difficult compared to the stack, and the management of the heap has never been disclosed by Microsoft, so it is difficult to study&lt;/li>
+&lt;li>In Windows 2000 - Windows XP SP1, heap management does not take security into account and is easy to exploit&lt;/li>
+&lt;li>In Windows XP SP2 - Windows 2003, cookies and pointer validation at the head of the block were added.&lt;/li>
+&lt;li>Windows Vista - Windows 7, the security, stability and efficiency of heap management have changed dramatically&lt;/li>
+&lt;/ul>
+&lt;h3 id="heap-data-structures-and-management-policies">Heap data structures and management policies&lt;/h3>
+&lt;h4 id="two-types-of-heap-structures">Two types of heap structures&lt;/h4>
+&lt;ul>
+&lt;li>Heap blocks: The memory in the heap area is organized into blocks of different sizes, identified by heap blocks.
+&lt;ul>
+&lt;li>Block head: the size of this block, whether it is occupied or not&lt;/li>
+&lt;li>Block body: data area&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Heap table: Located at the beginning of the heap area, it can index all important information about the heap area, including the size, location, and occupancy or not of the heap block. The heap table is often represented by more than one data structure.&lt;/li>
+&lt;li>In Windows, heap blocks in the occupied state are only indexed by the program that occupies them, and the heap table only indexes heap blocks in the idle state.&lt;/li>
+&lt;li>Important heap tables in Windows.
+&lt;ul>
+&lt;li>Idle bidirectional linked table: (Freelist) (Empty table)
+&lt;ul>
+&lt;li>The empty table contains 128 arrays, the second array &lt;code>freelist[1]&lt;/code> identifies 8 bytes of empty heap space, after which each item is incremented by 8 bytes one by one&lt;/li>
+&lt;li>&lt;code>free heap block size (including heap head) = index item * 8(bytes)&lt;/code>&lt;/li>
+&lt;li>&lt;code>freelist[0]&lt;/code> identifies all heap blocks larger than 1024 bytes (less than or equal to 512KB), which are sorted in ascending order from smallest to largest&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Fast one-way linked table (Lookaside) (fast table)
+&lt;ul>
+&lt;li>The fast table contains 128 entries and is organized similarly to the empty table, but the single-linked table&lt;/li>
+&lt;li>Always initialized to null, each fast table has up to 4 nodes&lt;/li>
+&lt;li>Each node is initialized as occupied, so no heap block merging occurs&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h4 id="management-policy">Management Policy&lt;/h4>
+&lt;ul>
+&lt;li>Heap Block Allocation
+&lt;ul>
+&lt;li>Zero empty table allocation: chaining free blocks of different sizes in ascending order, looking for the last block in reverse from &lt;code>free[0]&lt;/code>, and then searching forward for the smallest free heap block that can meet the requirements for allocation&lt;/li>
+&lt;li>Ordinary free table allocation: find the best free space allocation, followed by the next best&lt;/li>
+&lt;li>Fast table allocation: find the table with matching size, offload it from the heap table, and return a pointer to the heap block to the program&lt;/li>
+&lt;li>When the empty table cannot find the optimal heap block, a slightly larger block is used for allocation. This is a suboptimal allocation, where a block is first cut out from the larger block to the exact size requested for allocation, and then the remaining part is relabeled with the block header and concatenated into the empty table.&lt;/li>
+&lt;li>The fast table is only allocated when it is an exact match, so there is no such phenomenon&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Heap block release
+&lt;ul>
+&lt;li>Change the heap block status to free and chain to the appropriate heap table. All freed blocks will be chained to the end of the heap table, and the allocation will be taken from the end of the heap table first.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Heap block merge
+&lt;ul>
+&lt;li>Repeatedly requesting and releasing heap areas will create a lot of memory fragments, so in order to use memory wisely and efficiently some heap blocks will be merged&lt;/li>
+&lt;li>This operation consists of unloading two blocks from the free table, merging the heap blocks, adjusting the block head information of the merged block, and re-chaining the new block into the free table.&lt;/li>
+&lt;li>The heap area will also undergo a memory crunch (shrink the compact) performed by &lt;code>RtlCompactHeap&lt;/code>, which will adjust the entire heap and try to merge the available pieces&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Heap block allocation and release strategy
+&lt;ul>
+&lt;li>Small blocks (SIZE&amp;lt;1KB)
+&lt;ul>
+&lt;li>Allocation
+&lt;ul>
+&lt;li>Fast table allocation first, mechanical energy ordinary empty table allocation&lt;/li>
+&lt;li>If it fails, use heap cache allocation&lt;/li>
+&lt;li>If the heap cache allocation fails, try to allocate after memory crunch&lt;/li>
+&lt;li>If allocation is not possible, return NULL&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Release
+&lt;ul>
+&lt;li>Priority chaining to fast table (only 4 free blocks can be chained)&lt;/li>
+&lt;li>If the fast table is full, chain to the corresponding empty table&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Large blocks (1KB&amp;lt;=SIZE&amp;lt;512KB)
+&lt;ul>
+&lt;li>Allocation
+&lt;ul>
+&lt;li>Allocate using heap cache&lt;/li>
+&lt;li>If the heap cache allocation fails, use the big block in free[0] for allocation&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Release
+&lt;ul>
+&lt;li>Put it into heap cache first&lt;/li>
+&lt;li>If heap cache is full, chain into freelists[0]&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Jumbo block (SIZE&amp;gt;=512KB)
+&lt;ul>
+&lt;li>Allocation: dummy allocation (not from heap area)&lt;/li>
+&lt;li>Release: direct release, no heap table operation&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="practice">Practice&lt;/h2>
+&lt;blockquote>
+&lt;p>Lesson learned in blood: whether empty or fast table, its &lt;code>Blink/Flink&lt;/code> pointer points to &lt;strong>always&lt;/strong> the &lt;code>Blink/Flink&lt;/code> of the next/previous node&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="testing-empty-tables">Testing empty tables&lt;/h3>
+&lt;h4 id="code">code&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h5&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h6&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x1000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x10000&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">5&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">6&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h5&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">19&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h6&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">24&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">//free block and prevent coaleses
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// free to freelist[2]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// free to freelist[2]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h5&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// free to freelist[4]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="c1">// coalese h3 h4 h5 link the large block to freelist[8]
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="watch">Watch&lt;/h4>
+&lt;h5 id="int-exception-calls-up-debugger-not-running">INT exception calls up debugger, not running&lt;/h5>
+&lt;ul>
+&lt;li>After &lt;code>HeadCreate()&lt;/code> creates the heap area, give the heap area pointer to EAX, and observe that the address is &lt;code>0x360000&lt;/code> at this point&lt;/li>
+&lt;li>Check the memory area &lt;code>0x360000&lt;/code>, the information backward is (copied, I don&amp;rsquo;t know how big these structures are anyway) segment table index (SegmentList), virtual table index (VirtualAllocationList), empty table usage mark (freelist usage bitmap) and empty table index area&lt;/li>
+&lt;li>The empty table index is found at offset &lt;code>0x178&lt;/code>, and its content is &lt;code>0x00360688&lt;/code>, which means &lt;code>freelist[0]&lt;/code> points to the offset &lt;code>0x688&lt;/code>, let&amp;rsquo;s congratulate what is stored in this place&lt;/li>
+&lt;li>This place stores &lt;code>0x00360178&lt;/code>, wonderful, it points to &lt;code>freelist[0]&lt;/code>, it goes around and points to itself, and this &lt;code>freelist[0]&lt;/code> seems to point to the only free heap area, generally known as the &amp;ldquo;tail block&amp;rdquo;&lt;/li>
+&lt;li>According to the structure of the heap block (below), the actual block starts at &lt;code>0x00360680&lt;/code>, and it looks like the heap block pointer crosses the heap block head and points directly to the data area&lt;/li>
+&lt;li>&lt;code>0x1-0x2&lt;/code> bytes is its own size, at this time the value is &lt;code>0x0130&lt;/code>, indicating that the size of the heap is &lt;code>0x130&lt;/code> bytes&lt;/li>
+&lt;li>The &lt;code>0x3-0x4&lt;/code> bytes are the previous heap block size, this value is &lt;code>0x08&lt;/code> (?????). Isn&amp;rsquo;t it said to be unique???)&lt;/li>
+&lt;li>The &lt;code>0x5&lt;/code> byte is the index, which is 0 at this point&lt;/li>
+&lt;li>&lt;code>0x6&lt;/code> byte is Flag, at this point this is 1&lt;/li>
+&lt;li>&lt;code>0x7&lt;/code> byte is reserved byte, which is 0&lt;/li>
+&lt;li>&lt;code>0x8&lt;/code> byte is the tag index (debug state), I don&amp;rsquo;t know what it does, it is 0&lt;/li>
+&lt;li>&lt;code>0x9-0xC&lt;/code> (empty block exclusive) byte is the address of the previous empty block, it is &lt;code>0x00360178&lt;/code>&lt;/li>
+&lt;li>The &lt;code>0xD-0x10&lt;/code> (empty heap block exclusive) byte is the address of the next empty heap block, again &lt;code>0x00360178&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h5 id="runs-six-allocations">runs six allocations&lt;/h5>
+&lt;ul>
+&lt;li>&lt;code>0x00360680-0x00360688&lt;/code> is the h1 block header, &lt;code>0x00360689-0x0036068F&lt;/code> is the 8 byte block body with &lt;code>00 00 00 00 78 01 36 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x00360690-0x00360698&lt;/code> is the h2 block header, &lt;code>0x00360699-0x0036069F&lt;/code> is the 8-byte block body with &lt;code>00 00 00 00 00 01 36 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606A0-0x003606A8&lt;/code> is the h3 block header, &lt;code>0x003606A9-0x003606AF&lt;/code> is the 8-byte block body with &lt;code>00 00 00 00 00 00 00 36 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606B0-0x003606B8&lt;/code> is the h4 block header, &lt;code>0x003606B9-0x003606BF&lt;/code> is the 8-byte block body with &lt;code>00 00 00 00 00 00 00 00 00&lt;/code>&lt;/li>
+&lt;li>&lt;code>0x003606C0-0x003606C8&lt;/code> is the h5 block header, &lt;code>0x003606C9-0x003606DF&lt;/code> is a 24 byte block body with `00 00 00 00 00 00 00 00 00 00 00&lt;/li>
+&lt;li>&lt;code>0x003606E0-0x003606E8&lt;/code> is the h5 block header and &lt;code>0x003606E9-0x003606FF&lt;/code> is the 24 byte block body with &lt;code>00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h5 id="freeing-the-heap">Freeing the heap&lt;/h5>
+&lt;ul>
+&lt;li>The first time the heap is freed the block size is 16 bytes, so it is connected to &lt;code>freeList[2]&lt;/code>, which is the location of &lt;code>0x188&lt;/code>, at this time the content is &lt;code>0x00360688&lt;/code>&lt;/li>
+&lt;li>The second freed heap is also connected to &lt;code>freeList[2]&lt;/code>, which is not described in detail&lt;/li>
+&lt;li>The third released heap is also connected to &lt;code>freeList[2]&lt;/code>, which is not described in detail&lt;/li>
+&lt;li>The fourth time it is freed, h3, h4 and h5 are adjacent to each other, so they are merged, where h3h4 is 2 heap units each and h5 is 4, so they are merged to a total of 8 heap units, excluding the heap head, they are left with 7 heap units, so they are put into &lt;code>freeList[8]&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h4 id="conclusion">Conclusion&lt;/h4>
+&lt;ul>
+&lt;li>The information contained in the heap table is SegmentList, VirtualAllocationList, freelist usage bitmap and empty index area in that order.&lt;/li>
+&lt;li>When a heap is just initialized, its heap block status
+&lt;ul>
+&lt;li>There is only one large block in the idle state, which is called the &amp;ldquo;tail block&amp;rdquo;&lt;/li>
+&lt;li>This is followed by the fast table&lt;/li>
+&lt;li>Freelist[0] points to the &amp;ldquo;tail block&amp;rdquo;&lt;/li>
+&lt;li>Each index of the region points to itself, except for the zero freelist index, which means that there are no free blocks in all the rest of the free-table&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>First occupied block&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">Busy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">ExtraPresent&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FillPattern&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">VirtualAlloc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">LastEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">NoCoalesce&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">BusyHeapHeadBlock&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 8 Byte Head
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">SelfSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">PreviousChunkSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCHAR&lt;/span> &lt;span class="n">SegmentIndex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span> &lt;span class="n">Flags&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">UnusedBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">TagIndex_Debug&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Data After...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Idle state block head&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">Busy&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">ExtraPresent&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FillPattern&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">VirtualAlloc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">LastEntry&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">FFU2&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">BIT&lt;/span> &lt;span class="n">NoCoalesce&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">BusyHeapHeadBlock&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 16 Byte Head
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">SelfSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">USHORT&lt;/span> &lt;span class="n">PreviousChunkSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCHAR&lt;/span> &lt;span class="n">SegmentIndex&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">struct&lt;/span> &lt;span class="nc">Flag&lt;/span> &lt;span class="n">Flags&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">UnusedBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">UCAHR&lt;/span> &lt;span class="n">TagIndex_Debug&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">FlinkInFreelist&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 下一个
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">PVOID&lt;/span> &lt;span class="n">BlinkInFreelist&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 上一个
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Empty Data After...
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Heap block allocation
+&lt;ul>
+&lt;li>The size of the heap block includes the block header, so the application for 32 bytes will allocate 40 bytes.&lt;/li>
+&lt;li>The unit of heap block is 8 bytes, less than 8 bytes are allocated according to 8 bytes, so the minimum actual allocation is 16 bytes&lt;/li>
+&lt;li>In the initial state, the fast table and the empty table are empty, there is no exact allocation, the request will be allocated using the suboptimal block&lt;/li>
+&lt;li>Due to the occurrence of suboptimal allocation, the allocation function will cut away some small blocks from the tail block, modify the size at the beginning of the tail block, and finally point &lt;code>freelist[0]&lt;/code> to the new tail block&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="test-the-fast-table">Test the fast table&lt;/h3>
+&lt;h4 id="code-1">code&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-CPP" data-lang="CPP">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;windows.h&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HLOCAL&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HANDLE&lt;/span> &lt;span class="n">hp&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">hp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapCreate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kr">__asm&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="mi">3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h1&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">8&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h3&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">16&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h4&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">24&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h3&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h4&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">h2&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">HeapAlloc&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">HEAP_ZERO_MEMORY&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">16&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">HeapFree&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">hp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">h2&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="conclusion-1">Conclusion&lt;/h4>
+&lt;ul>
+&lt;li>The block first identification bit is 0x01&lt;/li>
+&lt;li>Only the pointer to the next block in the stack is stored, there is no pointer to the previous block in the stack&lt;/li>
+&lt;li>The address of &lt;code>freeList[0]&lt;/code> at offset &lt;code>0x178&lt;/code> becomes &lt;code>0x00361E90&lt;/code> and the original &lt;code>0x00360688&lt;/code> is occupied by the fast table&lt;/li>
+&lt;li>The fast table starts at &lt;code>0x688&lt;/code>, each structure has a total of &lt;code>0x30&lt;/code> bytes, and the first four bytes of content are the fast table chain&lt;/li>
+&lt;li>Although the 0Day security book says that the 8-byte heap area is inserted as &lt;code>lookaside[1]&lt;/code>, it seems to me that it is the one at &lt;code>0x688&lt;/code> that is &lt;code>lookaside[0]&lt;/code>, the one at &lt;code>0x6B8&lt;/code> that is &lt;code>lookaside[1]&lt;/code>, and the one at &lt;code>0x0E8&lt;/code> that can be called &lt;code>lookaside[2]&lt;/code>, which The size of the heap block with the block header is 16 bytes in total&lt;/li>
+&lt;/ul></description></item></channel></rss>

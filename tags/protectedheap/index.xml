@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ProtectedHeap on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/protectedheap/</link><description>Recent content in ProtectedHeap on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 28 Nov 2020 16:15:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/protectedheap/index.xml" rel="self" type="application/rss+xml"/><item><title>Exploit learning notes 021 Protected HEAP</title><link>https://blog.moeomu.com/posts/exploit-learning-notes-021-protected-heap/</link><pubDate>Sat, 28 Nov 2020 16:15:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/exploit-learning-notes-021-protected-heap/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/exploit-learning-notes-021-protected-heap/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="introduction">Introduction&lt;/h2>
+&lt;ul>
+&lt;li>PEB Random: Microsoft no longer uses a fixed PEB base address &lt;code>0x7ffdf000&lt;/code> after &lt;code>Windows XP SP2&lt;/code>, but a PEB base address with some randomness. the PEB randomization mainly affects attacks on functions in the PEB, and function pointers in the PEB are excellent targets when &lt;code>DWORD SHOOT&lt;/code>. Moving the PEB base address will make such attacks more difficult to some extent. See &lt;a class="link" href="https://www.moeomu.com/posts/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/" target="_blank" rel="noopener"
+>heap overflow exploitation&lt;/a> and &lt;a class="link" href="https://www.moeomu.com/posts/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/" target="_blank" rel="noopener"
+>Attacking function pointers in the PEB&lt;/a> of the related introduction&lt;/li>
+&lt;li>&lt;code>SafeUnlink&lt;/code>: Microsoft has rewritten the code for manipulating bidirectional chained tables to be more careful when unloading heap blocks in &lt;code>free list&lt;/code>. Compare to &lt;a class="link" href="https://www.moeomu.com/posts/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/" target="_blank" rel="noopener"
+>heap overflow exploit-DWORD SHOOT&lt;/a> for the description of the bi-directional chained table disassembly problem, the chain table disassembly operation before SP2 was similar to the following code.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ListNode&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>SP2 will verify the integrity of the heap block forward and backward pointers in advance when performing a delete operation to prevent &lt;code>DWORD SHOOT&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">safe_remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ListNode&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">blink&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">flink&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">flink&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">blink&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 链表指针被破坏，进入异常
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>heap cookie: similar to the &lt;code>security cookie&lt;/code> in the stack, Microsoft has introduced a cookie in the heap to detect the occurrence of heap overflows. cookies are placed at the location of the &lt;code>segment table&lt;/code> of the original heap block at the head of the heap and occupy a size of 1 byte&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/heap%20struct.png"
+loading="lazy"
+alt="heap struct"
+>&lt;/p>
+&lt;ul>
+&lt;li>Metadata encryption: Microsoft started using this security measure in &lt;code>Windows Vista&lt;/code> and subsequent versions of the operating system. Some important data in the head of the block will be saved with a 4-byte random number to perform an iso operation, when using these data need to perform another iso run to restore, so that we can not directly destroy these data to protect the heap.&lt;/li>
+&lt;/ul>
+&lt;h2 id="attack-ideas">Attack ideas&lt;/h2>
+&lt;h3 id="attacking-the-variables-stored-inside-the-heap">Attacking the variables stored inside the heap&lt;/h3>
+&lt;blockquote>
+&lt;p>This is a way to achieve overflow by attacking function pointers stored in the heap or something like that, but it doesn&amp;rsquo;t have anything to do with the heap itself&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="attacking-the-heap-using-chunk-resizing">Attacking the heap using chunk resizing&lt;/h3>
+&lt;h4 id="principle">Principle&lt;/h4>
+&lt;blockquote>
+&lt;p>&lt;code>SafeUnlink&lt;/code> checks for double-linked table validity when the heap is unloaded from the freelist, but the insertion of a heap chunk into the freelist is not checked&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="timing">Timing&lt;/h4>
+&lt;ul>
+&lt;li>When the heap block is released from memory, it will be inserted into the empty table&lt;/li>
+&lt;li>If the heap block has more space than the requested space, the remaining space will be inserted into the empty table&lt;/li>
+&lt;/ul>
+&lt;h3 id="the-insertion-process-of-new-chunk">The insertion process of new chunk&lt;/h3>
+&lt;blockquote>
+&lt;p>Flink: next node; Blink: previous node; see &lt;a class="link" href="https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-list_entry" target="_blank" rel="noopener"
+>MSDN-NTDEF-LIST&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>New chunk-&amp;gt;Blink = old chunk-&amp;gt;Flink-&amp;gt;Blink&lt;/li>
+&lt;li>old chunk-&amp;gt;Flink-&amp;gt;Blink-&amp;gt;Flink=new chunk&lt;/li>
+&lt;li>Old chunk-&amp;gt;Flink-&amp;gt;Blink=New chunk&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Just overwrite the Flink pointer of the old chunk with the address and overwrite Blink with the value, and you&amp;rsquo;re ready to DWORDSHOOT again&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="code">Code&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="unfinished-business">Unfinished business&lt;/h3></description></item></channel></rss>

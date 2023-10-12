@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/linux/</link><description>Recent content in Linux on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 26 Oct 2022 19:14:09 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>Installing ArchLinux on ASUS ROG Strix Scar G532</title><link>https://blog.moeomu.com/posts/installing-archlinux-on-asus-rog-strix-scar-g532/</link><pubDate>Wed, 26 Oct 2022 19:14:09 +0800</pubDate><guid>https://blog.moeomu.com/posts/installing-archlinux-on-asus-rog-strix-scar-g532/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp" alt="Featured image of post Installing ArchLinux on ASUS ROG Strix Scar G532" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/installing-archlinux-on-asus-rog-strix-scar-g532/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="introduction-to-this-article">Introduction to this article&lt;/h2>
+&lt;blockquote>
+&lt;p>Asus Strix ScarG532&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>If you have the same machine as I do then you can follow this article exactly step by step and you will definitely end up with a successful installation of ArchLinux. I will exhaustively link the reference next to it so you can view and modify it to the configuration you want.&lt;/li>
+&lt;li>This note above is against the Arch way, so I am kidding. Please do not follow the configuration below step by step, and if you encounter the same problem as I did, you can refer to my solution&lt;/li>
+&lt;li>The components I have installed are as follows
+&lt;ul>
+&lt;li>Secure boot component: PreLoader&lt;/li>
+&lt;li>Bootloader: systemd-boot&lt;/li>
+&lt;li>Network and DHCP service: NetworkManager (because of better integration with Gnome)&lt;/li>
+&lt;li>Desktop environment: Gnome based on Wayland&lt;/li>
+&lt;li>Chinese input: ibus-libpinyin based on ibus (because of better integration with Gnome)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="installing-archlinux">Installing ArchLinux&lt;/h2>
+&lt;blockquote>
+&lt;p>This section follows exactly the &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>Installation guide - ArchWiki&lt;/a>, you can check this official documentation link for a more detailed explanation&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="pre-installation">Pre-installation&lt;/h3>
+&lt;h4 id="boot-disk-creation">Boot disk creation&lt;/h4>
+&lt;ul>
+&lt;li>You can visit the &lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>Download - ArchLinux&lt;/a> page to get the official boot image&lt;/li>
+&lt;li>Once downloaded, it is recommended to use &lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>balenaEtcher&lt;/a> to write the image to a USB stick&lt;/li>
+&lt;li>Boot the created ArchLinux installation environment from the USB stick&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>These three steps are too simple so do not repeat, if you need help please leave a message in the comments section&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="verify-uefi-mode-boot">Verify UEFI mode boot&lt;/h4>
+&lt;p>Execute the command &lt;code>ls /sys/firmware/efi/efivars&lt;/code>, if there is an output value then it proves that it is UEFI mode boot, later in the article the bootloader will use UEFI&lt;/p>
+&lt;h4 id="check-and-connect-to-the-network">Check and connect to the network&lt;/h4>
+&lt;blockquote>
+&lt;p>The following section will use the wireless card for network connection&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>rfkill&lt;/code>, if the output is as follows then the hardware is fine&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">ID TYPE DEVICE SOFT HARD
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">0&lt;/span> bluetooth hci0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">1&lt;/span> wlan phy0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>iwctl&lt;/code> to enter the network connection configuration tool interface, see &lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>iwctl - ArchWiki&lt;/a> for more details&lt;/li>
+&lt;li>Execute &lt;code>device list&lt;/code> to view the list of devices&lt;/li>
+&lt;li>Execute &lt;code>station wlan0 scan&lt;/code> to scan with wlan0 devices&lt;/li>
+&lt;li>Execute &lt;code>station wlan0 get-networks&lt;/code> to see the list of scanned networks&lt;/li>
+&lt;li>Execute &lt;code>station wlan0 connect SSID&lt;/code> to connect to the network&lt;/li>
+&lt;li>Execute &lt;code>ping archlinux.org&lt;/code> to check network connectivity&lt;/li>
+&lt;/ul>
+&lt;h4 id="calibrate-the-time">calibrate the time&lt;/h4>
+&lt;blockquote>
+&lt;p>systemd-timesyncd will automatically calibrate the time when it detects a network connection, so there is no need to manually calibrate the time&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>timedatectl status&lt;/code> to check and make sure the system time is correct&lt;/li>
+&lt;/ul>
+&lt;h4 id="disk-operations-data-is-priceless-be-careful">disk operations (&lt;strong>data is priceless, be careful&lt;/strong>)&lt;/h4>
+&lt;blockquote>
+&lt;p>This section must not be copied, you may have a different number of disks than I do, and your disk partition situation must be different than mine&lt;br>
+Be sure to refer to &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks" target="_blank" rel="noopener"
+>Partition the disks - ArchWiki&lt;/a> for disk partitioning&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>fdisk -l&lt;/code> to see how your disk is partitioned, and partition it as you see fit&lt;/li>
+&lt;li>Execute &lt;code>fdisk /dev/nvme0n1&lt;/code> for the first SSD operation, press &lt;code>m&lt;/code> to show help, save and exit the &lt;code>fdisk&lt;/code> interface after the operation is finished, this tool will write to the hard disk partition table only when it is saved, please feel free to operate it&lt;/li>
+&lt;li>(Danger) Execute &lt;code>mkfs.ext4 /dev/nvme0n1p4&lt;/code> to format the fourth partition of the first SSD, in this case it will be the mount point of &lt;code>/&lt;/code>&lt;/li>
+&lt;li>(Danger) Execute &lt;code>mkfs.ext4 /dev/nvme2n1p1&lt;/code> to format the first partition of the third SSD, which in this case will be the mount point of &lt;code>/home&lt;/code>.&lt;/li>
+&lt;li>Execute &lt;code>e2label /dev/nvme0n1p4 &amp;quot;ArchSys&amp;quot;&lt;/code> to set the label of the fourth partition of the first SSD to ArchSys, which will be used by systemd-boot&lt;/li>
+&lt;li>Execute &lt;code>e2label /dev/nvme2n1p1 &amp;quot;ArchData&amp;quot;&lt;/code> to set the label of the first partition of the third SSD to ArchData, which will be used by systemd-boot&lt;/li>
+&lt;li>Execute &lt;code>blkid | grep Arch&lt;/code> to check the disk label setting&lt;/li>
+&lt;li>Execute &lt;code>mount /dev/nvme0n1p4 /mnt&lt;/code> to mount the disk, it will be &lt;code>/&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>mount --mkdir /dev/nvme0n1p1 /mnt/boot&lt;/code> to mount the disk, it will be &lt;code>/boot&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>mount --mkdir /dev/nvme2n1p1 /mnt/home&lt;/code> to mount the disk, it will be &lt;code>/home&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>mkswap /dev/nvme0n1p5&lt;/code> to format the fifth partition of the first SSD as a memory swap partition&lt;/li>
+&lt;li>Execute &lt;code>swapon /dev/nvme0n1p5&lt;/code> to enable the memory swap partition&lt;/li>
+&lt;/ul>
+&lt;h3 id="start-installation">Start installation&lt;/h3>
+&lt;h4 id="change-the-address-of-the-selected-mirror">change the address of the selected mirror&lt;/h4>
+&lt;blockquote>
+&lt;p>vim is a command line text editor, if you don&amp;rsquo;t know how to use it, you can switch to nano, if you are already in the vim interface, you can exit vim in normal mode by typing an English colon and q&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>vim /etc/pacman.d/mirrorlist&lt;/code> to edit the installation source image list&lt;/li>
+&lt;li>Add this line &lt;code>Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch&lt;/code> to the top, or you can follow your own custom&lt;/li>
+&lt;/ul>
+&lt;h4 id="to-install-the-necessary-packages">to install the necessary packages&lt;/h4>
+&lt;blockquote>
+&lt;p>intel-ucode is the microcode update package for intel, recommended to install&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>pacstrap -K /mnt base linux linux-firmware intel-ucode&lt;/code> to install the system base package&lt;/li>
+&lt;li>Execute &lt;code>pacstrap /mnt networkmanager bluez vim sudo bash-completion openssh man git wget zsh&lt;/code> to install some software you need&lt;/li>
+&lt;/ul>
+&lt;h3 id="configure-the-new-system">Configure the new system&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>genfstab -U /mnt &amp;gt;&amp;gt; /mnt/etc/fstab&lt;/code> to create a system partition table definition&lt;/li>
+&lt;li>Execute &lt;code>arch-chroot /mnt&lt;/code> to switch the shell to the new system and execute the command&lt;/li>
+&lt;li>Execute &lt;code>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime&lt;/code> to set the system time zone to Asia-Shanghai&lt;/li>
+&lt;li>Execute &lt;code>hwclock --systohc&lt;/code> to synchronize the hardware time&lt;/li>
+&lt;li>Execute &lt;code>vim /etc/locale.gen&lt;/code> to edit the system&amp;rsquo;s localization settings, my settings are as follows, which can be used as a reference. &lt;strong>Note: If you don&amp;rsquo;t add &lt;code>zh_CN.UTF-8 UTF-8&lt;/code> in this step, then you won&amp;rsquo;t find Pinyin input in Gnome&amp;rsquo;s &lt;code>Keyboard&lt;/code> option&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">en_US.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">zh_CN.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>locale-gen&lt;/code> to generate localization settings&lt;/li>
+&lt;li>Execute &lt;code>vim /etc/locale.conf&lt;/code> to edit the language configuration file, I use English system, enter &lt;code>LANG=en_US.UTF-8&lt;/code>, if you use Chinese system, change it to &lt;code>LANG=zh_CN.UTF-8&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>vim /etc/hostname&lt;/code> to edit this host name&lt;/li>
+&lt;li>Execute &lt;code>mkinitcpio -P&lt;/code> to create a boot memory initialization image&lt;/li>
+&lt;li>Execute &lt;code>passwd&lt;/code> to change the root user password&lt;/li>
+&lt;/ul>
+&lt;h3 id="configure-system-startup-items">Configure system startup items&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>bootctl --path=/boot install&lt;/code> to install systemd-boot into /boot&lt;/li>
+&lt;li>Execute &lt;code>systemctl enable systemd-boot-update.service&lt;/code> to start systemd-boot&amp;rsquo;s automatic update service&lt;/li>
+&lt;li>Execute &lt;code>vim /boot/loader/loader.conf&lt;/code> to edit the systemd-boot startup configuration file&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">default archlinux.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">timeout 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">console-mode max
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">editor no
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-entries 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-firmware 1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>vim /boot/loader/entries/archlinux.conf&lt;/code> to edit ArchLinux boot entries&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Execute &lt;code>vim /boot/loader/entries/arch-fallback.conf&lt;/code> to edit the ArchLinux-Fallback boot entry&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux (fallback initramfs)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux-fallback.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="other">Other&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>systemctl enable NetworkManager.service&lt;/code> to make NetworkManager&amp;rsquo;s service start on boot&lt;/li>
+&lt;li>Execute &lt;code>systemctl enbale bluetooth.service&lt;/code> to make the Bluetooth service start on boot&lt;/li>
+&lt;li>Execute &lt;code>exit&lt;/code> to exit the new system environment&lt;/li>
+&lt;li>Execute &lt;code>reboot&lt;/code> to reboot the system&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;blockquote>
+&lt;p>&lt;strong>Hint: You can actually end up here, but if you use it as a primary system, ArchLinux as it is now is clearly not up to the task, so here is more software installation reference&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;hr>
+&lt;h2 id="more-installation-configurations">More installation configurations&lt;/h2>
+&lt;h3 id="connecting-to-the-network">Connecting to the network&lt;/h3>
+&lt;blockquote>
+&lt;p>Using the NetworkManager command line tool&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>nmcli device wifi list&lt;/code> to see the wifi list&lt;/li>
+&lt;li>Execute &lt;code>nmcli device wifi connect SSID_or_BSSID password your_password&lt;/code> to connect to the network&lt;/li>
+&lt;li>Execute &lt;code>nmcli connection show&lt;/code> to see the current connection&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>You can see more usage in the &lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager#nmcli_examples" target="_blank" rel="noopener"
+>nmcli example - ArchWiki&lt;/a> article&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="create-a-new-user">Create a new user&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>useradd -m misaka&lt;/code> to create a new user named misaka&lt;/li>
+&lt;li>Execute &lt;code>export EDITOR=vim &amp;amp;&amp;amp; visudo&lt;/code> to edit this file and follow the prompts to add the new user to the privileged users group, so that the new user can use sudo for privileged operations normally&lt;/li>
+&lt;li>Execute &lt;code>usermod -a -G wheel misaka&lt;/code> to add the misaka user to the wheel user group, the advantage of this is that Gnome can correctly identify the privileges of this new user, and the authentication of this user name will pop up by default when doing root privileges in Gnome&lt;/li>
+&lt;li>Execute &lt;code>passwd misaka&lt;/code> to change the password of the new user&lt;/li>
+&lt;/ul>
+&lt;h3 id="install-gnome-gui">Install Gnome GUI&lt;/h3>
+&lt;blockquote>
+&lt;p>Hint: The command below is written to install a lot of software because there are a lot of software in the Gnome package that I don&amp;rsquo;t need, so I have to manually select the software I want to install, or you can use the simpler &lt;code>pacman -S gnome&lt;/code> instead of the installation command below, as you like&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Executing the following command will install the base components of Gnome&lt;/li>
+&lt;li>&lt;code>pacman -S file-roller gdm gedit gnome-backgrounds gnome-calculator gnome-control-center gnome-disk-utility gnome-logs gnome-menus gnome- settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gvfs nautilus seahorse seahorse- nautilus xdg-user-dirs-gtk&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>If the installation gives you a choice between using &lt;code>jack2&lt;/code> or &lt;code>pipewire&lt;/code>, choose &lt;code>pipewire&lt;/code>. This is the system&amp;rsquo;s sound service.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>systemctl enable gdm.service&lt;/code> to make the Gnome login screen boot up and self start, it will start Gnome on the next reboot&lt;/li>
+&lt;/ul>
+&lt;h3 id="install-chinese-input-method-and-fonts">Install Chinese input method and fonts&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>pacman -S ttf-dejavu wqy-zenhei wqy-microhei adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts&lt;/code> to install Chinese fonts&lt;/li>
+&lt;li>Execute &lt;code>ibus ibus-libpinyin&lt;/code> to install ibus and ibus&amp;rsquo; Smart Pinyin input method&lt;/li>
+&lt;/ul>
+&lt;h3 id="reboot-and-login-as-normal-user">Reboot and login as normal user&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>reboot&lt;/code>&lt;/li>
+&lt;li>Start Terminal&lt;/li>
+&lt;/ul>
+&lt;h3 id="gnome-window-control-button-settings">Gnome window control button settings&lt;/h3>
+&lt;ul>
+&lt;li>Execute &lt;code>gsettings set org.gnome.desktop.wm.preferences button-layout &amp;quot;close,minimize,maximize:&amp;quot;&lt;/code> which will show all windows close, minimize and maximize buttons and put them on the left side&lt;/li>
+&lt;/ul>
+&lt;h3 id="nvidia-driver-settings">NVIDIA driver settings&lt;/h3>
+&lt;blockquote>
+&lt;p>&lt;strong>Warning: Do not reboot while this section is running&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Run &lt;code>sudo pacman -S nvidia nvidia-settings&lt;/code> to install the NVIDIA driver and setup program&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>It will change the default window system from Wayland to X11, if you want to continue using Wayland as the window system, please execute the following command&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>sudo ln -s /dev/null /etc/udev/rules.d/61-gdm.rules&lt;/code> to disable udev&amp;rsquo;s rules for disabling Wayland in GDM&lt;/li>
+&lt;li>Execute &lt;code>gsettings set org.gnome.mutter experimental-features '[&amp;quot;kms-modifiers&amp;quot;]'&lt;/code> to enable kms-modifiers for gsettings&lt;/li>
+&lt;li>Execute &lt;code>sudo vim /boot/loader/entries/archlinux.conf&lt;/code> to edit the boot entry and change the last line to &lt;code>options root=&amp;quot;LABEL=ArchSys&amp;quot; rw quiet splash nvidia-drm.modeset=1&lt;/code>&lt;/li>
+&lt;li>Run &lt;code>sudo vim /etc/mkinitcpio.conf&lt;/code> to edit modsettings to change &lt;code>MODULES=()&lt;/code> to &lt;code>nvidia nvidia_modeset nvidia_uvm nvidia_drm&lt;/code> and save the file. For more help information please refer to &lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA#DRM_kernel_mode_setting" target="_blank" rel="noopener"
+>DRM_kernel_mode_setting - ArchWiki&lt;/a>&lt;/li>
+&lt;li>Execute &lt;code>sudo mkinitcpio -P&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Reference source for this section: &lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>Use Wayland with proprietary NVIDIA drivers - Manjaro Forum&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="secure-boot">Secure Boot&lt;/h3>
+&lt;blockquote>
+&lt;p>Reference source for this section: &lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>Unified Extensible Firmware Interface/Secure Boot - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Downloaded from &lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>Linux Foundation Secure Boot System Release - James Bottomley&amp;rsquo;s Random Page&lt;/a> PreLoader.efi and HashTool.efi&lt;/li>
+&lt;li>If you configured them as above, then copy these two files to your &lt;code>/boot/EFI/systemd&lt;/code> directory&lt;/li>
+&lt;li>Rename &lt;code>/boot/EFI/systemd/systemd-bootx64.efi&lt;/code> to &lt;code>/boot/EFI/systemd/loader.efi&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp your_download_path/&lt;span class="o">{&lt;/span>PreLoader,HashTool&lt;span class="o">}&lt;/span>.efi esp/EFI/systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp esp/EFI/systemd/systemd-bootx64.efi esp/EFI/systemd/loader.efi
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Run &lt;code>sudo pacman -S efibootmgr&lt;/code> to install efibootmgr&lt;/li>
+&lt;li>&lt;strong>Please note that maybe your disk is different from mine&lt;/strong>, run &lt;code>sudo efibootmgr --verbose --disk /dev/nvme0n1 --part 1 --create --label &amp;quot;Arch Linux Security Boot&amp;quot; --loader /boot/EFI/ systemd/PreLoader.efi&lt;/code> adds an NVRAM boot entry&lt;/li>
+&lt;/ul>
+&lt;h3 id="install-the-gnome-extensions">Install the Gnome extensions&lt;/h3>
+&lt;ul>
+&lt;li>Run &lt;code>flatpak install com.mattjakeman.ExtensionManager&lt;/code> to install Gnome Extension Manager&lt;/li>
+&lt;li>Search for and install the following extensions in the Gnome Extension Manager and configure them
+&lt;ul>
+&lt;li>TrayIcons: reinstall (highly recommended)&lt;/li>
+&lt;li>Blur My Shell&lt;/li>
+&lt;li>Gnome Clipboard&lt;/li>
+&lt;li>Compiz similar magic light effect&lt;/li>
+&lt;li>Run to the dock&lt;/li>
+&lt;li>No activity button&lt;/li>
+&lt;li>Open Weather&lt;/li>
+&lt;li>Privacy quick settings menu&lt;/li>
+&lt;li>Vital Signs&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="other-issues">Other issues&lt;/h2>
+&lt;blockquote>
+&lt;p>The following section will use the Aur software repository, which can be found in &lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>Aur - ArchLinux&lt;/a> for more information.&lt;br>
+&lt;code>paru&lt;/code> is an Aur repositories utility that automatically fetches programs within the installed Aur repositories, visit &lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>Morganamilo/paru - Github&lt;/a> to see how to install and use paru.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="gnome-cant-mount-ntfs-external-disk-properly">Gnome can&amp;rsquo;t mount NTFS external disk properly&lt;/h3>
+&lt;blockquote>
+&lt;p>It may be that gvfs in Gnome needs to use some utilities in ntfs-3g to mount NTFS disks properly. ntfs driver is built in after Linux kernel version 5.15, so you can install ntfs utilities using kernel ntfs driver separately with the above command.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>paru ntfsprogs-ntfs3&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="no-sound">No sound&lt;/h3>
+&lt;blockquote>
+&lt;p>This section references.&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>Problem summary of installing Ubuntu on AsusStrixScarG532 - MoeomuBlog&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>ASUS ROG G533QS - ArchWiki&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;p>There are two solutions above, please use which one according to your preference&lt;/p>
+&lt;h3 id="gpg-problem">GPG problem&lt;/h3>
+&lt;blockquote>
+&lt;p>Reference for this section: &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>GnuPG - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="ioctl-error">ioctl error&lt;/h4>
+&lt;blockquote>
+&lt;p>Guide: &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG#Invalid_IPC_response_and_Inappropriate_ioctl_for_device" target="_blank" rel="noopener"
+>Invalid_IPC_response_and_Inappropriate_ioctl_for_device - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Add &lt;code>export GPG_TTY=$(tty)&lt;/code> to environment variables such as &lt;code>.bashrc&lt;/code>, &lt;code>.zshrc&lt;/code>, etc.&lt;/li>
+&lt;/ul>
+&lt;h4 id="configure-pinentry-as-gnome3-style">configure pinentry as Gnome3 style&lt;/h4>
+&lt;blockquote>
+&lt;p>Failure to do so will cause GPG to fail to find the GUI password entry program, which in turn will cause more GUI program errors&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>echo pinentry-program /usr/bin/pinentry-gnome3 &amp;gt;&amp;gt; .gnupg/gpg-agent.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="keyboard-lighting-and-power-control">Keyboard lighting and power control&lt;/h3>
+&lt;blockquote>
+&lt;p>read more at &lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>ASUS Linux&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Execute &lt;code>paru asusctl&lt;/code>&lt;/li>
+&lt;li>Execute &lt;code>paru rog-control-center&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="reference">Reference&lt;/h2>
+&lt;ul>
+&lt;li>[HowTo] Use Wayland with proprietary NVIDIA drivers. (2022, February 10). Manjaro Linux Forum. &lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130&lt;/a>&lt;/li>
+&lt;li>Arch Linux - Downloads. (n.d.). Archlinux.org. &lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>https://archlinux.org/download/&lt;/a>&lt;/li>
+&lt;li>Arch Linux 源使用帮助 — USTC Mirror Help 文档. (n.d.). Mirrors.ustc.edu.cn. Retrieved October 26, 2022, from &lt;a class="link" href="https://mirrors.ustc.edu.cn/help/archlinux.html" target="_blank" rel="noopener"
+>https://mirrors.ustc.edu.cn/help/archlinux.html&lt;/a>&lt;/li>
+&lt;li>ASUS NoteBook Linux. (n.d.). Asus-Linux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>https://asus-linux.org/&lt;/a>&lt;/li>
+&lt;li>ASUS ROG G533QS - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/ASUS_ROG_G533QS&lt;/a>&lt;/li>
+&lt;li>AUR (en) - Home. (n.d.). Aur.archlinux.org. &lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>https://aur.archlinux.org/&lt;/a>&lt;/li>
+&lt;li>balenaEtcher - Home. (2020). BalenaEtcher. &lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>https://www.balena.io/etcher/&lt;/a>&lt;/li>
+&lt;li>GnuPG - ArchWiki. (2018). Archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/GnuPG&lt;/a>&lt;/li>
+&lt;li>Installation guide - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Installation_guide&lt;/a>&lt;/li>
+&lt;li>iwd - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Iwctl&lt;/a>&lt;/li>
+&lt;li>Linux Foundation Secure Boot System Released | James Bottomley’s random Pages. (n.d.). Retrieved October 26, 2022, from &lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/&lt;/a>&lt;/li>
+&lt;li>Lulu. (2022, October 26). Paru. GitHub. &lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>https://github.com/Morganamilo/paru&lt;/a>&lt;/li>
+&lt;li>Misaka. (2022, October 20). Problem summary of installing Ubuntu on AsusStrixScarG532. Moeomu Blog. &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems&lt;/a>&lt;/li>
+&lt;li>NetworkManager - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NetworkManager&lt;/a>&lt;/li>
+&lt;li>NVIDIA - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NVIDIA&lt;/a>&lt;/li>
+&lt;li>Unified Extensible Firmware Interface/Secure Boot - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Problem summary of installing Ubuntu on AsusStrixScarG532</title><link>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/</link><pubDate>Thu, 20 Oct 2022 13:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp" alt="Featured image of post Problem summary of installing Ubuntu on AsusStrixScarG532" />&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="system-sound-problems">System sound problems&lt;/h2>
+&lt;h3 id="no-sound">No sound&lt;/h3>
+&lt;ol>
+&lt;li>&lt;code>/etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;li>Append a line at the end of this file:&lt;code>options snd-hda-intel model=asus-zenbook&lt;/code>&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ol>
+&lt;h3 id="sound-is-not-adjustable">Sound is not adjustable&lt;/h3>
+&lt;blockquote>
+&lt;p>Description: The master volume is not adjustable, can only be mute or maximum.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>Edit &lt;code>/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Add the following to the front of &lt;code>[Element PCM]&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[Element Master]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">switch = mute
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">volume = ignore
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>Kill pulse audio daemon and it will automatically restart: &lt;code>pulseaudio -k&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Note: Do not run pulseaudio as root, otherwise the daemon will not close properly.&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="suspend-problems">Suspend problems&lt;/h2>
+&lt;h3 id="cant-wake-up-again-after-locking-the-screen">Can&amp;rsquo;t wake up again after locking the screen&lt;/h3>
+&lt;blockquote>
+&lt;p>Description: After locking the screen, the computer can&amp;rsquo;t wake up again. The hard drive and other hardware work fine, but the screen is all black.&lt;/p>
+&lt;/blockquote>
+&lt;ol>
+&lt;li>install laptop-mod-tools: &lt;code>sudo apt install laptop-mode-tools&lt;/code>&lt;/li>
+&lt;li>start laptop-mode-tools: &lt;code>sudo laptop_mode start&lt;/code>&lt;/li>
+&lt;li>add mutter debug environment variable, edit &lt;code>/etc/environment&lt;/code>
+&lt;ul>
+&lt;li>if in Ubuntu 22.04: &lt;code>MUTTER_DEBUG_ENABLE_ATOMIC_KMS=0&lt;/code>&lt;/li>
+&lt;li>if in Ubuntu 22.10 and later: &lt;code>MUTTER_DEBUG_FORCE_KMS_MODE=simple&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ol>
+&lt;h2 id="reference">reference&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://askubuntu.com/questions/1288054/snd-hda-intel-model-for-ubuntu-20-04-installed-in-an-asus-rog-strix-g15-g512" target="_blank" rel="noopener"
+>snd-hda-intel model for UBUNTU 20.04 installed in an ASUS ROG STRIX G15 (G512) - AskUbuntu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntuforums.org/showthread.php?t=2414755" target="_blank" rel="noopener"
+>Volume either muted or maxed out, nothing in between - ubuntu forums&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bugs.launchpad.net/ubuntu/&amp;#43;source/mutter/&amp;#43;bug/1968040" target="_blank" rel="noopener"
+>Blanked screen doesn&amp;rsquo;t wake up after locking - Launchpad&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Problems Encountered In Installing Arch on ROGLaptop</title><link>https://blog.moeomu.com/posts/problems-encountered-in-installing-arch-on-roglaptop/</link><pubDate>Tue, 09 Nov 2021 09:22:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/problems-encountered-in-installing-arch-on-roglaptop/</guid><description>&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/problems-encountered-in-installing-arch-on-roglaptop/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="no-display-after-installing-nvidia-graphics-card">No display after installing NVIDIA graphics card&lt;/h2>
+&lt;h3 id="installed-packages">Installed packages&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>xf86-video-intel&lt;/code>&lt;/li>
+&lt;li>&lt;code>mesa&lt;/code>&lt;/li>
+&lt;li>&lt;code>nvidia&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="solution">Solution&lt;/h3>
+&lt;ul>
+&lt;li>remove package: &lt;code>sudo pacman -R xf86-video-intel&lt;/code>&lt;/li>
+&lt;li>remove xconfig: &lt;code>sudo rm /etc/X11/xorg.conf&lt;/code>&lt;/li>
+&lt;li>edit xconfig: &lt;code>sudo vim /etc/X11/xorg.conf.d/10-nvidia-drm-outputclass.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>10-nvidia-drm-outputclass.conf&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">Section &amp;#34;OutputClass&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Identifier &amp;#34;intel&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MatchDriver &amp;#34;i915&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Driver &amp;#34;modesetting&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndSection
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Section &amp;#34;OutputClass&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Identifier &amp;#34;nvidia&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> MatchDriver &amp;#34;nvidia-drm&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Driver &amp;#34;nvidia&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Option &amp;#34;AllowEmptyInitialConfiguration&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> Option &amp;#34;PrimaryGPU&amp;#34; &amp;#34;yes&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ModulePath &amp;#34;/usr/lib/nvidia/xorg&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> ModulePath &amp;#34;/usr/lib/xorg/modules&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EndSection
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>reboot&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>More references: &lt;a class="link" href="https://wiki.archlinux.org/title/PRIME" target="_blank" rel="noopener"
+>ArchWiki-PRIME&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="no-sound">No sound&lt;/h2>
+&lt;ul>
+&lt;li>edit file:&lt;code>sudo vim /etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>alsa-base.conf&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">options snd-hda-intel model=asus-zenbook
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>Problems that still exist: The volume can only be 0% or 100%, but the application volume can be adjusted individually.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>More references: &lt;a class="link" href="https://askubuntu.com/questions/1276428/no-sound-alc294-asus-rog-strix-512-ubuntu-20-04-01" target="_blank" rel="noopener"
+>No sound ALC294 Asus ROG Strix 512 Ubuntu 20.04.01&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="the-wireless-network-is-unstable">The wireless network is unstable&lt;/h2>
+&lt;h3 id="installed-packages-1">Installed packages&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>dhcpcd&lt;/code>&lt;/li>
+&lt;li>&lt;code>NetworkManager&lt;/code>&lt;/li>
+&lt;li>&lt;code>iwd&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="solution-1">Solution&lt;/h3>
+&lt;ul>
+&lt;li>stop and disable service:
+&lt;ul>
+&lt;li>&lt;code>sudo systemctl stop dhcpcd&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo systemctl disable dhcpcd&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo systemctl stop iwd&lt;/code>&lt;/li>
+&lt;li>&lt;code>sudo systemctl disable iwd&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>remove package: &lt;code>sudo pacman -R dhcpcd&lt;/code>&lt;/li>
+&lt;li>reboot&lt;/li>
+&lt;/ul>
+&lt;h3 id="fundamental-problem">Fundamental problem&lt;/h3>
+&lt;p>The fundamental problem is that dhcpcd conflicts with NetworkManager.&lt;/p></description></item><item><title>Linux Kernel Programming study notes 001 Compiling and Booting Kernel</title><link>https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/</link><pubDate>Wed, 07 Jul 2021 11:20:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/</guid><description>&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/" >Moeomu&amp;rsquo;s Blog&lt;/a>&lt;/p>
+&lt;h2 id="prepare-the-environment">Prepare the environment&lt;/h2>
+&lt;ul>
+&lt;li>Ubuntu 20.04 LTS&lt;/li>
+&lt;li>Linux 4.9.229&lt;/li>
+&lt;li>Busybox 1.33.0&lt;/li>
+&lt;li>qemu&lt;/li>
+&lt;/ul>
+&lt;h3 id="download-kernel-source-code-and-file-system-source-code">Download kernel source code and file system source code&lt;/h3>
+&lt;ul>
+&lt;li>Download &lt;code>linux-4.9.229.tar.gz&lt;/code> at the site &lt;a class="link" href="https://www.kernel.org" target="_blank" rel="noopener"
+>Kernel.org&lt;/a>.&lt;/li>
+&lt;li>Download &lt;code>busybox-1.33.0.tar.bz2&lt;/code> from the site &lt;a class="link" href="https://www.busybox.net/downloads" target="_blank" rel="noopener"
+>Busybox.net&lt;/a>.&lt;/li>
+&lt;li>Install qemu via apt: &lt;code>sudo apt install qemu-system-x86&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;h2 id="compilation">Compilation&lt;/h2>
+&lt;h3 id="compiling-the-kernel">Compiling the kernel&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>export ARCH=x86&lt;/code>。&lt;/li>
+&lt;li>&lt;code>make x86_64_defconfig&lt;/code>。&lt;/li>
+&lt;li>&lt;code>make menuconfig&lt;/code>。
+&lt;ul>
+&lt;li>Check &lt;code>General Settings -&amp;gt; Initial RAM file system and RAM disk (initramfs/initrd) support&lt;/code>.&lt;/li>
+&lt;li>Check &lt;code>Device Driver -&amp;gt; Block Devices -&amp;gt; RAM Block Device Support&lt;/code>.&lt;/li>
+&lt;li>Modify &lt;code>Device Driver -&amp;gt; Block Devices -&amp;gt; RAM Block Device Support -&amp;gt; (65536) default RAM disk size (kbytes)&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>If this step reports a &lt;code>fatal error: curses.h&lt;/code>, then install &lt;code>sudo apt install libncurses5-dev&lt;/code>.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>The compiled kernel is placed in the&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The compiled kernel is placed in the directory &lt;code>arch/x86/boot&lt;/code> under the file name &lt;code>bzImage&lt;/code>.&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="compile-busybox">Compile busybox&lt;/h3>
+&lt;ul>
+&lt;li>Compile busybox
+&lt;ul>
+&lt;li>Check &amp;ldquo;Settings -&amp;gt; Build Options -&amp;gt; [*] Build Busybox as a static binary (no fragmented libraries)&amp;rdquo;.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>make &amp;amp;&amp;amp; make install&lt;/code>。&lt;/li>
+&lt;/ul>
+&lt;h2 id="packaged-file-system">Packaged file system&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>mkdir etc dev mnt&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p proc sys tmp&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p etc/init.d&lt;/code>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/fstab&lt;/code>。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">proc /proc proc defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs /tmp tmpfs defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysfs /sys sysfs defaults 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Welcome to Moeomu Linux&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/mount -a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Remounting the root filesystem&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mount -o remount rw /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">moutn -t devpts devpts /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> /sbin/mdev &amp;gt; /proc/sys/kernel/hotplug
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mdev -s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/inittab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">::sysinit:/etc/init.d/rcS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::respawn:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::askfirst:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::cttlaltdel:/bin/umount -a -r
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/inittab&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>cd dev&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod console c 5 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod null c 1 3&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod tty1 c 4 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>The following code is executed line by line in the busybox source code directory&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>rm -rf rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo rm -rf fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dd &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>/dev/zero &lt;span class="nv">of&lt;/span>&lt;span class="o">=&lt;/span>./rootfs.ext3 &lt;span class="nv">bs&lt;/span>&lt;span class="o">=&lt;/span>1M &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkfs.ext3 rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -o loop rootfs.ext3 ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -rf ./_install/* ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gzip --best -c rootfs.ext3 &amp;gt; rootfs.img.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>The final filesystem is generated: &lt;code>rootfs.img.gz&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="running-the-system-with-qemu">Running the system with QEMU&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>qemu-system-x86_64 -kernel ./linux-4.9.229/arch/x86_64/boot/bzImage -initrd ./busybox-1.33.1/rootfs.img.gz -append &amp;quot;root=/dev/ram init=/linuxrc&amp;quot; -serial file:output.txt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Previews are as follows&lt;/p>
+&lt;p>&lt;img src="https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/qemu.png"
+width="719"
+height="466"
+srcset="https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_480x0_resize_box_3.png 480w, https://blog.moeomu.com/posts/linux-kernel-programming-study-notes-001-compiling-and-booting-kernel/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="RHildI.png"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>OhMyZsh Installation Guide</title><link>https://blog.moeomu.com/posts/ohmyzsh-installation-guide/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/posts/ohmyzsh-installation-guide/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>Source: &lt;a class="link" href="https://blog.moeomu.com/posts/ohmyzsh-installation-guide/" >Moeomu&amp;rsquo;s blog&lt;/a>&lt;/p>
+&lt;h2 id="install-zsh">Install zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="clone-git-repo">Clone git repo&lt;/h2>
+&lt;ul>
+&lt;li>China mainland: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>Global: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="config-zsh">config zsh&lt;/h2>
+&lt;h3 id="set-as-default-shell">set as default shell&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="auto-suggestions-plugin">auto suggestions plugin&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

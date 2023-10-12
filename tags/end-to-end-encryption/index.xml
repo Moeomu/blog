@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>End-to-end Encryption on Misaka's Secrect Garden</title><link>https://blog.moeomu.com/tags/end-to-end-encryption/</link><description>Recent content in End-to-end Encryption on Misaka's Secrect Garden</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Tue, 28 Jun 2022 08:58:01 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/tags/end-to-end-encryption/index.xml" rel="self" type="application/rss+xml"/><item><title>Safer use of PGP</title><link>https://blog.moeomu.com/posts/safer-use-of-pgp/</link><pubDate>Tue, 28 Jun 2022 08:58:01 +0800</pubDate><guid>https://blog.moeomu.com/posts/safer-use-of-pgp/</guid><description>&lt;p>Source of this article: &lt;a class="link" href="https://blog.moeomu.com/posts/safer-use-of-pgp/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="introduction-of-gnupg">Introduction of GnuPG&lt;/h2>
+&lt;h3 id="official-introduction">Official Introduction&lt;/h3>
+&lt;blockquote>
+&lt;p>Source: &lt;a class="link" href="https://www.gnupg.org/" target="_blank" rel="noopener"
+>GnuPG&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>GnuPG is a complete and free implementation of the OpenPGP standard as defined by RFC4880 (also known as PGP). GnuPG allows you to encrypt and sign your data and communications; it features a versatile key management system, along with access modules for all kinds of public key directories. GnuPG, also known as GPG, is a command line tool with features for easy integration with other applications. A wealth of frontend applications and libraries are available. GnuPG also provides support for S/MIME and Secure Shell (ssh).&lt;/p>
+&lt;p>Since its introduction in 1997, GnuPG is Free Software (meaning that it respects your freedom). It can be freely used, modified and distributed under the terms of the GNU General Public License .&lt;/p>
+&lt;blockquote>
+&lt;p>Arguing that you don&amp;rsquo;t care about the right to privacy because you have nothing to hide is no different from saying you don&amp;rsquo;t care about free speech because you have nothing to say.&lt;br>
+– Edward Snowden&lt;/p>
+&lt;/blockquote>
+&lt;p>Using encryption helps to protect your privacy and the privacy of the people you communicate with. Encryption makes life difficult for bulk surveillance systems. GnuPG is one of the tools that Snowden used to uncover the secrets of the NSA.&lt;/p>
+&lt;p>Please visit the &lt;a class="link" href="%28https://emailselfdefense.fsf.org/en/%29" >Email Self-Defense site&lt;/a> to learn how and why you should use GnuPG for your electronic communication.&lt;/p>
+&lt;h3 id="so">So&lt;/h3>
+&lt;h4 id="q1-why-should-i-use-gnupg">Q1: Why should I use GnuPG?&lt;/h4>
+&lt;ul>
+&lt;li>Because it is free software and can be used, modified and distributed freely.&lt;/li>
+&lt;li>By using it, your communication information will be encrypted and secure.&lt;/li>
+&lt;li>PGP can guarantee that a message is sent by someone you trust, and no one else can decrypt it except you two, and this message is transmitted without any modification of even one punctuation or one byte in between.&lt;/li>
+&lt;li>A PGP-signed message can be transmitted over any untrusted channel and cannot be tampered with or decrypted by anyone in the middle.&lt;/li>
+&lt;/ul>
+&lt;h4 id="q2-im-obviously-not-afraid-of-censorship-what-other-reasons-do-you-have-to-recommend-gnupg">Q2: I&amp;rsquo;m obviously not afraid of censorship. What other reasons do you have to recommend GnuPG?&lt;/h4>
+&lt;ul>
+&lt;li>Your privacy is up to you, and most people don&amp;rsquo;t want to live under surveillance.&lt;/li>
+&lt;li>If even mild criticism is not allowed, silence will be perceived as ill-intentioned. If silence were no longer allowed, it would be a crime to praise inadequate efforts. If only one voice is allowed to exist, then the only voice that exists is a lie.&lt;/li>
+&lt;li>If it were more unfortunate to live in a totalitarian state, encrypted communications would protect yourself and the friends you care about.&lt;/li>
+&lt;/ul>
+&lt;h2 id="installation">Installation&lt;/h2>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;blockquote>
+&lt;p>Gpg4win is recommended, it has a complete package and an easy to use GUI.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Download the version for your computer from &lt;a class="link" href="https://gpg4win.org/download.html" target="_blank" rel="noopener"
+>Gpg4win&lt;/a>. In general, if you have no special needs, just click the green download button.&lt;/li>
+&lt;/ul>
+&lt;h3 id="macos">macOS&lt;/h3>
+&lt;blockquote>
+&lt;p>GPGSuite is recommended&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Download the version for your computer from &lt;a class="link" href="https://gpgtools.org" target="_blank" rel="noopener"
+>GPGSuite&lt;/a>. In general, if you have no special needs, just click the red download button.&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>Reminder: GPGMail in the GPGSuite suite is paid software, so if you need to use it to automatically encrypt emails, then you need to purchase GPGMail. but rest assured that the encrypted signature of text and files is completely free.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="linux">Linux&lt;/h3>
+&lt;blockquote>
+&lt;p>GnuPG is recommended&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Most Linux distributions come with GnuPG pre-installed and you do not need to install any software. However, it is recommended that you install a GUI management interface &lt;code>GPA&lt;/code>, as it is more user-friendly.&lt;/li>
+&lt;/ul>
+&lt;h2 id="generating-keys">Generating keys&lt;/h2>
+&lt;blockquote>
+&lt;p>Please experiment with this section first, and then generate your main key after you become proficient.&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="generate-a-master-key">Generate a master key&lt;/h3>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg -expert --full-gen-key&lt;/code>&lt;/li>
+&lt;li>Select key type: default&lt;/li>
+&lt;li>Enter the key length: 4096&lt;/li>
+&lt;li>Enter the key expiration time: &lt;code>2y&lt;/code> (for two years, you can enter 0 to never expire, you can change the key expiration time at any time), enter y to confirm.&lt;/li>
+&lt;li>Enter your name, this is optional, you can enter your screen name or even leave it out.&lt;/li>
+&lt;li>Enter your email, which is optional and can even be left out. If you want to use email encryption, then you must enter it.&lt;/li>
+&lt;li>Enter a note, which can be left blank.&lt;/li>
+&lt;li>Enter O to confirm the information is correct, then you need to enter a key password to start the key generation.&lt;/li>
+&lt;/ul>
+&lt;h3 id="generate-revocation-certificate">Generate revocation certificate&lt;/h3>
+&lt;blockquote>
+&lt;p>If you lose your master key (or it is taken), you can use a revocation certificate to prove that it is no longer in use. If you do not have a revocation certificate, then you must notify your friends one by one.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg --gen-revoke -ao revoke.pgp email@email.com #uid or key id&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="view-subkeys">View subkeys&lt;/h3>
+&lt;blockquote>
+&lt;p>The master key should not be used on a daily basis, you should use the generated subkeys on a daily basis. The advantage of this is that if you leak a subkey, you can immediately revoke it without having to deprecate the entire key pair.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>List all public keys and subkeys: &lt;code>-list-keys&lt;/code> or &lt;code>gpg -k&lt;/code>&lt;/li>
+&lt;li>List all keys, subkeys: &lt;code>-list-secret-keys&lt;/code> or &lt;code>gpg -K&lt;/code>&lt;/li>
+&lt;li>To see the key fingerprint information, you can add the &lt;code>-fingerprint&lt;/code> parameter, such as &lt;code>gpg --list-secret-keys --fingerprint&lt;/code>&lt;/li>
+&lt;li>If you want to see the key ID information, you can add the &lt;code>-keyid-format long&lt;/code> parameter, such as &lt;code>gpg --list-secret-keys --keyid-format long&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="exporting-keys">Exporting keys&lt;/h2>
+&lt;blockquote>
+&lt;p>Since subkeys are to be used for daily use, the master key should not exist in the same place, GPG cannot delete the key, it can only export and pour in only the subkeys needed.&lt;/p>
+&lt;p>Note: The exclamation mark after the key ID cannot be missing, otherwise all keys will be exported&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="export-public-key">Export public key&lt;/h3>
+&lt;ul>
+&lt;li>Export public key: &lt;code>gpg -ao public-key --export master-key-id&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="export-the-master-key">Export the master key&lt;/h3>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg -ao master-key --export-secret-key master-key ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="export-subkeys">Export subkeys&lt;/h3>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg -ao sub-key --export-secret-subkeys Sub-key ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="import-keys">Import keys&lt;/h2>
+&lt;ul>
+&lt;li>Enter the command &lt;code>gpg --import filename&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="communicate-securely-with-your-friends">Communicate securely with your friends&lt;/h2>
+&lt;ul>
+&lt;li>Now that you&amp;rsquo;re done, you&amp;rsquo;ll have a hard time leaving PGP after you get into the habit of using it daily&lt;/li>
+&lt;/ul>
+&lt;h2 id="publish-to-the-public-key-server">Publish to the public key server&lt;/h2>
+&lt;p>&amp;hellip; To be continued&amp;hellip;&lt;/p>
+&lt;h2 id="references">References&lt;/h2>
+&lt;ul>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（上）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8a/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-上/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（中）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%ad/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-中/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（下）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8b/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-下/&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

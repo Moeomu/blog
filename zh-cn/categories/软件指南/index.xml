@@ -1,0 +1,1728 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>软件指南 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/categories/%E8%BD%AF%E4%BB%B6%E6%8C%87%E5%8D%97/</link><description>Recent content in 软件指南 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 26 Oct 2022 19:14:09 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/categories/%E8%BD%AF%E4%BB%B6%E6%8C%87%E5%8D%97/index.xml" rel="self" type="application/rss+xml"/><item><title>在华硕玩家国度枪神4上安装ArchLinux</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E5%8D%8E%E7%A1%95%E7%8E%A9%E5%AE%B6%E5%9B%BD%E5%BA%A6%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85archlinux/</link><pubDate>Wed, 26 Oct 2022 19:14:09 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E5%8D%8E%E7%A1%95%E7%8E%A9%E5%AE%B6%E5%9B%BD%E5%BA%A6%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85archlinux/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp" alt="Featured image of post 在华硕玩家国度枪神4上安装ArchLinux" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8%e5%8d%8e%e7%a1%95%e7%8e%a9%e5%ae%b6%e5%9b%bd%e5%ba%a6%e6%9e%aa%e7%a5%9e4%e4%b8%8a%e5%ae%89%e8%a3%85archlinux/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="本文简介">本文简介&lt;/h2>
+&lt;blockquote>
+&lt;p>Asus Strix ScarG532&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>如果您和我是一样的机器那么完全可以遵循本文一步一步地执行命令，最终一定会成功安装ArchLinux。我会详尽地将参考资料链接在旁边，您可以查看和修改成您想要的配置。&lt;/li>
+&lt;li>上面这条说明有违Arch之道，所以我是在开玩笑。请勿一步一步遵循下文配置，如果您遇到了和我一样的问题，您可以参考我的解决方案&lt;/li>
+&lt;li>我所安装的组件内容如下
+&lt;ul>
+&lt;li>安全启动组件：PreLoader&lt;/li>
+&lt;li>启动引导程序：systemd-boot&lt;/li>
+&lt;li>网络和DHCP服务：NetworkManager (因为与Gnome集成更好)&lt;/li>
+&lt;li>桌面环境：Gnome based on Wayland&lt;/li>
+&lt;li>中文输入：ibus-libpinyin based on ibus (因为与Gnome集成更好)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装archlinux">安装ArchLinux&lt;/h2>
+&lt;blockquote>
+&lt;p>这一节完全遵循&lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>Installation guide - ArchWiki&lt;/a>，您可以查看此官方文档链接获得更详细的解释&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="预安装">预安装&lt;/h3>
+&lt;h4 id="启动盘制作">启动盘制作&lt;/h4>
+&lt;ul>
+&lt;li>您可以访问&lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>Download - ArchLinux&lt;/a>页面来获取官方启动镜像&lt;/li>
+&lt;li>下载好后推荐使用&lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>balenaEtcher&lt;/a>将镜像写入U盘&lt;/li>
+&lt;li>从U盘启动制作好的ArchLinux安装环境系统&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>这三步由于过于简单所以不多赘述，如果需要帮助请在评论区留言&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="验证uefi模式启动">验证UEFI模式启动&lt;/h4>
+&lt;p>执行命令&lt;code>ls /sys/firmware/efi/efivars&lt;/code>，如果有输出值那么证明是UEFI模式启动，后文中引导程序将使用UEFI&lt;/p>
+&lt;h4 id="检查并连接网络">检查并连接网络&lt;/h4>
+&lt;blockquote>
+&lt;p>下文将使用无线网卡进行网络连接&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>rfkill&lt;/code>，如果输出如下则证明硬件正常&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">ID TYPE DEVICE SOFT HARD
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">0&lt;/span> bluetooth hci0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">1&lt;/span> wlan phy0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>iwctl&lt;/code>进入网络连接配置工具界面，更多内容查看&lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>iwctl - ArchWiki&lt;/a>&lt;/li>
+&lt;li>执行&lt;code>device list&lt;/code>查看设备列表&lt;/li>
+&lt;li>执行&lt;code>station wlan0 scan&lt;/code>使用wlan0设备进行扫描&lt;/li>
+&lt;li>执行&lt;code>station wlan0 get-networks&lt;/code>查看扫描到的网络列表&lt;/li>
+&lt;li>执行&lt;code>station wlan0 connect SSID&lt;/code>连接网络&lt;/li>
+&lt;li>执行&lt;code>ping archlinux.org&lt;/code>检测网络连接情况&lt;/li>
+&lt;/ul>
+&lt;h4 id="校准时间">校准时间&lt;/h4>
+&lt;blockquote>
+&lt;p>systemd-timesyncd检测到网络连接将会自动校准时间，因此不需要手动校准时间&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>timedatectl status&lt;/code>查看并确保系统时间正确&lt;/li>
+&lt;/ul>
+&lt;h4 id="磁盘操作数据无价务必谨慎操作">磁盘操作(&lt;strong>数据无价，务必谨慎操作&lt;/strong>)&lt;/h4>
+&lt;blockquote>
+&lt;p>本节是一定不可以照搬的，您的磁盘数量可能和我不一样，您的磁盘分区情况也一定和我不一样&lt;br>
+务必参考&lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks" target="_blank" rel="noopener"
+>Partition the disks - ArchWiki&lt;/a>进行磁盘分区&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>fdisk -l&lt;/code>查看磁盘分区情况，按照您的需要自己分区&lt;/li>
+&lt;li>执行&lt;code>fdisk /dev/nvme0n1&lt;/code>进行第一块SSD的操作，按&lt;code>m&lt;/code>显示帮助，操作完成后保存退出&lt;code>fdisk&lt;/code>界面，此工具在保存时才会写入硬盘分区表，请放心操作&lt;/li>
+&lt;li>(危险)执行&lt;code>mkfs.ext4 /dev/nvme0n1p4&lt;/code>格式化第一块SSD的第四个分区，在本例中将会是&lt;code>/&lt;/code>的挂载点&lt;/li>
+&lt;li>(危险)执行&lt;code>mkfs.ext4 /dev/nvme2n1p1&lt;/code>格式化第三块SSD的第一个分区，在本例中将会是&lt;code>/home&lt;/code>的挂载点&lt;/li>
+&lt;li>执行&lt;code>e2label /dev/nvme0n1p4 &amp;quot;ArchSys&amp;quot;&lt;/code>将第一块SSD的第四个分区的标签设置为ArchSys，systemd-boot将会用到它&lt;/li>
+&lt;li>执行&lt;code>e2label /dev/nvme2n1p1 &amp;quot;ArchData&amp;quot;&lt;/code>将第三块SSD的第一个分区的标签设置为ArchData，systemd-boot将会用到它&lt;/li>
+&lt;li>执行&lt;code>blkid | grep Arch&lt;/code>查看磁盘标签的设置情况&lt;/li>
+&lt;li>执行&lt;code>mount /dev/nvme0n1p4 /mnt&lt;/code>挂载磁盘，它将会是&lt;code>/&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>mount --mkdir /dev/nvme0n1p1 /mnt/boot&lt;/code>挂载磁盘，它将会是&lt;code>/boot&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>mount --mkdir /dev/nvme2n1p1 /mnt/home&lt;/code>挂载磁盘，它将会是&lt;code>/home&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>mkswap /dev/nvme0n1p5&lt;/code>格式化第一块SSD的第五个分区为内存交换分区&lt;/li>
+&lt;li>执行&lt;code>swapon /dev/nvme0n1p5&lt;/code>启用内存交换分区&lt;/li>
+&lt;/ul>
+&lt;h3 id="开始安装">开始安装&lt;/h3>
+&lt;h4 id="修改选择镜像地址">修改选择镜像地址&lt;/h4>
+&lt;blockquote>
+&lt;p>vim是一款命令行文本编辑器，如果不会用的话可以换为nano，如果已经进入了vim界面，可以在普通模式下输入英文冒号和q退出vim&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>vim /etc/pacman.d/mirrorlist&lt;/code>编辑安装源镜像列表&lt;/li>
+&lt;li>将本行&lt;code>Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch&lt;/code>加到最上方，或者可以遵循自己的习惯&lt;/li>
+&lt;/ul>
+&lt;h4 id="安装必须的包">安装必须的包&lt;/h4>
+&lt;blockquote>
+&lt;p>intel-ucode是intel的微码更新包，推荐安装&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>pacstrap -K /mnt base linux linux-firmware intel-ucode&lt;/code>安装系统基础包&lt;/li>
+&lt;li>执行&lt;code>pacstrap /mnt networkmanager bluez vim sudo bash-completion openssh man git wget zsh&lt;/code>安装一些自己需要的软件&lt;/li>
+&lt;/ul>
+&lt;h3 id="配置新系统">配置新系统&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>genfstab -U /mnt &amp;gt;&amp;gt; /mnt/etc/fstab&lt;/code>创建系统分区表定义&lt;/li>
+&lt;li>执行&lt;code>arch-chroot /mnt&lt;/code>将shell切换到新系统中执行命令&lt;/li>
+&lt;li>执行&lt;code>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime&lt;/code>将系统时区设置为亚洲-上海&lt;/li>
+&lt;li>执行&lt;code>hwclock --systohc&lt;/code>同步硬件时间&lt;/li>
+&lt;li>执行&lt;code>vim /etc/locale.gen&lt;/code>编辑系统的本地化设置，我的设定如下，可以作为参考。&lt;strong>注意：如果在这一步中不添加&lt;code>zh_CN.UTF-8 UTF-8&lt;/code>，那么在Gnome的&lt;code>Keyboard&lt;/code>选项中会找不到拼音输入&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">en_US.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">zh_CN.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>locale-gen&lt;/code>生成本地化设置&lt;/li>
+&lt;li>执行&lt;code>vim /etc/locale.conf&lt;/code>编辑语言配置文件，我使用英文系统，输入了&lt;code>LANG=en_US.UTF-8&lt;/code>，如果使用中文系统，改成&lt;code>LANG=zh_CN.UTF-8&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>vim /etc/hostname&lt;/code>编辑本主机名称&lt;/li>
+&lt;li>执行&lt;code>mkinitcpio -P&lt;/code>创建启动内存初始化镜像&lt;/li>
+&lt;li>执行&lt;code>passwd&lt;/code>修改root用户密码&lt;/li>
+&lt;/ul>
+&lt;h3 id="配置系统启动项">配置系统启动项&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>bootctl --path=/boot install&lt;/code>将systemd-boot安装到/boot中&lt;/li>
+&lt;li>执行&lt;code>systemctl enable systemd-boot-update.service&lt;/code>启动systemd-boot的自动更新服务&lt;/li>
+&lt;li>执行&lt;code>vim /boot/loader/loader.conf&lt;/code>编辑systemd-boot启动配置文件&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">default archlinux.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">timeout 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">console-mode max
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">editor no
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-entries 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-firmware 1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>vim /boot/loader/entries/archlinux.conf&lt;/code>编辑ArchLinux启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>vim /boot/loader/entries/arch-fallback.conf&lt;/code>编辑ArchLinux-Fallback启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux (fallback initramfs)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux-fallback.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="其它">其它&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>systemctl enable NetworkManager.service&lt;/code>让NetworkManager的服务开机自启动&lt;/li>
+&lt;li>执行&lt;code>systemctl enbale bluetooth.service&lt;/code>让蓝牙服务开机自启动&lt;/li>
+&lt;li>执行&lt;code>exit&lt;/code>退出新系统环境&lt;/li>
+&lt;li>执行&lt;code>reboot&lt;/code>重新启动系统&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;blockquote>
+&lt;p>&lt;strong>提示：到这里其实就可以结束了，但是如果作为主力系统来使用，ArchLinux现在的样子显然不合格，所以下文是更多的软件安装参考&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;hr>
+&lt;h2 id="更多安装配置">更多安装配置&lt;/h2>
+&lt;h3 id="连接网络">连接网络&lt;/h3>
+&lt;blockquote>
+&lt;p>使用NetworkManager命令行工具&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>nmcli device wifi list&lt;/code>查看wifi列表&lt;/li>
+&lt;li>执行&lt;code>nmcli device wifi connect SSID_or_BSSID password your_password&lt;/code>连接网络&lt;/li>
+&lt;li>执行&lt;code>nmcli connection show&lt;/code>查看当前连接&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>您可以在&lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager#nmcli_examples" target="_blank" rel="noopener"
+>nmcli example - ArchWiki&lt;/a>文章中查看更多用法&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="新建用户">新建用户&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>useradd -m misaka&lt;/code>来新建一个名为misaka的用户&lt;/li>
+&lt;li>执行&lt;code>export EDITOR=vim &amp;amp;&amp;amp; visudo&lt;/code>编辑此文件，按照提示，将新用户添加到特权用户组，让新用户可以正常使用sudo进行提权操作&lt;/li>
+&lt;li>执行&lt;code>usermod -a -G wheel misaka&lt;/code>将misaka用户添加到wheel用户组中，这样做的好处是让Gnome可以正确识别这个新用户的权限，在Gnome中进行root权限操作时默认弹出这个用户名的验证&lt;/li>
+&lt;li>执行&lt;code>passwd misaka&lt;/code>修改新用户的密码&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装图形界面gnome">安装图形界面Gnome&lt;/h3>
+&lt;blockquote>
+&lt;p>提示：下方写的命令要安装的软件很多，是因为Gnome包中有很多我不需要的软件，所以只能手动选择希望安装的软件，您也同样可以用更简单的&lt;code>pacman -S gnome&lt;/code>来代替下方的安装命令，随您喜好&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行下方的命令将安装Gnome的基础组件&lt;/li>
+&lt;li>&lt;code>pacman -S file-roller gdm gedit gnome-backgrounds gnome-calculator gnome-control-center gnome-disk-utility gnome-logs gnome-menus gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gvfs nautilus seahorse seahorse-nautilus xdg-user-dirs-gtk&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>如果安装时让您选择使用&lt;code>jack2&lt;/code>还是&lt;code>pipewire&lt;/code>，请选择&lt;code>pipewire&lt;/code>。这是系统的声音服务。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>systemctl enable gdm.service&lt;/code>让Gnome登陆界面开机自启动，它将会在下一次重启时启动Gnome&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装中文输入法和字体">安装中文输入法和字体&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>pacman -S ttf-dejavu wqy-zenhei wqy-microhei adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts&lt;/code>安装中文字体&lt;/li>
+&lt;li>执行&lt;code>ibus ibus-libpinyin&lt;/code>安装ibus和ibus的智能拼音输入法&lt;/li>
+&lt;/ul>
+&lt;h3 id="重新启动并以普通用户身份登陆">重新启动并以普通用户身份登陆&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>reboot&lt;/code>&lt;/li>
+&lt;li>启动Terminal&lt;/li>
+&lt;/ul>
+&lt;h3 id="gnome窗口控制按钮设置">Gnome窗口控制按钮设置&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>gsettings set org.gnome.desktop.wm.preferences button-layout &amp;quot;close,minimize,maximize:&amp;quot;&lt;/code>将会把所有窗口的关闭、最小化、最大化按钮显示出来并放到左侧&lt;/li>
+&lt;/ul>
+&lt;h3 id="nvidia驱动设置">NVIDIA驱动设置&lt;/h3>
+&lt;blockquote>
+&lt;p>&lt;strong>警告：本小节执行之中请勿重新启动&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>sudo pacman -S nvidia nvidia-settings&lt;/code>安装NVIDIA显卡驱动和设置程序&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>它将会把默认的窗口系统从Wayland换成X11，如果想继续使用Wayland作为窗口系统，请执行以下命令&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>sudo ln -s /dev/null /etc/udev/rules.d/61-gdm.rules&lt;/code>禁用udev的在GDM中禁用Wayland的规则&lt;/li>
+&lt;li>执行&lt;code>gsettings set org.gnome.mutter experimental-features '[&amp;quot;kms-modifiers&amp;quot;]'&lt;/code>启用gsettings的kms-modifiers&lt;/li>
+&lt;li>执行&lt;code>sudo vim /boot/loader/entries/archlinux.conf&lt;/code>编辑启动引导项将最后一行改成&lt;code>options root=&amp;quot;LABEL=ArchSys&amp;quot; rw quiet splash nvidia-drm.modeset=1&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>sudo vim /etc/mkinitcpio.conf&lt;/code>编辑modsettings将&lt;code>MODULES=()&lt;/code>改成&lt;code>nvidia nvidia_modeset nvidia_uvm nvidia_drm&lt;/code>并保存文件。更多帮助信息请参考&lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA#DRM_kernel_mode_setting" target="_blank" rel="noopener"
+>DRM_kernel_mode_setting - ArchWiki&lt;/a>&lt;/li>
+&lt;li>执行&lt;code>sudo mkinitcpio -P&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>本节参考来源：&lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>Use Wayland with proprietary NVIDIA drivers - Manjaro Forum&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="安全启动">安全启动&lt;/h3>
+&lt;blockquote>
+&lt;p>本节参考来源：&lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>Unified Extensible Firmware Interface/Secure Boot - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>从&lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>Linux Foundation Secure Boot System Released - James Bottomley&amp;rsquo;s random Pages&lt;/a>下载PreLoader.efi和HashTool.efi&lt;/li>
+&lt;li>如果您按照上文配置，那么将这两个文件复制到您的&lt;code>/boot/EFI/systemd&lt;/code>目录中&lt;/li>
+&lt;li>将&lt;code>/boot/EFI/systemd/systemd-bootx64.efi&lt;/code>重命名为&lt;code>/boot/EFI/systemd/loader.efi&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp your_download_path/&lt;span class="o">{&lt;/span>PreLoader,HashTool&lt;span class="o">}&lt;/span>.efi esp/EFI/systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp esp/EFI/systemd/systemd-bootx64.efi esp/EFI/systemd/loader.efi
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>sudo pacman -S efibootmgr&lt;/code>安装efibootmgr&lt;/li>
+&lt;li>&lt;strong>请注意可能您的磁盘和我不同&lt;/strong>，执行&lt;code>sudo efibootmgr --verbose --disk /dev/nvme0n1 --part 1 --create --label &amp;quot;Arch Linux Security Boot&amp;quot; --loader /boot/EFI/systemd/PreLoader.efi&lt;/code>添加一个NVRAM启动条目&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装gnome扩展程序">安装Gnome扩展程序&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>flatpak install com.mattjakeman.ExtensionManager&lt;/code>安装Gnome扩展程序管理器&lt;/li>
+&lt;li>在Gnome扩展程序管理器中搜索安装并配置下列扩展程序
+&lt;ul>
+&lt;li>TrayIcons: Reloaded(强烈推荐)&lt;/li>
+&lt;li>Blur My Shell&lt;/li>
+&lt;li>Gnome Clipboard&lt;/li>
+&lt;li>Compiz alike magic lamp effect&lt;/li>
+&lt;li>Dash to dock&lt;/li>
+&lt;li>No activities button&lt;/li>
+&lt;li>Open Weather&lt;/li>
+&lt;li>Privacy Quick Settings Menu&lt;/li>
+&lt;li>Vitals&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="其他问题">其他问题&lt;/h2>
+&lt;blockquote>
+&lt;p>下文会用到Aur软件源，可以在&lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>Aur - ArchLinux&lt;/a>中找到更多信息。&lt;br>
+&lt;code>paru&lt;/code>是一个Aur软件源的实用工具，可以自动获取安装Aur软件源内的程序，请访问&lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>Morganamilo/paru - Github&lt;/a>了解查看paru的安装和使用。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="gnome无法正常挂载ntfs外接磁盘">Gnome无法正常挂载NTFS外接磁盘&lt;/h3>
+&lt;blockquote>
+&lt;p>可能是Gnome中的gvfs需要使用ntfs-3g中的一些实用工具才可以正确挂载NTFS磁盘。Linux内核5.15版本之后将ntfs驱动内置，因此可以通过以上命令单独安装使用内核ntfs驱动的ntfs实用工具。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>paru ntfsprogs-ntfs3&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="没有声音">没有声音&lt;/h3>
+&lt;blockquote>
+&lt;p>本节参考：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>Problem summary of installing Ubuntu on AsusStrixScarG532 - MoeomuBlog&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>ASUS ROG G533QS - ArchWiki&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;p>有以上两个解决方式，具体使用哪个请根据自己的喜好&lt;/p>
+&lt;h3 id="gpg问题">GPG问题&lt;/h3>
+&lt;blockquote>
+&lt;p>本节参考：&lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>GnuPG - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="ioctl错误">ioctl错误&lt;/h4>
+&lt;blockquote>
+&lt;p>指南：&lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG#Invalid_IPC_response_and_Inappropriate_ioctl_for_device" target="_blank" rel="noopener"
+>Invalid_IPC_response_and_Inappropriate_ioctl_for_device - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>将&lt;code>export GPG_TTY=$(tty)&lt;/code>添加到环境变量中，例如&lt;code>.bashrc&lt;/code>，&lt;code>.zshrc&lt;/code>等文件中&lt;/li>
+&lt;/ul>
+&lt;h4 id="将pinentry配置为gnome3样式">将pinentry配置为Gnome3样式&lt;/h4>
+&lt;blockquote>
+&lt;p>不配置将会导致GPG无法找到图形界面的输入密码界面程序，进而导致更多的图形界面程序错误&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>echo pinentry-program /usr/bin/pinentry-gnome3 &amp;gt;&amp;gt; .gnupg/gpg-agent.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="键盘灯光和电源控制">键盘灯光和电源控制&lt;/h3>
+&lt;blockquote>
+&lt;p>在&lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>ASUS Linux&lt;/a>阅读更多&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>paru asusctl&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>paru rog-control-center&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>[HowTo] Use Wayland with proprietary NVIDIA drivers. (2022, February 10). Manjaro Linux Forum. &lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130&lt;/a>&lt;/li>
+&lt;li>Arch Linux - Downloads. (n.d.). Archlinux.org. &lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>https://archlinux.org/download/&lt;/a>&lt;/li>
+&lt;li>Arch Linux 源使用帮助 — USTC Mirror Help 文档. (n.d.). Mirrors.ustc.edu.cn. Retrieved October 26, 2022, from &lt;a class="link" href="https://mirrors.ustc.edu.cn/help/archlinux.html" target="_blank" rel="noopener"
+>https://mirrors.ustc.edu.cn/help/archlinux.html&lt;/a>&lt;/li>
+&lt;li>ASUS NoteBook Linux. (n.d.). Asus-Linux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>https://asus-linux.org/&lt;/a>&lt;/li>
+&lt;li>ASUS ROG G533QS - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/ASUS_ROG_G533QS&lt;/a>&lt;/li>
+&lt;li>AUR (en) - Home. (n.d.). Aur.archlinux.org. &lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>https://aur.archlinux.org/&lt;/a>&lt;/li>
+&lt;li>balenaEtcher - Home. (2020). BalenaEtcher. &lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>https://www.balena.io/etcher/&lt;/a>&lt;/li>
+&lt;li>GnuPG - ArchWiki. (2018). Archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/GnuPG&lt;/a>&lt;/li>
+&lt;li>Installation guide - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Installation_guide&lt;/a>&lt;/li>
+&lt;li>iwd - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Iwctl&lt;/a>&lt;/li>
+&lt;li>Linux Foundation Secure Boot System Released | James Bottomley’s random Pages. (n.d.). Retrieved October 26, 2022, from &lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/&lt;/a>&lt;/li>
+&lt;li>Lulu. (2022, October 26). Paru. GitHub. &lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>https://github.com/Morganamilo/paru&lt;/a>&lt;/li>
+&lt;li>Misaka. (2022, October 20). Problem summary of installing Ubuntu on AsusStrixScarG532. Moeomu Blog. &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems&lt;/a>&lt;/li>
+&lt;li>NetworkManager - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NetworkManager&lt;/a>&lt;/li>
+&lt;li>NVIDIA - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NVIDIA&lt;/a>&lt;/li>
+&lt;li>Unified Extensible Firmware Interface/Secure Boot - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>在一台VPS上部署Docker服务</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E4%B8%80%E5%8F%B0vps%E4%B8%8A%E9%83%A8%E7%BD%B2docker%E6%9C%8D%E5%8A%A1/</link><pubDate>Mon, 24 Oct 2022 22:03:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E4%B8%80%E5%8F%B0vps%E4%B8%8A%E9%83%A8%E7%BD%B2docker%E6%9C%8D%E5%8A%A1/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-2908894140.26d7gclffj8g.webp" alt="Featured image of post 在一台VPS上部署Docker服务" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8%e4%b8%80%e5%8f%b0vps%e4%b8%8a%e9%83%a8%e7%bd%b2docker%e6%9c%8d%e5%8a%a1/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="背景故事">背景故事&lt;/h2>
+&lt;ul>
+&lt;li>有一些开源的服务非常想体验一下，但是无法部署在Paas这种服务上，或者能部署但是无法持久化存储一些文件。所以不久前自己购买了一个VPS，考虑到安全性使用Docker来部署所有服务，而本地的反向代理使用Caddy，而Caddy通过Cloudflare API自动从受Cloudflare CDN保护的DNS解析下获取和续期HTTPS证书。以下是我部署服务的全部过程，如果有错误和疏漏请一定指出。&lt;/li>
+&lt;li>本文将不会详细到每一条命令，而是描述一个大体的构建框架思路。&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>警告：如果忽略本文中具体段落的阅读官方文档的建议直接执行接下来的指令，很大概率会出错。这时候可以去仔细查看那一段提到的官方文档，或者在本文的评论区提问。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="创建docker基本服务框架">创建Docker基本服务框架&lt;/h2>
+&lt;h3 id="创建用户">创建用户&lt;/h3>
+&lt;ol>
+&lt;li>
+&lt;p>运行以下命令&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl"> useradd -m mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> usermod -s /bin/bash mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> su mydocker
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> curl -fsSL https://get.docker.com/rootless &lt;span class="p">|&lt;/span> sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>遵循Docker官方的&lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>Run the Docker daemon as a non-root user (Rootless mode) - Docker Document&lt;/a>指南将您希望的配置项配置好&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;h3 id="创建docker网络">创建Docker网络&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>docker network create caddy&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="部署web服务">部署Web服务&lt;/h2>
+&lt;h3 id="部署alist服务">部署Alist服务&lt;/h3>
+&lt;blockquote>
+&lt;p>Alist的Github开源地址：&lt;a class="link" href="https://github.com/alist-org/alist" target="_blank" rel="noopener"
+>alist - Github&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Alist部署指令
+&lt;ul>
+&lt;li>&lt;code>-d&lt;/code>表示在后台运行&lt;/li>
+&lt;li>&lt;code>--name&lt;/code>指定此Docker服务名称&lt;/li>
+&lt;li>&lt;code>-p 宿主机端口:容器端口&lt;/code>指定绑定的端口&lt;/li>
+&lt;li>&lt;code>--network=caddy&lt;/code>表示绑定的Docker Network&lt;/li>
+&lt;li>&lt;code>-v 宿主机路径:容器内路径&lt;/code>指定需要永久存储的文件位置&lt;/li>
+&lt;li>&lt;code>--restart=always&lt;/code>表示服务停机重启。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;alist&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5244:5244 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/alist:/opt/alist/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> xhofe/alist:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>更多Alist参考指令
+&lt;ul>
+&lt;li>查看Alist密码：&lt;code>docker exec -it alist ./alist password&lt;/code>&lt;/li>
+&lt;li>查看Alist日志：&lt;code>docker logs -f alist&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="部署whoogle服务">部署Whoogle服务&lt;/h3>
+&lt;ul>
+&lt;li>部署指令如下，指令详情不再解释，和上文雷同&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name whoogle &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 5000:5000 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> benbusby/whoogle-search:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="部署caddy">部署Caddy&lt;/h2>
+&lt;h3 id="先决条件">先决条件&lt;/h3>
+&lt;p>在使用Docker部署Caddy服务之前，需要先创建所需要的Caddyfile配置文件，以供Caddy服务自动配置使用。&lt;/p>
+&lt;h3 id="caddyfile">Caddyfile&lt;/h3>
+&lt;ol>
+&lt;li>创建永久存储位置：&lt;code>mkdir -p $HOME/docker_data/caddy/&lt;/code>&lt;/li>
+&lt;li>创建并编辑Caddyfile文件：&lt;code>vim $HOME/docker_data/caddy/Caddyfile&lt;/code>&lt;/li>
+&lt;/ol>
+&lt;blockquote>
+&lt;p>Caddyfile&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-Caddyfile" data-lang="Caddyfile">&lt;span class="line">&lt;span class="cl">&lt;span class="n">(site_config)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">tls&lt;/span> &lt;span class="s">me_tls@example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">dns&lt;/span> &lt;span class="s">cloudflare&lt;/span> &lt;span class="se">{env.CLOUDFLARE_API_TOKEN}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>&lt;span class="c1">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"> # more config
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">reverse_proxy&lt;/span> &lt;span class="se">{args.0}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">drive.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">alist:5244&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">search.example.com&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">import&lt;/span> &lt;span class="vm">site_config&lt;/span> &lt;span class="k">whoogle:5000&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>补充说明：&lt;code>alist:5244&lt;/code>和&lt;code>whoogle:5000&lt;/code>能正常工作并正常被解析的原因是：这三个容器都存在于同一个Docker Network中，因此可以通过容器名称进行解析。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="使用docker部署caddy">使用Docker部署Caddy&lt;/h3>
+&lt;ul>
+&lt;li>部署指令如下，指令详情不再解释，和上文雷同&lt;/li>
+&lt;li>以下需要特别注意的是
+&lt;ul>
+&lt;li>&lt;code>your_cloudflare_login_email@example.com&lt;/code>替换为你的cloudflare账号邮箱&lt;/li>
+&lt;li>&lt;code>your_cloudflare_api_token&lt;/code>替换为你的cloudflare api token，你可以遵循&lt;a class="link" href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/" target="_blank" rel="noopener"
+>Create an API token - Cloudflare Docs&lt;/a>指南获取你的api token，注意这里创建的时候一定要选择&lt;code>Zone / DNS / Edit&lt;/code>和&lt;code>Zone / Zone / Read&lt;/code>权限&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">docker run -d --name&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;caddy&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -p 443:443 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --network&lt;span class="o">=&lt;/span>caddy &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/Caddyfile:/etc/caddy/Caddyfile &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/data:/data &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -v &lt;span class="nv">$HOME&lt;/span>/docker_data/caddy/config:/config &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_EMAIL&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_login_email@example.com &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">CLOUDFLARE_API_TOKEN&lt;/span>&lt;span class="o">=&lt;/span>your_cloudflare_api_token &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> -e &lt;span class="nv">ACME_AGREE&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --restart&lt;span class="o">=&lt;/span>always &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> slothcroissant/caddy-cloudflaredns:latest
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>Run the Docker daemon as a non-root user (Rootless mode). (2022, September 22). Docker Documentation. &lt;a class="link" href="https://docs.docker.com/engine/security/rootless/" target="_blank" rel="noopener"
+>https://docs.docker.com/engine/security/rootless/&lt;/a>&lt;/li>
+&lt;li>Docker Hub. (n.d.). Hub.docker.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns" target="_blank" rel="noopener"
+>https://hub.docker.com/r/slothcroissant/caddy-cloudflaredns&lt;/a>&lt;/li>
+&lt;li>Unrecognized directive: dns. (2020, May 14). Caddy Community. &lt;a class="link" href="https://caddy.community/t/unrecognized-directive-dns/8149/9" target="_blank" rel="noopener"
+>https://caddy.community/t/unrecognized-directive-dns/8149/9&lt;/a>&lt;/li>
+&lt;li>Server, C. W. (n.d.). Caddyfile Concepts - Caddy Documentation. Caddyserver.com. Retrieved October 24, 2022, from &lt;a class="link" href="https://caddyserver.com/docs/caddyfile/concepts" target="_blank" rel="noopener"
+>https://caddyserver.com/docs/caddyfile/concepts&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>在ROG枪神4上安装Ubuntu遇到的问题和解决办法</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8rog%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85ubuntu%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link><pubDate>Thu, 20 Oct 2022 13:22:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8rog%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85ubuntu%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp" alt="Featured image of post 在ROG枪神4上安装Ubuntu遇到的问题和解决办法" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8rog%e6%9e%aa%e7%a5%9e4%e4%b8%8a%e5%ae%89%e8%a3%85ubuntu%e9%81%87%e5%88%b0%e7%9a%84%e9%97%ae%e9%a2%98%e5%92%8c%e8%a7%a3%e5%86%b3%e5%8a%9e%e6%b3%95/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="声音的问题">声音的问题&lt;/h2>
+&lt;h3 id="问题一没有声音">问题一：没有声音&lt;/h3>
+&lt;ol>
+&lt;li>编辑文件：&lt;code>/etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;li>在这个文件的末尾添加一行：&lt;code>options snd-hda-intel model=asus-zenbook&lt;/code>&lt;/li>
+&lt;li>重新启动系统&lt;/li>
+&lt;/ol>
+&lt;h3 id="问题二声音无法调整">问题二：声音无法调整&lt;/h3>
+&lt;blockquote>
+&lt;p>描述：主声音不可调整，只能是静音或者最大声音。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>编辑文件：&lt;code>/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在&lt;code>[Element PCM]&lt;/code>的前面添加以下内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[Element Master]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">switch = mute
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">volume = ignore
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>关闭pulse音频守护进程，它将被systemd自动重新启动：&lt;code>pulseaudio -k&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>注意：请勿以root身份运行pulseaudio，否则将无法正常关闭守护进程。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="睡眠问题">睡眠问题&lt;/h2>
+&lt;h3 id="锁定屏幕后无法再次唤醒">锁定屏幕后无法再次唤醒&lt;/h3>
+&lt;blockquote>
+&lt;p>描述：锁定屏幕后，计算机不能再次唤醒。硬盘和其他硬件工作正常，但屏幕全黑。&lt;/p>
+&lt;/blockquote>
+&lt;ol>
+&lt;li>安装laptop-mod-tools：&lt;code>sudo apt install laptop-mod-tools&lt;/code>&lt;/li>
+&lt;li>启动laptop-mod-tools：&lt;code>sudo laptop_mode start&lt;/code>&lt;/li>
+&lt;li>添加mutter debug环境变量，编辑文件：&lt;code>/etc/environment&lt;/code>
+&lt;ul>
+&lt;li>如果是Ubuntu 22.04: &lt;code>MUTTER_DEBUG_ENABLE_ATOMIC_KMS=0&lt;/code>&lt;/li>
+&lt;li>如果是Ubuntu 22.10及以后版本：&lt;code>MUTTER_DEBUG_FORCE_KMS_MODE=simple&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>重新启动系统&lt;/li>
+&lt;/ol>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://askubuntu.com/questions/1288054/snd-hda-intel-model-for-ubuntu-20-04-installed-in-an-asus-rog-strix-g15-g512" target="_blank" rel="noopener"
+>snd-hda-intel model for UBUNTU 20.04 installed in an ASUS ROG STRIX G15 (G512) - AskUbuntu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntuforums.org/showthread.php?t=2414755" target="_blank" rel="noopener"
+>Volume either muted or maxed out, nothing in between - ubuntu forums&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bugs.launchpad.net/ubuntu/&amp;#43;source/mutter/&amp;#43;bug/1968040" target="_blank" rel="noopener"
+>Blanked screen doesn&amp;rsquo;t wake up after locking - Launchpad&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>更安全的PGP使用方法</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%9B%B4%E5%AE%89%E5%85%A8%E7%9A%84pgp%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</link><pubDate>Tue, 28 Jun 2022 08:58:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%9B%B4%E5%AE%89%E5%85%A8%E7%9A%84pgp%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%9b%b4%e5%ae%89%e5%85%a8%e7%9a%84PGP%e4%bd%bf%e7%94%a8%e6%96%b9%e6%b3%95/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="gnupg介绍">GnuPG介绍&lt;/h2>
+&lt;h3 id="官方介绍">官方介绍&lt;/h3>
+&lt;blockquote>
+&lt;p>来源：&lt;a class="link" href="https://www.gnupg.org/" target="_blank" rel="noopener"
+>GnuPG&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>GnuPG是RFC4880所定义的OpenPGP标准（也称为PGP）的完整和免费的实现。GnuPG允许你对你的数据和通信进行加密和签名；它有一个多功能的密钥管理系统，同时还有各种公钥目录的访问模块。GnuPG，也被称为GPG，是一个命令行工具，具有易于与其他应用程序集成的功能。有大量的前端应用程序和库可用。GnuPG还提供对S/MIME和安全外壳（ssh）的支持。&lt;/p>
+&lt;p>自1997年推出以来，GnuPG是自由软件（意味着它尊重你的自由）。它可以在GNU通用公共许可证的条款下自由使用、修改和发布。&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;em>争辩说你不关心隐私权，因为你没有什么可隐藏的，这与说你不关心言论自由，因为你没有什么可说的没有什么区别。&lt;/em>&lt;br>
+&lt;em>&amp;ndash;爱德华·斯诺登&lt;/em>&lt;/p>
+&lt;/blockquote>
+&lt;p>使用加密技术有助于保护你的隐私和与你交流的人的隐私。加密使大量监控系统的生活变得困难。GnuPG是斯诺登用来揭开NSA秘密的工具之一。&lt;/p>
+&lt;p>请访问&lt;a class="link" href="https://emailselfdefense.fsf.org/en/" target="_blank" rel="noopener"
+>电子邮件自卫&lt;/a>网站，了解如何以及为什么你应该使用GnuPG进行电子通信。&lt;/p>
+&lt;h3 id="所以呢">所以呢？&lt;/h3>
+&lt;h4 id="q1-为什么要使用gnupg">Q1: 为什么要使用GnuPG？&lt;/h4>
+&lt;ul>
+&lt;li>因为它是自由软件，可以自由使用、修改和发布。&lt;/li>
+&lt;li>使用它，你的通讯信息将是加密的、安全的。&lt;/li>
+&lt;li>PGP能保证一条信息是你相信的人发的，除了你俩之外别人无法解密，而且这条消息在传送时中间没有经过任何哪怕是一个标点一个字节的修改。&lt;/li>
+&lt;li>经过PGP签名加密的消息可以在任何一条不可信信道上传输，而且中途无法被任何人篡改、解密。&lt;/li>
+&lt;/ul>
+&lt;h4 id="q2-我明明不怕审查身正不怕影子歪你还有什么理由推荐gnupg">Q2: 我明明不怕审查，身正不怕影子歪，你还有什么理由推荐GnuPG？&lt;/h4>
+&lt;ul>
+&lt;li>您的隐私由您决定，大多数的人们都不希望生活在监控之下。&lt;/li>
+&lt;li>如果温和的批评也不被允许，沉默将被认为居心叵测。如果沉默也不再允许，赞扬不够卖力将是一种罪行。如果只允许一种声音存在，那么，唯一存在的那个声音就是谎言。&lt;/li>
+&lt;li>如果更加不幸地生活在极权主义国家，加密通讯能保护自己，保护自己所在乎的朋友们。&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装">安装&lt;/h2>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;blockquote>
+&lt;p>推荐使用Gpg4win，它的套件齐全，有个容易使用的GUI。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>从&lt;a class="link" href="https://gpg4win.org/download.html" target="_blank" rel="noopener"
+>Gpg4win&lt;/a>下载适用于您计算机的版本。一般而言，如果您没有特殊需求，直接点击绿色的下载按钮即可。&lt;/li>
+&lt;/ul>
+&lt;h3 id="macos">macOS&lt;/h3>
+&lt;blockquote>
+&lt;p>推荐使用GPGSuite&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>从&lt;a class="link" href="https://gpgtools.org" target="_blank" rel="noopener"
+>GPGSuite&lt;/a>下载适用于您计算机的版本。一般而言，如果您没有特殊需求，直接点击红色的下载按钮即可。&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>提醒：GPGSuite套件中的GPGMail是付费软件，如果您需要用它自动加密电子邮件，那么您需要购买GPGMail。但是请放心，文本和文件的加密签名完全是免费的。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="linux">Linux&lt;/h3>
+&lt;blockquote>
+&lt;p>推荐使用GnuPG&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>大多数Linux发行版都已经预置了GnuPG，您不需要安装任何软件。但是推荐您安装一个GUI管理界面&lt;code>GPA&lt;/code>，因为它更加方便用户使用。&lt;/li>
+&lt;/ul>
+&lt;h2 id="生成密钥">生成密钥&lt;/h2>
+&lt;blockquote>
+&lt;p>本节内容请先试验，熟练之后再生成自己主要使用的密钥。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="生成主密钥">生成主密钥&lt;/h3>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg -expert --full-gen-key&lt;/code>&lt;/li>
+&lt;li>选择密钥类型：默认&lt;/li>
+&lt;li>输入密钥长度：4096&lt;/li>
+&lt;li>输入密钥过期时间：&lt;code>2y&lt;/code>（表示两年，可以输入0表示永不过期，您可以随时更改密钥到期时间），输入y以确认。&lt;/li>
+&lt;li>输入您的名字，这是个可选项，可以输入网名甚至可以不输入。&lt;/li>
+&lt;li>输入您的电子邮件，这是个可选项，甚至可以不输入。如果您希望使用电子邮件加密，那您必须输入。&lt;/li>
+&lt;li>输入备注，可以留空。&lt;/li>
+&lt;li>输入O确认信息无误，随后您需要输入一个密钥密码，开始生成密钥。&lt;/li>
+&lt;/ul>
+&lt;h3 id="生成撤销证书">生成撤销证书&lt;/h3>
+&lt;blockquote>
+&lt;p>如果您丢失了主密钥（或者被夺取），您可以使用撤销证书来证明它不再使用。如果您没有撤销证书，那么您必须一个个通知朋友们。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg --gen-revoke -ao revoke.pgp email@email.com #uid 或者key id&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="查看子密钥">查看子密钥&lt;/h3>
+&lt;blockquote>
+&lt;p>主密钥日常不应该使用，日常您应该使用生成的子密钥。这样做的好处就是如果您泄漏了某个子密钥，您可以立即吊销这个子密钥，而不用废弃整个密钥对。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>列出所有公钥、子公钥：&lt;code>--list-keys&lt;/code>或者&lt;code>gpg -k&lt;/code>&lt;/li>
+&lt;li>列出所有密钥、子密钥：&lt;code>--list-secret-keys&lt;/code>或者&lt;code>gpg -K&lt;/code>&lt;/li>
+&lt;li>如果要查看密钥指纹信息，可以加上&lt;code>--fingerprint&lt;/code>参数，比如&lt;code>gpg --list-secret-keys --fingerprint&lt;/code>&lt;/li>
+&lt;li>如果要查看密钥ID信息，可以加上&lt;code>--keyid-format long&lt;/code>参数，比如&lt;code>gpg --list-secret-keys --keyid-format long&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="导出密钥">导出密钥&lt;/h2>
+&lt;blockquote>
+&lt;p>既然日常使用要使用子密钥，那么主密钥不应该存在于同一个地方，GPG无法删除密钥，只能导出后只倒入需要的子密钥。&lt;/p>
+&lt;p>注意：密钥ID后的感叹号不可缺少，否则将会导出所有密钥&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="导出公钥">导出公钥&lt;/h3>
+&lt;ul>
+&lt;li>导出公钥：&lt;code>gpg -ao public-key --export 主密钥ID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="导出主密钥">导出主密钥&lt;/h3>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg -ao master-key --export-secret-key 主密钥ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="导出子密钥">导出子密钥&lt;/h3>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg -ao sub-key --export-secret-subkeys 子密钥ID!&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="导入密钥">导入密钥&lt;/h2>
+&lt;ul>
+&lt;li>输入命令&lt;code>gpg --import 文件名&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="和朋友们安全交流">和朋友们安全交流&lt;/h2>
+&lt;ul>
+&lt;li>您现在已经大功告成，养成日常使用PGP加密签名的习惯之后，相信您也很难离开它了&lt;/li>
+&lt;/ul>
+&lt;h2 id="发布到公钥服务器">发布到公钥服务器&lt;/h2>
+&lt;p>&amp;hellip;未完待续&amp;hellip;&lt;/p>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（上）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8a/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-上/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（中）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%ad/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-中/&lt;/a>&lt;/li>
+&lt;li>Ulyc. (2021, January 13). 2021年，用更现代的方法使用PGP（下）. C的博客. &lt;a class="link" href="https://ulyc.github.io/2021/01/13/2021%e5%b9%b4-%e7%94%a8%e6%9b%b4%e7%8e%b0%e4%bb%a3%e7%9a%84%e6%96%b9%e6%b3%95%e4%bd%bf%e7%94%a8PGP-%e4%b8%8b/" target="_blank" rel="noopener"
+>https://ulyc.github.io/2021/01/13/2021年-用更现代的方法使用PGP-下/&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>OhMyZsh中的Git命令缩写</title><link>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E4%B8%AD%E7%9A%84git%E5%91%BD%E4%BB%A4%E7%BC%A9%E5%86%99/</link><pubDate>Tue, 26 Apr 2022 21:26:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E4%B8%AD%E7%9A%84git%E5%91%BD%E4%BB%A4%E7%BC%A9%E5%86%99/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/ohmyzsh%e4%b8%ad%e7%9a%84git%e5%91%bd%e4%bb%a4%e7%bc%a9%e5%86%99/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="git的命令缩写">Git的命令缩写&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">g&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gaa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gapa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --patch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gau&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gav&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add --verbose&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gap&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git apply&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gapt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git apply --3way&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gba&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -a&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -d&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbda&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --no-color --merged | command grep -vE &amp;#34;^([+*]|\s*($(git_main_branch)|$(git_develop_branch))\s*$)&amp;#34; | command xargs git branch -d 2&amp;gt;/dev/null&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbD&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch -D&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git blame -b -w&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbnm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --no-merged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --remote&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect bad&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect good&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbsr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect reset&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gbss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git bisect start&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gc!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcn!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gca&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gca!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcan!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gcans!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -v -a -s --no-edit --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcam&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcsm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcas&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcasm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -a -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout -b&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git config --list&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git clone --recurse-submodules&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gclean&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git clean -id&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpristine&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --hard &amp;amp;&amp;amp; git clean -dffx&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcmsg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gco&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcor&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git checkout --recurse-submodules&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcount&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git shortlog -sn&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcpa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcpc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git cherry-pick --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gcssm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git commit -S -s -m&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdca&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --cached&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdcw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --cached --word-diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdct&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git describe --tags $(git rev-list --tags --max-count=1)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gds&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --staged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff-tree --no-commit-id --name-only -r&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff @{upstream}&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gdw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git diff --word-diff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># --jobs=&amp;lt;n&amp;gt; was added in git 2.8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">is-at-least 2.8 &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$git_version&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch --all --prune --jobs=10&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch --all --prune&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git fetch origin&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gfg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git ls-files | grep&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git gui citool&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git gui citool --amend&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpur&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;ggu&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpull&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull origin &amp;#34;$(git_current_branch)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggpush&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push origin &amp;#34;$(git_current_branch)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ggsup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git branch --set-upstream-to=origin/$(git_current_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpsup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --set-upstream origin $(git_current_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">ghh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git help&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gignore&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git update-index --assume-unchanged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gignored&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git ls-files -v | grep &amp;#34;^[[:lower:]]&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> git-svn-dcommit-push&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn dcommit &amp;amp;&amp;amp; git push github $(git_main_branch):svntrunk&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gk&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;\gitk --all --branches &amp;amp;!&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gke&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;\gitk --all $(git log -g --pretty=%h) &amp;amp;!&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --stat&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --stat -p&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgg&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph --decorate --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glgm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --graph --max-count=10&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glol&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glols&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --stat&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glod&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glods&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --date=short&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glola&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;git log --graph --pretty=&amp;#39;%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)&amp;lt;%an&amp;gt;%Creset&amp;#39; --all&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glog&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate --graph&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gloga&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log --oneline --decorate --graph --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;_git_log_prettily&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmom&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge origin/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmtl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git mergetool --no-prompt&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmtlvim&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git mergetool --no-prompt --tool=vimdiff&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gmum&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge upstream/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gma&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git merge --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --dry-run&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpf&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --force-with-lease&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> gpf!&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push --force&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpoat&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push origin --all &amp;amp;&amp;amp; git push origin --tags&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push upstream&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gpv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git push -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gra&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote add&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grba&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbi&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase -i&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbom&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase origin/$(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbo&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --onto&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grbs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rebase --skip&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grev&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git revert&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grhh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --hard&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">groh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset origin/$(git_current_branch) --hard&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rm&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grmc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git rm --cached&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grmv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote rename&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grrm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote remove&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grs&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grset&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote set-url&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore --source&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git restore --staged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grt&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;cd &amp;#34;$(git rev-parse --show-toplevel || echo .)&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gru&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git reset --&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">grv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git remote -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsb&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status -sb&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn dcommit&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsh&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git show&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsi&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git submodule init&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsps&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git show --pretty=short --show-signature&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsr&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git svn rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gss&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gst&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git status&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># use the default stash push on git 2.13 and newer&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">is-at-least 2.13 &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$git_version&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsta&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash push&amp;#39;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsta&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash save&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstaa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash apply&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash clear&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash drop&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash list&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash pop&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsts&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash show --text&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;gsta --include-untracked&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gstall&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git stash --all&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsu&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git submodule update&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gsw&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch -c&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswm&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gswd&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git switch $(git_develop_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gts&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git tag -s&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gtv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git tag | sort -V&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gtl&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;gtl(){ git tag --sort=-v:refname -n -l &amp;#34;${1}*&amp;#34; }; noglob gtl&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gunignore&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git update-index --no-assume-unchanged&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gunwip&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git log -n 1 | grep -q -c &amp;#34;\-\-wip\-\-&amp;#34; &amp;amp;&amp;amp; git reset HEAD~1&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gup&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupv&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupa&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase --autostash&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gupav&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull --rebase --autostash -v&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">glum&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git pull upstream $(git_main_branch)&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gwch&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git whatchanged -p --abbrev-commit --pretty=medium&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gwip&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git add -A; git rm $(git ls-files --deleted) 2&amp;gt; /dev/null; git commit --no-verify --no-gpg-sign -m &amp;#34;--wip-- [skip ci]&amp;#34;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gam&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gamc&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --continue&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gams&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --skip&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gama&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --abort&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">alias&lt;/span> &lt;span class="nv">gamscp&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;git am --show-current-patch&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>虚拟机硬件加速导致的Electron应用白屏的问题</title><link>https://blog.moeomu.com/zh-cn/posts/%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A1%AC%E4%BB%B6%E5%8A%A0%E9%80%9F%E5%AF%BC%E8%87%B4%E7%9A%84electron%E5%BA%94%E7%94%A8%E7%99%BD%E5%B1%8F%E7%9A%84%E9%97%AE%E9%A2%98/</link><pubDate>Tue, 12 Oct 2021 19:22:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%A1%AC%E4%BB%B6%E5%8A%A0%E9%80%9F%E5%AF%BC%E8%87%B4%E7%9A%84electron%E5%BA%94%E7%94%A8%E7%99%BD%E5%B1%8F%E7%9A%84%E9%97%AE%E9%A2%98/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e8%99%9a%e6%8b%9f%e6%9c%ba%e7%a1%ac%e4%bb%b6%e5%8a%a0%e9%80%9f%e5%af%bc%e8%87%b4%e7%9a%84electron%e5%ba%94%e7%94%a8%e7%99%bd%e5%b1%8f%e7%9a%84%e9%97%ae%e9%a2%98/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="问题再现">问题再现&lt;/h2>
+&lt;ul>
+&lt;li>可重现：是&lt;/li>
+&lt;li>主机系统：macOS BigSur 11.6&lt;/li>
+&lt;li>虚拟机系统：Ubuntu Desktop 20.04.3&lt;/li>
+&lt;li>Parallels虚拟机版本：17.0.1&lt;/li>
+&lt;li>问题描述：虚拟机系统在安装或者运行基于NodeJS尤其是Electron的应用后，应用会出现占据1/4的白色屏幕且3/4黑屏的异常显示情况，无法正常使用&lt;/li>
+&lt;li>故障典型应用：
+&lt;ul>
+&lt;li>VSCode&lt;/li>
+&lt;li>Motrix&lt;/li>
+&lt;li>Typora&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/WvksDr9PTQFi3ut.png"
+loading="lazy"
+alt="vscode"
+>&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/bRWZPJSQqjhFUNG.png"
+loading="lazy"
+alt="typora"
+>&lt;/p>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;h3 id="方案一">方案一&lt;/h3>
+&lt;p>给每一个Electron应用添加启动时参数&lt;code>--disable-gpu&lt;/code>&lt;/p>
+&lt;blockquote>
+&lt;p>补充：可以在桌面建立一个快捷方式实现，以vscode为例，内容如下&lt;/p>
+&lt;p>code.desktop&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Entry&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>Visual Studio Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Comment&lt;/span>&lt;span class="o">=&lt;/span>Code Editing. Redefined.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">GenericName&lt;/span>&lt;span class="o">=&lt;/span>Text Editor
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --unity-launch %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Type&lt;/span>&lt;span class="o">=&lt;/span>Application
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupNotify&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">StartupWMClass&lt;/span>&lt;span class="o">=&lt;/span>Code
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Categories&lt;/span>&lt;span class="o">=&lt;/span>Utility&lt;span class="p">;&lt;/span>TextEditor&lt;span class="p">;&lt;/span>Development&lt;span class="p">;&lt;/span>IDE&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">MimeType&lt;/span>&lt;span class="o">=&lt;/span>text/plain&lt;span class="p">;&lt;/span>inode/directory&lt;span class="p">;&lt;/span>application/x-code-workspace&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Actions&lt;/span>&lt;span class="o">=&lt;/span>new-empty-window&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Keywords&lt;/span>&lt;span class="o">=&lt;/span>vscode&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">X-Desktop-File-Install-Version&lt;span class="o">=&lt;/span>0.24
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>Desktop Action new-empty-window&lt;span class="o">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Name&lt;/span>&lt;span class="o">=&lt;/span>New Empty Window
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Exec&lt;/span>&lt;span class="o">=&lt;/span>/usr/share/code/code --disable-gpu --new-window %F
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">Icon&lt;/span>&lt;span class="o">=&lt;/span>com.visualstudio.code
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="方案二">方案二&lt;/h3>
+&lt;p>关闭Parallels/其他虚拟化软件-此虚拟机的图形-硬件加速功能，如下图所示&lt;/p>
+&lt;p>&lt;img src="https://i.loli.net/2021/10/13/vSLmaJbtXiBd3xR.png"
+loading="lazy"
+alt="close"
+>&lt;/p>
+&lt;h2 id="其他信息">其他信息&lt;/h2>
+&lt;p>Electron的官方开发人员在&lt;a class="link" href="https://github.com/electron/electron/issues/5257#issuecomment-213890151" target="_blank" rel="noopener"
+>Github&lt;/a>上提到&lt;/p>
+&lt;blockquote>
+&lt;p>You can probably disable GPU acceleration to work around this, or just use another visual machine software. Basically the GPU acceleration of Linux in virtual machines is a mess, depending on the software of visual machine, the version and distribution of Linux, and the version of Chromium, you can get various results and bugs.&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>Linux的虚拟机硬件加速一团糟，因此出现这个情况是正常的&lt;/li>
+&lt;/ul></description></item><item><title>NodeJS镜像源配置</title><link>https://blog.moeomu.com/zh-cn/posts/nodejs%E9%95%9C%E5%83%8F%E6%BA%90%E9%85%8D%E7%BD%AE/</link><pubDate>Mon, 27 Sep 2021 13:56:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/nodejs%E9%95%9C%E5%83%8F%E6%BA%90%E9%85%8D%E7%BD%AE/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/nodejs%e6%ba%90%e9%85%8d%e7%bd%ae/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装">安装&lt;/h2>
+&lt;blockquote>
+&lt;p>Debain(Ubuntu, etc.)&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">apt install node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">apt install yarn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>macOS&lt;/p>
+&lt;/blockquote>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew install node
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install yarn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="配置镜像源">配置镜像源&lt;/h2>
+&lt;h3 id="设置为淘宝镜像源">设置为淘宝镜像源&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm config &lt;span class="nb">set&lt;/span> registry https://registry.npm.taobao.org/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yarn config &lt;span class="nb">set&lt;/span> registry https://registry.npm.taobao.org/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="重置为官方镜像源">重置为官方镜像源&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">npm config &lt;span class="nb">set&lt;/span> registry https://registry.npmjs.org/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">yarn config &lt;span class="nb">set&lt;/span> registry https://registry.yarnpkg.com/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>macOS关闭内置屏幕</title><link>https://blog.moeomu.com/zh-cn/posts/macos%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E5%B1%8F%E5%B9%95/</link><pubDate>Thu, 16 Sep 2021 17:00:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/macos%E5%85%B3%E9%97%AD%E5%86%85%E7%BD%AE%E5%B1%8F%E5%B9%95/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/macos%e5%85%b3%e9%97%ad%e5%86%85%e7%bd%ae%e5%b1%8f%e5%b9%95/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="磁铁大法">磁铁大法&lt;/h2>
+&lt;p>寻找两块磁铁，放置在 MacBook的音响附近的位置，欺骗系统合盖检测从而实现关闭内置屏幕&lt;/p>
+&lt;h2 id="nvram启动设置法">NVRAM启动设置法&lt;/h2>
+&lt;blockquote>
+&lt;p>此方法从驱动层面实现了将画面单独显示在外接屏幕上&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="启用">启用&lt;/h3>
+&lt;ul>
+&lt;li>重新启动，按着&lt;code>Command+R&lt;/code>按键不放&lt;/li>
+&lt;li>输入密码进入启动设置-终端&lt;/li>
+&lt;li>输入命令&lt;code>nvram boot-args=&amp;quot;niog=1&amp;quot;&lt;/code>&lt;/li>
+&lt;li>连接外接显示器，连接电源，重新启动&lt;/li>
+&lt;li>启动后输入用户密码立刻合盖，随后看到外接屏有画面，打开MacBook的盖子，成功&lt;/li>
+&lt;/ul>
+&lt;h3 id="还原">还原&lt;/h3>
+&lt;ul>
+&lt;li>重新启动，按着&lt;code>Command+R&lt;/code>按键不放&lt;/li>
+&lt;li>输入密码进入启动设置-终端&lt;/li>
+&lt;li>输入命令&lt;code>nvram -d boot-args&lt;/code>&lt;/li>
+&lt;li>重新启动&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsTools高版本Kali报错</title><link>https://blog.moeomu.com/zh-cn/posts/parallelstools%E9%AB%98%E7%89%88%E6%9C%ACkali%E6%8A%A5%E9%94%99/</link><pubDate>Tue, 06 Jul 2021 15:55:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/parallelstools%E9%AB%98%E7%89%88%E6%9C%ACkali%E6%8A%A5%E9%94%99/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/parallelstools%e9%ab%98%e7%89%88%e6%9c%ackali%e6%8a%a5%e9%94%99/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="首先更新kali源">首先更新kali源&lt;/h2>
+&lt;ul>
+&lt;li>阿里云源如下&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">deb http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">deb-src http://mirrors.aliyun.com/kali kali-rolling main non-free contrib
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="报错内容">报错内容&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">An error occurred &lt;span class="k">while&lt;/span> installing the following packages:
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- libelf-dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- linux-headers-5.10.0-kali9-amd64
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Install these packages manually and start the Parallels Tools installation again.
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;ul>
+&lt;li>安装缺失的包&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">sudo apt install dkms
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt intall libelf-dev
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>坑点记录：&lt;br>
+Kali 2021默认的&lt;code>xfce&lt;/code>桌面环境会导致安装ParallelsTools后白屏，所以要事先将桌面环境切换为&lt;code>gnome&lt;/code>或者在安装kali的时候就取消选择&lt;code>xface&lt;/code>，选中&lt;code>gnome&lt;/code>&lt;/p>
+&lt;/blockquote></description></item><item><title>Windows下使用GPG为Git Commit签名</title><link>https://blog.moeomu.com/zh-cn/posts/windows%E4%B8%8B%E4%BD%BF%E7%94%A8gpg%E4%B8%BAgit-commit%E7%AD%BE%E5%90%8D/</link><pubDate>Sat, 05 Jun 2021 08:50:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/windows%E4%B8%8B%E4%BD%BF%E7%94%A8gpg%E4%B8%BAgit-commit%E7%AD%BE%E5%90%8D/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/windows%e4%b8%8b%e4%bd%bf%e7%94%a8gpg%e4%b8%bagit-commit%e7%ad%be%e5%90%8d/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="下载gpg4win">下载GPG4WIN&lt;/h2>
+&lt;p>下载链接：&lt;a class="link" href="https://www.gpg4win.org/thanks-for-download.html" target="_blank" rel="noopener"
+>gpg4win&lt;/a>&lt;/p>
+&lt;h2 id="创建和应用gpg密钥">创建和应用GPG密钥&lt;/h2>
+&lt;h3 id="创建gpg密钥">创建GPG密钥&lt;/h3>
+&lt;ul>
+&lt;li>创建：&lt;code>gpg --full-generate-key&lt;/code>&lt;/li>
+&lt;li>密钥长度：&lt;code>4096&lt;/code>&lt;/li>
+&lt;li>输入用户名、邮箱&lt;/li>
+&lt;li>列出所有密钥：&lt;code>gpg --list-secret-keys --keyid-format=long&lt;/code>&lt;/li>
+&lt;li>根据keyid导出密钥：&lt;code>gpg --armor --export KEYID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="应用密钥">应用密钥&lt;/h3>
+&lt;ul>
+&lt;li>将密钥导入Github和Gitee&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置git-windows">配置Git Windows&lt;/h2>
+&lt;ul>
+&lt;li>配置默认用户名和邮箱，需要和创建GPG时设定的值保持一致
+&lt;ul>
+&lt;li>&lt;code>git config --global user.name USERNAME&lt;/code>&lt;/li>
+&lt;li>&lt;code>git config --global user.email EMAIL&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>配置密钥
+&lt;ul>
+&lt;li>&lt;code>git config --global user.signingKey KEYID&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>启用全局加密签名
+&lt;ul>
+&lt;li>&lt;code>git config --global commit.gpgSign true&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item><item><title>macOS下使用GPG为Git Commit签名</title><link>https://blog.moeomu.com/zh-cn/posts/macos%E4%B8%8B%E4%BD%BF%E7%94%A8gpg%E4%B8%BAgit-commit%E7%AD%BE%E5%90%8D/</link><pubDate>Tue, 25 May 2021 07:55:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/macos%E4%B8%8B%E4%BD%BF%E7%94%A8gpg%E4%B8%BAgit-commit%E7%AD%BE%E5%90%8D/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/macos%e4%b8%8b%e4%bd%bf%e7%94%a8gpg%e4%b8%bagit-commit%e7%ad%be%e5%90%8d/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="关于github-gpg密钥验证">关于GitHub GPG密钥验证&lt;/h2>
+&lt;h3 id="开启commit签名">开启Commit签名&lt;/h3>
+&lt;p>GitHub有个新的“警惕模式”，启用后GPG密钥需要签名认证的commit才会显示“Verity”，启用方法如下&lt;/p>
+&lt;ul>
+&lt;li>首先创建GPG密钥（&lt;a class="link" href="https://docs.github.com/en/github/authenticating-to-github/managing-commit-signature-verification/generating-a-new-gpg-key" target="_blank" rel="noopener"
+>GitHub官方Docs&lt;/a>有详细方法，不再赘述）&lt;/li>
+&lt;li>列出GPG密钥的特征码：&lt;code>gpg -K --keyid-format LONG&lt;/code>，将&lt;strong>keyid&lt;/strong>记录&lt;/li>
+&lt;li>告知git使用此GPG密钥：&lt;code>git config user.signingkey your_keyid&lt;/code>&lt;/li>
+&lt;li>本地git的用户名和邮箱需要和GPG密钥生成时填入的相同：&lt;code>git config user.name name&lt;/code>，&lt;code>git config user.email email&lt;/code>&lt;/li>
+&lt;li>启用本地git的Commit签名：&lt;code>git config commit.gpgsign true&lt;/code>&lt;/li>
+&lt;li>Commit签名加入-S选项：&lt;code>git commit -S -m message&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="发生致命错误-无法commit-macos">发生致命错误-无法Commit-macOS&lt;/h3>
+&lt;h4 id="问题如下复现于macos-1131中">问题如下，复现于macOS 11.3.1中&lt;/h4>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">error: gpg failed to sign the data
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">fatal: failed to write commit object
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="macos中的解决办法">macOS中的解决办法&lt;/h4>
+&lt;ul>
+&lt;li>更新&amp;amp;安装&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">brew upgrade gnupg &lt;span class="c1"># This has a make step which takes a while&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew link --overwrite gnupg
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">brew install pinentry-mac
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;pinentry-program /usr/local/bin/pinentry-mac&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.gnupg/gpg-agent.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">killall gpg-agent
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global gpg.program gpg &lt;span class="c1"># perhaps you had this already? On linux maybe gpg2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global commit.gpgsign &lt;span class="nb">true&lt;/span> &lt;span class="c1"># if you want to sign every commit&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>再次签名&lt;/li>
+&lt;li>查看commit状态：&lt;code>git log --show-signature -1&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>Windows下用vscode编写python的问题总结</title><link>https://blog.moeomu.com/zh-cn/posts/windows%E4%B8%8B%E7%94%A8vscode%E7%BC%96%E5%86%99python%E7%9A%84%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</link><pubDate>Tue, 19 Jan 2021 17:48:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/windows%E4%B8%8B%E7%94%A8vscode%E7%BC%96%E5%86%99python%E7%9A%84%E9%97%AE%E9%A2%98%E6%80%BB%E7%BB%93/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/windows%e4%b8%8b%e7%94%a8vscode%e7%bc%96%e5%86%99python%e7%9a%84%e9%97%ae%e9%a2%98%e6%80%bb%e7%bb%93/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="vscode-python-venv-powershell未签名环境无法激活">VSCode-Python-Venv-PowerShell未签名环境无法激活&lt;/h2>
+&lt;blockquote>
+&lt;p>在Windows下激活VENV虚拟Python环境写代码遇到了PowerShell文件的无法运行的事情，原因是PowerShell脚本文件未签名，百度寻找了一下解决办法却是清一色的让将Windows安全策略改成签名，如下&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>set-executionpolicy remotesigned&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>总觉得不应该这样，这样修改策略实属下策，去谷歌找了一下解决办法，发现这是个2018年的问题，未有良好的解决办法，但是仍旧找到了一份好的策略，即将当前用户的签名策略改成需远程签名，其它用户仍旧是阻挡&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>随后可以通过以下代码查看策略修改情况&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>&lt;code>Get-ExecutionPolicy -LIST&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="python更换pip源">Python更换PIP源&lt;/h2>
+&lt;blockquote>
+&lt;p>每次都搜索引擎找源太麻烦了，不如直接记个笔记备份到本地为好&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="windows">Windows&lt;/h3>
+&lt;p>&lt;code>%HOMEPATH%/pip/pip.ini&lt;/code>&lt;/p>
+&lt;h3 id="linux--macos">Linux &amp;amp; macOS&lt;/h3>
+&lt;p>&lt;code>~/.pip/pip.conf&lt;/code>&lt;/p>
+&lt;h3 id="编辑格式">编辑格式&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[global]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">[install]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">trusted-host=pypi.tuna.tsinghua.edu.cn
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="pip源">pip源&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>名称&lt;/th>
+&lt;th>源的地址&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>清华&lt;/td>
+&lt;td>&lt;a class="link" href="https://pypi.tuna.tsinghua.edu.cn/simple" target="_blank" rel="noopener"
+>https://pypi.tuna.tsinghua.edu.cn/simple&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>阿里云&lt;/td>
+&lt;td>&lt;a class="link" href="http://mirrors.aliyun.com/pypi/simple/" target="_blank" rel="noopener"
+>http://mirrors.aliyun.com/pypi/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>中国科技大学&lt;/td>
+&lt;td>&lt;a class="link" href="https://pypi.mirrors.ustc.edu.cn/simple/" target="_blank" rel="noopener"
+>https://pypi.mirrors.ustc.edu.cn/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>华中理工大学&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.hustunique.com/" target="_blank" rel="noopener"
+>http://pypi.hustunique.com/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>山东理工大学&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.sdutlinux.org/" target="_blank" rel="noopener"
+>http://pypi.sdutlinux.org/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>豆瓣&lt;/td>
+&lt;td>&lt;a class="link" href="http://pypi.douban.com/simple/" target="_blank" rel="noopener"
+>http://pypi.douban.com/simple/&lt;/a>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="pip模块未找到错误">pip模块未找到错误&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>python -m ensurepip&lt;/code>&lt;/li>
+&lt;li>&lt;code>python -m pip install --upgrade pip&lt;/code>&lt;/li>
+&lt;/ul></description></item><item><title>ParallelsDesktop16 修复网络</title><link>https://blog.moeomu.com/zh-cn/posts/parallelsdesktop16-%E4%BF%AE%E5%A4%8D%E7%BD%91%E7%BB%9C/</link><pubDate>Wed, 16 Dec 2020 13:42:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/parallelsdesktop16-%E4%BF%AE%E5%A4%8D%E7%BD%91%E7%BB%9C/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/parallelsdesktop16-%e4%bf%ae%e5%a4%8d%e7%bd%91%e7%bb%9c/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="前奏">前奏&lt;/h2>
+&lt;ul>
+&lt;li>在macOS Big Sur下可以使用&lt;/li>
+&lt;li>之前是使用命令启动的不完美解决办法，还会导致一系列权限问题，现在终于完美了&lt;/li>
+&lt;/ul>
+&lt;h2 id="解决方案">解决方案&lt;/h2>
+&lt;ul>
+&lt;li>最高权限编辑文件&lt;code>/Library/Preferences/Parallels/network.desktop.xml&lt;/code>&lt;/li>
+&lt;li>将&lt;code>UseKextless&lt;/code>字段的值从&lt;code>-1&lt;/code>改为&lt;code>0&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>注意：这个值可能并不是所有人-1，也可能并不是所有人改为0都行，勇于尝试嘛&lt;/p>
+&lt;/blockquote></description></item><item><title>Homebrew和Brewcask的安装</title><link>https://blog.moeomu.com/zh-cn/posts/homebrew%E5%92%8Cbrewcask%E7%9A%84%E5%AE%89%E8%A3%85/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/homebrew%E5%92%8Cbrewcask%E7%9A%84%E5%AE%89%E8%A3%85/</guid><description>&lt;p>大家请注意时效性：&lt;strong>本文写于2020/11/10&lt;/strong>&amp;amp;&amp;amp;&lt;strong>本文更新于2021/07/02&lt;/strong>&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/homebrew%e5%92%8cbrewcask%e7%9a%84%e5%ae%89%e8%a3%85/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装git">安装git&lt;/h2>
+&lt;ul>
+&lt;li>方法一：安装XCode Terminal:&lt;code>xcode-select --install&lt;/code>&lt;/li>
+&lt;li>方法二：直接去git网站下载git的macOS安装包&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装homebrew">安装HomeBrew&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>首先下载原版&lt;a class="link" href="https://cdn.jsdelivr.net/gh/Homebrew/install@master/install.sh" target="_blank" rel="noopener"
+>installer.sh&lt;/a>的jsDelivr CDN镜像&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>输入下列指令运行：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/homebrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/homebrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/linuxbrew-core.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/linuxbrew-core&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git config --global url.&lt;span class="s2">&amp;#34;https://mirrors.ustc.edu.cn/brew.git&amp;#34;&lt;/span>.insteadOf &lt;span class="s2">&amp;#34;https://github.com/Homebrew/brew&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod +x install.sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">HOMEBREW_BOTTLE_DOMAIN&lt;/span>&lt;span class="o">=&lt;/span>https://mirrors.ustc.edu.cn/homebrew-bottles ./install.sh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>通过USTC的git源克隆Homebrew-Cask项目&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>cd /usr/local/Homebrew/Library/Taps/homebrew&lt;/code>&lt;/li>
+&lt;li>&lt;code>git clone https://mirrors.ustc.edu.cn/homebrew-cask.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="检查源配置">检查源配置&lt;/h2>
+&lt;ul>
+&lt;li>查看brew镜像源：&lt;code>git -C &amp;quot;$(brew --repo)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>查看homebrew-core镜像源：&lt;code>git -C &amp;quot;$(brew --repo homebrew/core)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>查看homebrew-cask镜像源：&lt;code>git -C &amp;quot;$(brew --repo homebrew/cask)&amp;quot; remote -v&lt;/code>&lt;/li>
+&lt;li>合格的标准是这些源的地址全是USTC的网址&lt;/li>
+&lt;/ul>
+&lt;h2 id="update">Update&lt;/h2>
+&lt;ul>
+&lt;li>&lt;code>brew update&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装oh-my-zsh非必须">安装Oh-My-Zsh(非必须)&lt;/h2>
+&lt;ul>
+&lt;li>更新zsh：&lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>git克隆oh-my-zsh项目：&lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>重命名项目：&lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>将模版复制到home目录下命名为.zshrc：&lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;li>退出Terminal，启动Terminal，成功&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置terminal非必须">配置Terminal(非必须)&lt;/h2>
+&lt;ul>
+&lt;li>偏好设置-启动时，打开-使用描述文件新建窗口-Homebrew&lt;/li>
+&lt;li>偏好设置-描述文件-Homebrew-文本-字体-14点&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置terminal代理非必须">配置Terminal代理(非必须)&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">https_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">http_proxy&lt;/span>&lt;span class="o">=&lt;/span>http://127.0.0.1:7809
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>OhMyZsh安装指南</title><link>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/ohmyzsh%e5%ae%89%e8%a3%85%e6%8c%87%e5%8d%97/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装zsh">安装zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="克隆git仓库clone-git-repo">克隆Git仓库(clone git repo)&lt;/h2>
+&lt;ul>
+&lt;li>中国大陆: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>世界: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置zshconfig">配置zsh(config)&lt;/h2>
+&lt;h3 id="设置为默认shellset-default-shell">设置为默认shell(set default shell)&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="自动补全插件auto-suggestions-plugin">自动补全插件(auto suggestions plugin)&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>

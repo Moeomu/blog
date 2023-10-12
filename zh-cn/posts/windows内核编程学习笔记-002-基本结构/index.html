@@ -1,0 +1,508 @@
+<!doctype html><html lang=zh-cn dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="这一节依旧是基础内容的复习"><title>Windows内核编程学习笔记-002-基本结构</title><link rel=canonical href=https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/><link rel=stylesheet href=/scss/style.min.abbd69b2908fdfcd5179898beaafd374514a86538d81639ddd2c58c06ae54e40.css><meta property="og:title" content="Windows内核编程学习笔记-002-基本结构"><meta property="og:description" content="这一节依旧是基础内容的复习"><meta property="og:url" content="https://blog.moeomu.com/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/"><meta property="og:site_name" content="Misaka的秘密花园"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Windows"><meta property="article:tag" content="内核"><meta property="article:published_time" content="2020-12-18T20:52:00+08:00"><meta property="article:modified_time" content="2020-12-18T20:52:00+08:00"><meta name=twitter:title content="Windows内核编程学习笔记-002-基本结构"><meta name=twitter:description content="这一节依旧是基础内容的复习"><script async src=https://umami.moeomu.com/Prototype data-website-id=da63d88b-4c19-4ee6-93cc-e12bd941eb81></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=切换菜单>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/zh-cn><img src=/img/avatar_hu5c4b01d6d06a4818a5284ca6e51e5ac9_24136_300x0_resize_q75_box.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a>
+<span class=emoji>🍥</span></figure><div class=site-meta><h1 class=site-name><a href=/zh-cn>Misaka的秘密花园</a></h1><h2 class=site-description>In the gardens embrace, a celestial sprite dances.</h2></div></header><ol class=social-menu><li><a href=https://github.com/Misakaou target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/zh-cn/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>主页</span></a></li><li><a href=/zh-cn/%E5%BD%92%E6%A1%A3/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>归档</span></a></li><li><a href=/zh-cn/%E6%90%9C%E7%B4%A2/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>搜索</span></a></li><li><a href=/zh-cn/%E9%93%BE%E6%8E%A5/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg><span>链接</span></a></li><li><a href=/zh-cn/%E7%95%99%E8%A8%80%E6%9D%BF/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M21 14l-3-3h-7a1 1 0 01-1-1V4a1 1 0 011-1h9a1 1 0 011 1v10"/><path d="M14 15v2a1 1 0 01-1 1H6l-3 3V11a1 1 0 011-1h2"/></svg><span>留言板</span></a></li><li><a href=/zh-cn/%E5%85%B3%E4%BA%8E/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>关于</span></a></li><div class=menu-bottom-section><li id=i18n-switch><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><select name=language onchange="window.location.href=this.selectedOptions[0].value"><option value=https://blog.moeomu.com/>English</option><option value=https://blog.moeomu.com/zh-cn/ selected>中文</option></select></li><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>暗色模式</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目录</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#字符串操作>字符串操作</a><ol><li><a href=#字符串初始化>字符串初始化</a></li><li><a href=#字符串拷贝>字符串拷贝</a></li></ol></li><li><a href=#链表>链表</a><ol><li><a href=#链表的定义>链表的定义</a></li><li><a href=#使用链表>使用链表</a></li><li><a href=#头节点初始化>头节点初始化</a></li><li><a href=#节点插入>节点插入</a></li><li><a href=#链表遍历>链表遍历</a></li><li><a href=#节点移除>节点移除</a></li><li><a href=#判断链表状态>判断链表状态</a></li></ol></li><li><a href=#自旋锁>自旋锁</a><ol><li><a href=#使用自旋锁>使用自旋锁</a></li><li><a href=#初始化使用自旋锁>初始化/使用自旋锁</a></li><li><a href=#自旋锁在双向链表中使用>自旋锁在双向链表中使用</a></li><li><a href=#队列自旋锁>队列自旋锁</a></li></ol></li><li><a href=#内存分配>内存分配</a><ol><li><a href=#常规内存分配>常规内存分配</a></li><li><a href=#快表内存分配>快表内存分配</a></li></ol></li><li><a href=#对象与句柄>对象与句柄</a></li><li><a href=#注册表>注册表</a><ol><li><a href=#打开与关闭>打开与关闭</a></li></ol></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/zh-cn/categories/%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B/>内核编程</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-002-%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/>Windows内核编程学习笔记-002-基本结构</a></h2><h3 class=article-subtitle>这一节依旧是基础内容的复习</h3></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Dec 18, 2020</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>阅读时长: 5 分钟</time></div></footer><footer class=article-translations><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5h7"/><path d="M9 3v2c0 4.418-2.239 8-5 8"/><path d="M5 9c-.003 2.144 2.952 3.908 6.7 4"/><path d="M12 20l4-9 4 9"/><path d="M19.1 18h-6.2"/></svg><div><a href=https://blog.moeomu.com/posts/windows-kernel-programming-study-notes-002-basic-structure/ class=link>English</a></div></footer></div></header><section class=article-content><p>本文来源：<a class=link href=/zh-cn/posts/windows%e5%86%85%e6%a0%b8%e7%bc%96%e7%a8%8b%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-002-%e5%9f%ba%e6%9c%ac%e7%bb%93%e6%9e%84/>Moeomu的博客</a></p><h2 id=字符串操作>字符串操作</h2><blockquote><p>内核中使用UNICODE_STRING结构来作为基本的字符串结构，应该注意的是使用此结构中的lenth成员确定字符串长度，而不是<code>'\0'</code>。</p></blockquote><h3 id=字符串初始化>字符串初始化</h3><ul><li>函数：<code>RtlInitUnicodeString</code></li><li>参数：<ul><li><code>PUNICODE_STRING</code>: <code>DestinationString</code></li><li><code>PCWSTR</code>: <code>SourceString</code></li></ul></li><li>返回值：无</li><li>IRQL：<code>&lt;=DISPATCH_LEVEL</code></li><li>解释：初始化一个以0结尾的WCHAR字符串，第一个参数是输入参数也是输出参数</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=n>UNICODE_STRING</span> <span class=n>uFirstString</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=nf>RtlInitUnicodeString</span><span class=p>(</span><span class=o>&amp;</span><span class=n>uFirstString</span><span class=p>,</span> <span class=sa>L</span><span class=s>&#34;HelloWorld</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;String:%wZ&#34;</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>uFirstString</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>坑：它并没有为buffer分配空间，而是直接指向Source首地址，因此要保证Source始终有效，否则就是无效访问</p></blockquote><h3 id=字符串拷贝>字符串拷贝</h3><ul><li>函数：<code>RtlUnicodeStringCopyString</code></li><li>参数：<ul><li><code>PUNICODE_STRING</code>: <code>DestinationString</code></li><li><code>NTSTRSAFE_PCWSTR</code>: <code>pszSrc</code></li></ul></li><li>返回值：<code>NTSTAUTS</code><ul><li>成功执行返回<code>STATUS_SUCCESS</code></li></ul></li><li>IRQL：<code>=PASSIVE_LEVEL</code></li><li>解释：将src复制一份到dest里面</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=n>WCHAR</span> <span class=n>strBuf</span><span class=p>[</span><span class=mi>128</span><span class=p>]</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=n>UNICODE_STRING</span> <span class=n>uFirstString</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=nf>RtlInitEmptyUnicodeString</span><span class=p>(</span><span class=o>&amp;</span><span class=n>uFirstString</span><span class=p>,</span> <span class=n>strBuf</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>strBuf</span><span class=p>));</span>
+</span></span><span class=line><span class=cl><span class=nf>RtlUnicodeStringCopyString</span><span class=p>(</span><span class=o>&amp;</span><span class=n>uFirstString</span><span class=p>,</span> <span class=sa>L</span><span class=s>&#34;Hello Kernel</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;String: %wZ&#34;</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>uFirstString</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>坑：为了使用RtlUnicodeStringCopyString函数，应该添加头文件<code>Ntstrsafe.h</code>；不能copy到定长buf的String里，否则会蓝屏报内存读写错误</p></blockquote><h2 id=链表>链表</h2><h3 id=链表的定义>链表的定义</h3><blockquote><p>以下是wdk中链表的定义</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=n>_LIST_ENTRY</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>struct</span> <span class=n>_LIST_ENTRY</span> <span class=o>*</span><span class=n>Flink</span><span class=p>;</span> <span class=c1>// 后节点
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>struct</span> <span class=n>_LIST_ENTRY</span> <span class=o>*</span><span class=n>Blink</span><span class=p>;</span> <span class=c1>// 前节点
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span> <span class=n>LIST_ENTRY</span><span class=p>,</span> <span class=o>*</span><span class=n>PLIST_ENTRY</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=使用链表>使用链表</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=k>typedef</span> <span class=k>struct</span> <span class=n>_TestListEntry</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ULONG</span> <span class=n>m_ulData1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ULONG</span> <span class=n>m_ulData2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>LIST_ENTRY</span> <span class=n>m_ListEntry</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ULONG</span> <span class=n>m_ulData3</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ULONG</span> <span class=n>m_ulData4</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li>一般而言，为了方便操作，会定义一个链表的头结点，不包含任何内容，只是一个LIST_ENTRY结构。</li></ul><h3 id=头节点初始化>头节点初始化</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=n>LIST_ENTRY</span> <span class=n>ListHeader</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=nf>InitializeListHead</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ListHeader</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=节点插入>节点插入</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=n>LIST_ENTRY</span> <span class=n>ListHeader</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=n>TestListEntry</span> <span class=n>Entry1</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=n>TestListEntry</span> <span class=n>Entry2</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl><span class=n>TestListEntry</span> <span class=n>Entry3</span> <span class=o>=</span> <span class=p>{</span><span class=mi>0</span><span class=p>};</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>Entry1</span><span class=p>.</span><span class=n>m_ulData1</span> <span class=o>=</span> <span class=sc>&#39;A&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>Entry2</span><span class=p>.</span><span class=n>m_ulData1</span> <span class=o>=</span> <span class=sc>&#39;B&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>Entry3</span><span class=p>.</span><span class=n>m_ulData1</span> <span class=o>=</span> <span class=sc>&#39;C&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nf>InitializeListHead</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ListHeader</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>InsertHeadList</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ListHeader</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>Entry2</span><span class=p>.</span><span class=n>m_ListEntry</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>InsertHeadList</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ListHeader</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>Entry1</span><span class=p>.</span><span class=n>m_ListEntry</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nf>InsertTailList</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ListHeader</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>Entry3</span><span class=p>.</span><span class=n>m_ListEntry</span><span class=p>);</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=链表遍历>链表遍历</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=n>PLIST_ENTRY</span> <span class=n>pListEntry</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>pListEntry</span> <span class=o>=</span> <span class=n>ListHeader</span><span class=p>.</span><span class=n>Flink</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>while</span><span class=p>(</span><span class=n>pListEntry</span> <span class=o>!=</span> <span class=o>&amp;</span><span class=n>ListHeader</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>PTestListEntry</span> <span class=n>pTestEntry</span> <span class=o>=</span> <span class=nf>CONTAINING_RECORD</span><span class=p>(</span><span class=n>pListEntry</span><span class=p>,</span> <span class=n>TestListEntry</span><span class=p>,</span> <span class=n>m_ListEntry</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;ListPtr=%p, Entry=%p, Tag=%c</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>pListEntry</span><span class=p>,</span> <span class=n>pTestEntry</span><span class=p>,</span> <span class=p>(</span><span class=n>CHAR</span><span class=p>)</span><span class=n>pTestEntry</span><span class=o>-&gt;</span><span class=n>m_ulData1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>pListEntry</span> <span class=o>=</span> <span class=n>pListEntry</span><span class=o>-&gt;</span><span class=n>Flink</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><ul><li><code>CONTAINING_RECORD</code>的作用是将<code>m_ListEntry</code>地址转为结构体<code>TestListEntry</code>首地址</li><li><code>CONTAINING_RECORD</code>用法：<code>CONTAINING_RECORD(PCHAR Address, TYPE Type, PCHAR Field)</code></li></ul><h3 id=节点移除>节点移除</h3><ul><li>移除首节点：<code>PLIST_ENTRY RemoveHeadList(PLIST_ENTRY ListHead)</code></li><li>移除尾节点：<code>PLIST_ENTRY RemoveTailList(PLIST_ENTRY ListHead)</code></li><li>如果成功，上面两个函数都将返回链首地址，如果无法移除，则返回NULL</li><li>移除特定节点：<ul><li><code>BOOLEAN RemoveEntryList(PLIST_ENTRY Entry)</code></li><li>若移除后变成空链表，那么将返回TRUE，如果非空，则返回FALSE</li></ul></li></ul><h3 id=判断链表状态>判断链表状态</h3><ul><li><code>BOOLEAN IsListEmpty(const LIST_ENTRY *ListHead)</code></li><li>它返回TRUE时表示为空链表，否则表示链表非空</li></ul><h2 id=自旋锁>自旋锁</h2><h3 id=使用自旋锁>使用自旋锁</h3><blockquote><p>自旋锁是内核提供的一种高IRQL锁，用同步以及独占的方式访问某个资源</p><p><strong>注意事项</strong>：</p><ul><li>自旋锁变量不能存放在当前函数栈中，否则每次进入初始化一遍跟不初始化一样</li></ul></blockquote><h3 id=初始化使用自旋锁>初始化/使用自旋锁</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=c1>// Initialize Spin Lock WARN: not local var
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>KSPIN_LOCK</span> <span class=n>my_spin_lock</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>initLock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nf>KeInitializeSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>TestFuncLock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// it&#39;s a safe function
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=c1>// Acquire Lock
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>KIRQL</span> <span class=n>irql</span><span class=p>;</span> <span class=c1>// save old irql
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>  <span class=c1>// Normal Spin Lock
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nf>KeAcquireSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>irql</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=c1>// TO DO
+</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=nf>KeReleaseSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>,</span> <span class=n>irql</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=自旋锁在双向链表中使用>自旋锁在双向链表中使用</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=kt>void</span> <span class=nf>TestFuncLock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// it&#39;s a safe function
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] Enter...</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Acquire Lock
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>KIRQL</span> <span class=n>irql</span><span class=p>;</span> <span class=c1>// save old irql
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Normal Spin Lock
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=nf>KeAcquireSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>irql</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Test List
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>typedef</span> <span class=k>struct</span> <span class=n>_FILE_INFO</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>LIST_ENTRY</span> <span class=n>m_ListEntry</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>UNICODE_STRING</span> <span class=n>m_strFileName</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span><span class=n>FILE_INFO</span><span class=p>,</span> <span class=o>*</span><span class=n>PFILE_INFO</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>LIST_ENTRY</span> <span class=n>listHead</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>FILE_INFO</span> <span class=n>my_file_info</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>RtlInitUnicodeString</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_file_info</span><span class=p>.</span><span class=n>m_strFileName</span><span class=p>,</span> <span class=sa>L</span><span class=s>&#34;TestName&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=nf>InitializeListHead</span><span class=p>(</span><span class=o>&amp;</span><span class=n>listHead</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>ExInterlockedInsertHeadList</span><span class=p>(</span><span class=o>&amp;</span><span class=n>listHead</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>my_file_info</span><span class=p>.</span><span class=n>m_ListEntry</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>KeReleaseSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>,</span> <span class=n>irql</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=队列自旋锁>队列自旋锁</h3><blockquote><p>队列自旋锁可以在多CPU平台上有更好的性能，也遵循先等待先获取自旋锁的原则。</p></blockquote><ul><li>它和普通自旋锁的初始化是一样的，但是初始化后的自旋锁绝不能混用</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=n>KSPIN_LOCK</span> <span class=n>my_spin_lock</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>initLock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nf>KeInitializeSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kt>void</span> <span class=nf>TestFuncLock</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// it&#39;s a safe function
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Acquire Lock
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>KIRQL</span> <span class=n>irql</span><span class=p>;</span> <span class=c1>// save old irql
+</span></span></span><span class=line><span class=cl><span class=c1></span>
+</span></span><span class=line><span class=cl>    <span class=c1>// Queue Spin Lock
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>KLOCK_QUEUE_HANDLE</span> <span class=n>my_lock_queue_handle</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=nf>KeAcquireInStackQueuedSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_spin_lock</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>my_lock_queue_handle</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=nf>KeReleaseInStackQueuedSpinLock</span><span class=p>(</span><span class=o>&amp;</span><span class=n>my_lock_queue_handle</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=内存分配>内存分配</h2><h3 id=常规内存分配>常规内存分配</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=kt>void</span> <span class=nf>TestFuncMem</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>PVOID</span> <span class=n>buffer</span> <span class=o>=</span> <span class=nf>ExAllocatePoolWithTag</span><span class=p>(</span><span class=n>NonPagedPoolNx</span><span class=p>,</span> <span class=mi>512</span><span class=p>,</span> <span class=err>&#39;</span><span class=n>tag1</span><span class=err>&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>buffer</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ExFreePoolWithTag</span><span class=p>(</span><span class=n>buffer</span><span class=p>,</span> <span class=err>&#39;</span><span class=n>tag1</span><span class=err>&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] Pool Operate Success!</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] Allocate Pool Failed!</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=快表内存分配>快表内存分配</h3><blockquote><p>优点：高频率从系统中申请和释放内存，使用快表分配将大大提高性能</p></blockquote><ul><li>注意：有些地方称为“旁视列表”(LookAside)</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=kt>void</span> <span class=nf>TestFuncMemLookaside</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>PNPAGED_LOOKASIDE_LIST</span> <span class=n>pLookAsideList</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>BOOLEAN</span> <span class=n>bSucc</span> <span class=o>=</span> <span class=n>FALSE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>BOOLEAN</span> <span class=n>bInit</span> <span class=o>=</span> <span class=n>FALSE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>PVOID</span> <span class=n>pFirstMemory</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>PVOID</span> <span class=n>pSeocdeMemory</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>do</span> 
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>pLookAsideList</span> <span class=o>=</span> <span class=p>(</span><span class=n>PNPAGED_LOOKASIDE_LIST</span><span class=p>)</span><span class=nf>ExAllocatePoolWithTag</span><span class=p>(</span><span class=n>NonPagedPoolNx</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>NPAGED_LOOKASIDE_LIST</span><span class=p>),</span> <span class=err>&#39;</span><span class=n>test</span><span class=err>&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>pLookAsideList</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nf>memset</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=k>sizeof</span><span class=p>(</span><span class=n>NPAGED_LOOKASIDE_LIST</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1>// init
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>ExInitializeNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>,</span> <span class=mi>0</span><span class=p>,</span> <span class=mi>128</span><span class=p>,</span> <span class=err>&#39;</span><span class=n>test</span><span class=err>&#39;</span><span class=p>,</span> <span class=mi>0</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>bInit</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1>// start allocate
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>pFirstMemory</span> <span class=o>=</span> <span class=nf>ExAllocateFromNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>pFirstMemory</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>pSeocdeMemory</span> <span class=o>=</span> <span class=nf>ExAllocateFromNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>pSeocdeMemory</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] First Address:%p, Second Address:%p</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>,</span> <span class=n>pFirstMemory</span><span class=p>,</span> <span class=n>pSeocdeMemory</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// free first
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>ExFreeToNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>,</span> <span class=n>pFirstMemory</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>pFirstMemory</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=c1>// reallocate
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=n>pFirstMemory</span> <span class=o>=</span> <span class=nf>ExAllocateFromNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>pFirstMemory</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] Re-Allocate First Address:%p</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>,</span> <span class=n>pFirstMemory</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>bSucc</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>while</span> <span class=p>(</span><span class=n>FALSE</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>pFirstMemory</span> <span class=o>!=</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ExFreeToNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>,</span> <span class=n>pFirstMemory</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>pFirstMemory</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>pSeocdeMemory</span> <span class=o>!=</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ExFreeToNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>,</span> <span class=n>pSeocdeMemory</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>pSeocdeMemory</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>bInit</span> <span class=o>==</span> <span class=n>TRUE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ExDeleteNPagedLookasideList</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>bInit</span> <span class=o>=</span> <span class=n>FALSE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>pLookAsideList</span> <span class=o>!=</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ExFreePoolWithTag</span><span class=p>(</span><span class=n>pLookAsideList</span><span class=p>,</span> <span class=err>&#39;</span><span class=n>test</span><span class=err>&#39;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>pLookAsideList</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=对象与句柄>对象与句柄</h2><blockquote><p>在内核中创建，在内核中销毁，由内核管理与维护的对象称为内核对象</p></blockquote><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=kt>void</span> <span class=nf>TestFuncObject</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>BOOLEAN</span> <span class=n>bSucc</span> <span class=o>=</span> <span class=n>FALSE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>HANDLE</span> <span class=n>hCreateEvent</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>PVOID</span> <span class=n>pCreateEventObject</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>HANDLE</span> <span class=n>hOpenEvent</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>PVOID</span> <span class=n>pOpenEventObject</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>do</span> 
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>OBJECT_ATTRIBUTES</span> <span class=n>ObjAttr</span> <span class=o>=</span> <span class=p>{</span> <span class=mi>0</span> <span class=p>};</span>
+</span></span><span class=line><span class=cl>        <span class=n>UNICODE_STRING</span> <span class=n>uNameString</span> <span class=o>=</span> <span class=p>{</span> <span class=mi>0</span> <span class=p>};</span>
+</span></span><span class=line><span class=cl>        <span class=nf>RtlInitUnicodeString</span><span class=p>(</span><span class=o>&amp;</span><span class=n>uNameString</span><span class=p>,</span> <span class=sa>L</span><span class=s>&#34;</span><span class=se>\\</span><span class=s>BaseNamedObjects</span><span class=se>\\</span><span class=s>TestEvent&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nf>InitializeObjectAttributes</span><span class=p>(</span><span class=o>&amp;</span><span class=n>ObjAttr</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>uNameString</span><span class=p>,</span> <span class=n>OBJ_KERNEL_HANDLE</span> <span class=o>|</span> <span class=n>OBJ_CASE_INSENSITIVE</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ZwCreateEvent</span><span class=p>(</span><span class=o>&amp;</span><span class=n>hCreateEvent</span><span class=p>,</span> <span class=n>EVENT_ALL_ACCESS</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>ObjAttr</span><span class=p>,</span> <span class=n>SynchronizationEvent</span><span class=p>,</span> <span class=n>FALSE</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>hCreateEvent</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// get point
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>ObReferenceObjectByHandle</span><span class=p>(</span><span class=n>hCreateEvent</span><span class=p>,</span> <span class=n>EVENT_ALL_ACCESS</span><span class=p>,</span> <span class=o>*</span><span class=n>ExEventObjectType</span><span class=p>,</span> <span class=n>KernelMode</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>pCreateEventObject</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>pCreateEventObject</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// open obj with attribute:name
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nf>ZwOpenEvent</span><span class=p>(</span><span class=o>&amp;</span><span class=n>hOpenEvent</span><span class=p>,</span> <span class=n>EVENT_ALL_ACCESS</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>ObjAttr</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>hOpenEvent</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ObReferenceObjectByHandle</span><span class=p>(</span><span class=n>hOpenEvent</span><span class=p>,</span> <span class=n>EVENT_ALL_ACCESS</span><span class=p>,</span> <span class=o>*</span><span class=n>ExEventObjectType</span><span class=p>,</span> <span class=n>KernelMode</span><span class=p>,</span> <span class=o>&amp;</span><span class=n>pOpenEventObject</span><span class=p>,</span> <span class=nb>NULL</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>pOpenEventObject</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] Create Handle:%p, Create Object Address:%p</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>,</span> <span class=n>hCreateEvent</span><span class=p>,</span> <span class=n>pCreateEventObject</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=nf>DbgPrint</span><span class=p>(</span><span class=s>&#34;[%ws] Open Handle:%p, Open Object Address:%p</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>,</span> <span class=n>__FUNCTIONW__</span><span class=p>,</span> <span class=n>hOpenEvent</span><span class=p>,</span> <span class=n>pOpenEventObject</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>bSucc</span> <span class=o>=</span> <span class=n>TRUE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>while</span> <span class=p>(</span><span class=n>FALSE</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>pCreateEventObject</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ObDereferenceObject</span><span class=p>(</span><span class=n>pCreateEventObject</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>pCreateEventObject</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>hCreateEvent</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ZwClose</span><span class=p>(</span><span class=n>hCreateEvent</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>hCreateEvent</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>pOpenEventObject</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ObDereferenceObject</span><span class=p>(</span><span class=n>pOpenEventObject</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>pOpenEventObject</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>hOpenEvent</span> <span class=o>==</span> <span class=nb>NULL</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nf>ZwClose</span><span class=p>(</span><span class=n>hOpenEvent</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>hOpenEvent</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><blockquote><p>一个小小的坑：在导入头文件的时候发生冲突：<code>ntddk.h</code>和<code>ntifs.h</code>，解决办法是将<code>ntifs.h</code>放到<code>ntddk.h</code>的前面导入，这样就没有冲突了</p></blockquote><h2 id=注册表>注册表</h2><blockquote><p>注册表其实是Windows的配置存储结构，存储着系统绝大部分的配置信息，其中大多数文件存储在系统盘下SYSTEM32\CONFIG目录下，这些文件以内存映射方式存储在内核空间中，然后以“HIVE”的方式组织起来，注册表API实际上操作的是HIVE内存数据，最终会写回到config目录下对应的文件中去</p></blockquote><h3 id=打开与关闭>打开与关闭</h3><ul><li>未完待续</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C></code></pre></td></tr></table></div></div></section><footer class=article-footer><section class=article-tags><a href=/zh-cn/tags/windows/>Windows</a>
+<a href=/zh-cn/tags/%E5%86%85%E6%A0%B8/>内核</a></section><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>相关文章</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/zh-cn/posts/windows%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/><div class=article-details><h2 class=article-title>Windows内核编程学习笔记-001-环境搭建</h2></div></a></article><article><a href=/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/><div class=article-details><h2 class=article-title>Linux内核编程学习笔记-001-编译和启动内核</h2></div></a></article></div></div></aside><script src=https://giscus.app/client.js data-repo=Moeomu/blog data-repo-id=R_kgDOHHJl4A data-category=Announcements data-category-id=DIC_kwDOHHJl4M4CR7uM data-mapping=pathname data-strict=0 data-reactions-enabled=1 data-emit-metadata=0 data-input-position=top data-theme=light data-lang=en crossorigin=anonymous async></script>
+<script>function setGiscusTheme(e){let t=document.querySelector("iframe.giscus-frame");t&&t.contentWindow.postMessage({giscus:{setConfig:{theme:e}}},"https://giscus.app")}(function(){addEventListener("message",t=>{if(event.origin!=="https://giscus.app")return;e()}),window.addEventListener("onColorSchemeChange",e);function e(){setGiscusTheme(document.documentElement.dataset.scheme==="light"?"light":"dark_dimmed")}})()</script><footer class=site-footer><section class=copyright>&copy;
+2020 -
+2023 Misaka的秘密花园</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>主题 <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.21.0>Stack</a></b> 由 <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> 设计</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

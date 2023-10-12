@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>堆保护 on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E4%BF%9D%E6%8A%A4/</link><description>Recent content in 堆保护 on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 28 Nov 2020 16:15:00 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/%E5%A0%86%E4%BF%9D%E6%8A%A4/index.xml" rel="self" type="application/rss+xml"/><item><title>漏洞利用学习笔记-021-保护下的堆</title><link>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-021-%E4%BF%9D%E6%8A%A4%E4%B8%8B%E7%9A%84%E5%A0%86/</link><pubDate>Sat, 28 Nov 2020 16:15:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-021-%E4%BF%9D%E6%8A%A4%E4%B8%8B%E7%9A%84%E5%A0%86/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e6%bc%8f%e6%b4%9e%e5%88%a9%e7%94%a8%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-021-%e4%bf%9d%e6%8a%a4%e4%b8%8b%e7%9a%84%e5%a0%86/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="简介">简介&lt;/h2>
+&lt;ul>
+&lt;li>PEB Random：微软在&lt;code>Windows XP SP2&lt;/code>之后不再使用固定的PEB基址&lt;code>0x7ffdf000&lt;/code>，而是使用具有一定随机性的PEB基址。PEB随机化之后主要影响了对PEB中函数的攻击，在&lt;code>DWORD SHOOT&lt;/code>的时候，PEB中的函数指针是绝佳的目标，移动PEB基址将在一定程度上给这类攻击增加难度。覆盖PEB中函数指针的利用方式请参见&lt;a class="link" href="https://www.moeomu.com/posts/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/" target="_blank" rel="noopener"
+>堆溢出利用&lt;/a>中的实验和&lt;a class="link" href="https://www.moeomu.com/posts/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/" target="_blank" rel="noopener"
+>攻击PEB中的函数指针&lt;/a>的相关介绍&lt;/li>
+&lt;li>&lt;code>SafeUnlink&lt;/code>：微软改写了操作双向链表的代码，在卸载&lt;code>free list&lt;/code>中的堆块时更加小心。对照&lt;a class="link" href="https://www.moeomu.com/posts/%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-007-%E5%A0%86%E6%BA%A2%E5%87%BA%E7%9A%84%E5%88%A9%E7%94%A8/" target="_blank" rel="noopener"
+>堆溢出利用-DWORD SHOOT&lt;/a>中关于双向链表拆卸问题的描述，在SP2之前的链表拆卸操作类似于如下代码：&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ListNode&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>SP2 在进行删除操作时，将提前验证堆块前向指针和后向指针的完整性，以防止发生&lt;code>DWORD SHOOT&lt;/code>：&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">safe_remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ListNode&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">blink&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">flink&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">node&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">flink&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">blink&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">node&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">flink&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node&lt;/span> &lt;span class="o">-&amp;gt;&lt;/span> &lt;span class="n">blink&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 链表指针被破坏，进入异常
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>heap cookie：栈中的&lt;code>security cookie&lt;/code>类似，微软在堆中也引入了cookie，用于检测堆溢出的发生。cookie被布置在堆首部分原堆块的&lt;code>segment table&lt;/code>的位置，占1个字节大小&lt;/li>
+&lt;/ul>
+&lt;p>&lt;img src="https://blog.moeomu.com/heap%20struct.png"
+loading="lazy"
+alt="heap struct"
+>&lt;/p>
+&lt;ul>
+&lt;li>元数据加密：微软在&lt;code>Windows Vista&lt;/code>及后续版本的操作系统中开始使用该安全措施。块首中的一些重要数据在保存时会与一个4字节的随机数进行异或运算，在使用这些数据时候需要再进行一次异或运行来还原，这样我们就不能直接破坏这些数据了，以达到保护堆的目的。&lt;/li>
+&lt;/ul>
+&lt;h2 id="攻击思路">攻击思路&lt;/h2>
+&lt;h3 id="攻击堆内存储的变量">攻击堆内存储的变量&lt;/h3>
+&lt;blockquote>
+&lt;p>这样的方法是攻击堆内存储的函数指针之类的方法实现溢出，但是和堆本身并没有什么关系&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="利用chunk重设大小攻击堆">利用chunk重设大小攻击堆&lt;/h3>
+&lt;h4 id="原理">原理&lt;/h4>
+&lt;blockquote>
+&lt;p>&lt;code>SafeUnlink&lt;/code>在堆从freelist中卸下堆块的时候进行双链表有效性校验，但是将堆块插入freelist中的操作却没有校验&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="时机">时机&lt;/h4>
+&lt;ul>
+&lt;li>内存中释放堆块后，将会被插入空表&lt;/li>
+&lt;li>堆块的空间大于申请的空间，剩余的空间将被插入空表&lt;/li>
+&lt;/ul>
+&lt;h3 id="新chunk的插入过程">新chunk的插入过程&lt;/h3>
+&lt;blockquote>
+&lt;p>Flink：下一个节点；Blink：上一个节点；参见&lt;a class="link" href="https://docs.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-list_entry" target="_blank" rel="noopener"
+>MSDN-NTDEF-LIST&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>新chunk-&amp;gt;Blink=旧chunk-&amp;gt;Flink-&amp;gt;Blink&lt;/li>
+&lt;li>旧chunk-&amp;gt;Flink-&amp;gt;Blink-&amp;gt;Flink=新chunk&lt;/li>
+&lt;li>旧chunk-&amp;gt;Flink-&amp;gt;Blink=新chunk&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>只要将旧chunk的Flink指针覆盖为地址，将Blink覆盖为值，就又可以进行DWORDSHOOT了&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="代码">代码&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-cpp" data-lang="cpp">&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="未完待续">未完待续&lt;/h3></description></item></channel></rss>

@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Misaka的秘密花园</title><link>https://blog.moeomu.com/zh-cn/tags/linux/</link><description>Recent content in Linux on Misaka的秘密花园</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Wed, 26 Oct 2022 19:14:09 +0800</lastBuildDate><atom:link href="https://blog.moeomu.com/zh-cn/tags/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>在华硕玩家国度枪神4上安装ArchLinux</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E5%8D%8E%E7%A1%95%E7%8E%A9%E5%AE%B6%E5%9B%BD%E5%BA%A6%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85archlinux/</link><pubDate>Wed, 26 Oct 2022 19:14:09 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8%E5%8D%8E%E7%A1%95%E7%8E%A9%E5%AE%B6%E5%9B%BD%E5%BA%A6%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85archlinux/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp" alt="Featured image of post 在华硕玩家国度枪神4上安装ArchLinux" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8%e5%8d%8e%e7%a1%95%e7%8e%a9%e5%ae%b6%e5%9b%bd%e5%ba%a6%e6%9e%aa%e7%a5%9e4%e4%b8%8a%e5%ae%89%e8%a3%85archlinux/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="本文简介">本文简介&lt;/h2>
+&lt;blockquote>
+&lt;p>Asus Strix ScarG532&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>如果您和我是一样的机器那么完全可以遵循本文一步一步地执行命令，最终一定会成功安装ArchLinux。我会详尽地将参考资料链接在旁边，您可以查看和修改成您想要的配置。&lt;/li>
+&lt;li>上面这条说明有违Arch之道，所以我是在开玩笑。请勿一步一步遵循下文配置，如果您遇到了和我一样的问题，您可以参考我的解决方案&lt;/li>
+&lt;li>我所安装的组件内容如下
+&lt;ul>
+&lt;li>安全启动组件：PreLoader&lt;/li>
+&lt;li>启动引导程序：systemd-boot&lt;/li>
+&lt;li>网络和DHCP服务：NetworkManager (因为与Gnome集成更好)&lt;/li>
+&lt;li>桌面环境：Gnome based on Wayland&lt;/li>
+&lt;li>中文输入：ibus-libpinyin based on ibus (因为与Gnome集成更好)&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="安装archlinux">安装ArchLinux&lt;/h2>
+&lt;blockquote>
+&lt;p>这一节完全遵循&lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>Installation guide - ArchWiki&lt;/a>，您可以查看此官方文档链接获得更详细的解释&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="预安装">预安装&lt;/h3>
+&lt;h4 id="启动盘制作">启动盘制作&lt;/h4>
+&lt;ul>
+&lt;li>您可以访问&lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>Download - ArchLinux&lt;/a>页面来获取官方启动镜像&lt;/li>
+&lt;li>下载好后推荐使用&lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>balenaEtcher&lt;/a>将镜像写入U盘&lt;/li>
+&lt;li>从U盘启动制作好的ArchLinux安装环境系统&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>这三步由于过于简单所以不多赘述，如果需要帮助请在评论区留言&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="验证uefi模式启动">验证UEFI模式启动&lt;/h4>
+&lt;p>执行命令&lt;code>ls /sys/firmware/efi/efivars&lt;/code>，如果有输出值那么证明是UEFI模式启动，后文中引导程序将使用UEFI&lt;/p>
+&lt;h4 id="检查并连接网络">检查并连接网络&lt;/h4>
+&lt;blockquote>
+&lt;p>下文将使用无线网卡进行网络连接&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>rfkill&lt;/code>，如果输出如下则证明硬件正常&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-sh" data-lang="sh">&lt;span class="line">&lt;span class="cl">ID TYPE DEVICE SOFT HARD
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">0&lt;/span> bluetooth hci0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="m">1&lt;/span> wlan phy0 unblocked unblocked
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>iwctl&lt;/code>进入网络连接配置工具界面，更多内容查看&lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>iwctl - ArchWiki&lt;/a>&lt;/li>
+&lt;li>执行&lt;code>device list&lt;/code>查看设备列表&lt;/li>
+&lt;li>执行&lt;code>station wlan0 scan&lt;/code>使用wlan0设备进行扫描&lt;/li>
+&lt;li>执行&lt;code>station wlan0 get-networks&lt;/code>查看扫描到的网络列表&lt;/li>
+&lt;li>执行&lt;code>station wlan0 connect SSID&lt;/code>连接网络&lt;/li>
+&lt;li>执行&lt;code>ping archlinux.org&lt;/code>检测网络连接情况&lt;/li>
+&lt;/ul>
+&lt;h4 id="校准时间">校准时间&lt;/h4>
+&lt;blockquote>
+&lt;p>systemd-timesyncd检测到网络连接将会自动校准时间，因此不需要手动校准时间&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>timedatectl status&lt;/code>查看并确保系统时间正确&lt;/li>
+&lt;/ul>
+&lt;h4 id="磁盘操作数据无价务必谨慎操作">磁盘操作(&lt;strong>数据无价，务必谨慎操作&lt;/strong>)&lt;/h4>
+&lt;blockquote>
+&lt;p>本节是一定不可以照搬的，您的磁盘数量可能和我不一样，您的磁盘分区情况也一定和我不一样&lt;br>
+务必参考&lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks" target="_blank" rel="noopener"
+>Partition the disks - ArchWiki&lt;/a>进行磁盘分区&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>fdisk -l&lt;/code>查看磁盘分区情况，按照您的需要自己分区&lt;/li>
+&lt;li>执行&lt;code>fdisk /dev/nvme0n1&lt;/code>进行第一块SSD的操作，按&lt;code>m&lt;/code>显示帮助，操作完成后保存退出&lt;code>fdisk&lt;/code>界面，此工具在保存时才会写入硬盘分区表，请放心操作&lt;/li>
+&lt;li>(危险)执行&lt;code>mkfs.ext4 /dev/nvme0n1p4&lt;/code>格式化第一块SSD的第四个分区，在本例中将会是&lt;code>/&lt;/code>的挂载点&lt;/li>
+&lt;li>(危险)执行&lt;code>mkfs.ext4 /dev/nvme2n1p1&lt;/code>格式化第三块SSD的第一个分区，在本例中将会是&lt;code>/home&lt;/code>的挂载点&lt;/li>
+&lt;li>执行&lt;code>e2label /dev/nvme0n1p4 &amp;quot;ArchSys&amp;quot;&lt;/code>将第一块SSD的第四个分区的标签设置为ArchSys，systemd-boot将会用到它&lt;/li>
+&lt;li>执行&lt;code>e2label /dev/nvme2n1p1 &amp;quot;ArchData&amp;quot;&lt;/code>将第三块SSD的第一个分区的标签设置为ArchData，systemd-boot将会用到它&lt;/li>
+&lt;li>执行&lt;code>blkid | grep Arch&lt;/code>查看磁盘标签的设置情况&lt;/li>
+&lt;li>执行&lt;code>mount /dev/nvme0n1p4 /mnt&lt;/code>挂载磁盘，它将会是&lt;code>/&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>mount --mkdir /dev/nvme0n1p1 /mnt/boot&lt;/code>挂载磁盘，它将会是&lt;code>/boot&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>mount --mkdir /dev/nvme2n1p1 /mnt/home&lt;/code>挂载磁盘，它将会是&lt;code>/home&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>mkswap /dev/nvme0n1p5&lt;/code>格式化第一块SSD的第五个分区为内存交换分区&lt;/li>
+&lt;li>执行&lt;code>swapon /dev/nvme0n1p5&lt;/code>启用内存交换分区&lt;/li>
+&lt;/ul>
+&lt;h3 id="开始安装">开始安装&lt;/h3>
+&lt;h4 id="修改选择镜像地址">修改选择镜像地址&lt;/h4>
+&lt;blockquote>
+&lt;p>vim是一款命令行文本编辑器，如果不会用的话可以换为nano，如果已经进入了vim界面，可以在普通模式下输入英文冒号和q退出vim&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>vim /etc/pacman.d/mirrorlist&lt;/code>编辑安装源镜像列表&lt;/li>
+&lt;li>将本行&lt;code>Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch&lt;/code>加到最上方，或者可以遵循自己的习惯&lt;/li>
+&lt;/ul>
+&lt;h4 id="安装必须的包">安装必须的包&lt;/h4>
+&lt;blockquote>
+&lt;p>intel-ucode是intel的微码更新包，推荐安装&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>pacstrap -K /mnt base linux linux-firmware intel-ucode&lt;/code>安装系统基础包&lt;/li>
+&lt;li>执行&lt;code>pacstrap /mnt networkmanager bluez vim sudo bash-completion openssh man git wget zsh&lt;/code>安装一些自己需要的软件&lt;/li>
+&lt;/ul>
+&lt;h3 id="配置新系统">配置新系统&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>genfstab -U /mnt &amp;gt;&amp;gt; /mnt/etc/fstab&lt;/code>创建系统分区表定义&lt;/li>
+&lt;li>执行&lt;code>arch-chroot /mnt&lt;/code>将shell切换到新系统中执行命令&lt;/li>
+&lt;li>执行&lt;code>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime&lt;/code>将系统时区设置为亚洲-上海&lt;/li>
+&lt;li>执行&lt;code>hwclock --systohc&lt;/code>同步硬件时间&lt;/li>
+&lt;li>执行&lt;code>vim /etc/locale.gen&lt;/code>编辑系统的本地化设置，我的设定如下，可以作为参考。&lt;strong>注意：如果在这一步中不添加&lt;code>zh_CN.UTF-8 UTF-8&lt;/code>，那么在Gnome的&lt;code>Keyboard&lt;/code>选项中会找不到拼音输入&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">en_US.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">zh_CN.UTF-8 UTF-8
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>locale-gen&lt;/code>生成本地化设置&lt;/li>
+&lt;li>执行&lt;code>vim /etc/locale.conf&lt;/code>编辑语言配置文件，我使用英文系统，输入了&lt;code>LANG=en_US.UTF-8&lt;/code>，如果使用中文系统，改成&lt;code>LANG=zh_CN.UTF-8&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>vim /etc/hostname&lt;/code>编辑本主机名称&lt;/li>
+&lt;li>执行&lt;code>mkinitcpio -P&lt;/code>创建启动内存初始化镜像&lt;/li>
+&lt;li>执行&lt;code>passwd&lt;/code>修改root用户密码&lt;/li>
+&lt;/ul>
+&lt;h3 id="配置系统启动项">配置系统启动项&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>bootctl --path=/boot install&lt;/code>将systemd-boot安装到/boot中&lt;/li>
+&lt;li>执行&lt;code>systemctl enable systemd-boot-update.service&lt;/code>启动systemd-boot的自动更新服务&lt;/li>
+&lt;li>执行&lt;code>vim /boot/loader/loader.conf&lt;/code>编辑systemd-boot启动配置文件&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">default archlinux.conf
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">timeout 2
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">console-mode max
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">editor no
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-entries 1
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">auto-firmware 1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>vim /boot/loader/entries/archlinux.conf&lt;/code>编辑ArchLinux启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>vim /boot/loader/entries/arch-fallback.conf&lt;/code>编辑ArchLinux-Fallback启动项&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">title Arch Linux (fallback initramfs)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">linux /vmlinuz-linux
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /intel-ucode.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">initrd /initramfs-linux-fallback.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">options root=&amp;#34;LABEL=ArchSys&amp;#34; rw quiet splash
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="其它">其它&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>systemctl enable NetworkManager.service&lt;/code>让NetworkManager的服务开机自启动&lt;/li>
+&lt;li>执行&lt;code>systemctl enbale bluetooth.service&lt;/code>让蓝牙服务开机自启动&lt;/li>
+&lt;li>执行&lt;code>exit&lt;/code>退出新系统环境&lt;/li>
+&lt;li>执行&lt;code>reboot&lt;/code>重新启动系统&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;blockquote>
+&lt;p>&lt;strong>提示：到这里其实就可以结束了，但是如果作为主力系统来使用，ArchLinux现在的样子显然不合格，所以下文是更多的软件安装参考&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;hr>
+&lt;h2 id="更多安装配置">更多安装配置&lt;/h2>
+&lt;h3 id="连接网络">连接网络&lt;/h3>
+&lt;blockquote>
+&lt;p>使用NetworkManager命令行工具&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>nmcli device wifi list&lt;/code>查看wifi列表&lt;/li>
+&lt;li>执行&lt;code>nmcli device wifi connect SSID_or_BSSID password your_password&lt;/code>连接网络&lt;/li>
+&lt;li>执行&lt;code>nmcli connection show&lt;/code>查看当前连接&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>您可以在&lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager#nmcli_examples" target="_blank" rel="noopener"
+>nmcli example - ArchWiki&lt;/a>文章中查看更多用法&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="新建用户">新建用户&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>useradd -m misaka&lt;/code>来新建一个名为misaka的用户&lt;/li>
+&lt;li>执行&lt;code>export EDITOR=vim &amp;amp;&amp;amp; visudo&lt;/code>编辑此文件，按照提示，将新用户添加到特权用户组，让新用户可以正常使用sudo进行提权操作&lt;/li>
+&lt;li>执行&lt;code>usermod -a -G wheel misaka&lt;/code>将misaka用户添加到wheel用户组中，这样做的好处是让Gnome可以正确识别这个新用户的权限，在Gnome中进行root权限操作时默认弹出这个用户名的验证&lt;/li>
+&lt;li>执行&lt;code>passwd misaka&lt;/code>修改新用户的密码&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装图形界面gnome">安装图形界面Gnome&lt;/h3>
+&lt;blockquote>
+&lt;p>提示：下方写的命令要安装的软件很多，是因为Gnome包中有很多我不需要的软件，所以只能手动选择希望安装的软件，您也同样可以用更简单的&lt;code>pacman -S gnome&lt;/code>来代替下方的安装命令，随您喜好&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行下方的命令将安装Gnome的基础组件&lt;/li>
+&lt;li>&lt;code>pacman -S file-roller gdm gedit gnome-backgrounds gnome-calculator gnome-control-center gnome-disk-utility gnome-logs gnome-menus gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gvfs nautilus seahorse seahorse-nautilus xdg-user-dirs-gtk&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>如果安装时让您选择使用&lt;code>jack2&lt;/code>还是&lt;code>pipewire&lt;/code>，请选择&lt;code>pipewire&lt;/code>。这是系统的声音服务。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>systemctl enable gdm.service&lt;/code>让Gnome登陆界面开机自启动，它将会在下一次重启时启动Gnome&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装中文输入法和字体">安装中文输入法和字体&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>pacman -S ttf-dejavu wqy-zenhei wqy-microhei adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts&lt;/code>安装中文字体&lt;/li>
+&lt;li>执行&lt;code>ibus ibus-libpinyin&lt;/code>安装ibus和ibus的智能拼音输入法&lt;/li>
+&lt;/ul>
+&lt;h3 id="重新启动并以普通用户身份登陆">重新启动并以普通用户身份登陆&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>reboot&lt;/code>&lt;/li>
+&lt;li>启动Terminal&lt;/li>
+&lt;/ul>
+&lt;h3 id="gnome窗口控制按钮设置">Gnome窗口控制按钮设置&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>gsettings set org.gnome.desktop.wm.preferences button-layout &amp;quot;close,minimize,maximize:&amp;quot;&lt;/code>将会把所有窗口的关闭、最小化、最大化按钮显示出来并放到左侧&lt;/li>
+&lt;/ul>
+&lt;h3 id="nvidia驱动设置">NVIDIA驱动设置&lt;/h3>
+&lt;blockquote>
+&lt;p>&lt;strong>警告：本小节执行之中请勿重新启动&lt;/strong>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>sudo pacman -S nvidia nvidia-settings&lt;/code>安装NVIDIA显卡驱动和设置程序&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>它将会把默认的窗口系统从Wayland换成X11，如果想继续使用Wayland作为窗口系统，请执行以下命令&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>sudo ln -s /dev/null /etc/udev/rules.d/61-gdm.rules&lt;/code>禁用udev的在GDM中禁用Wayland的规则&lt;/li>
+&lt;li>执行&lt;code>gsettings set org.gnome.mutter experimental-features '[&amp;quot;kms-modifiers&amp;quot;]'&lt;/code>启用gsettings的kms-modifiers&lt;/li>
+&lt;li>执行&lt;code>sudo vim /boot/loader/entries/archlinux.conf&lt;/code>编辑启动引导项将最后一行改成&lt;code>options root=&amp;quot;LABEL=ArchSys&amp;quot; rw quiet splash nvidia-drm.modeset=1&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>sudo vim /etc/mkinitcpio.conf&lt;/code>编辑modsettings将&lt;code>MODULES=()&lt;/code>改成&lt;code>nvidia nvidia_modeset nvidia_uvm nvidia_drm&lt;/code>并保存文件。更多帮助信息请参考&lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA#DRM_kernel_mode_setting" target="_blank" rel="noopener"
+>DRM_kernel_mode_setting - ArchWiki&lt;/a>&lt;/li>
+&lt;li>执行&lt;code>sudo mkinitcpio -P&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>本节参考来源：&lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>Use Wayland with proprietary NVIDIA drivers - Manjaro Forum&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="安全启动">安全启动&lt;/h3>
+&lt;blockquote>
+&lt;p>本节参考来源：&lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>Unified Extensible Firmware Interface/Secure Boot - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>从&lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>Linux Foundation Secure Boot System Released - James Bottomley&amp;rsquo;s random Pages&lt;/a>下载PreLoader.efi和HashTool.efi&lt;/li>
+&lt;li>如果您按照上文配置，那么将这两个文件复制到您的&lt;code>/boot/EFI/systemd&lt;/code>目录中&lt;/li>
+&lt;li>将&lt;code>/boot/EFI/systemd/systemd-bootx64.efi&lt;/code>重命名为&lt;code>/boot/EFI/systemd/loader.efi&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">cp your_download_path/&lt;span class="o">{&lt;/span>PreLoader,HashTool&lt;span class="o">}&lt;/span>.efi esp/EFI/systemd
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp esp/EFI/systemd/systemd-bootx64.efi esp/EFI/systemd/loader.efi
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;ul>
+&lt;li>执行&lt;code>sudo pacman -S efibootmgr&lt;/code>安装efibootmgr&lt;/li>
+&lt;li>&lt;strong>请注意可能您的磁盘和我不同&lt;/strong>，执行&lt;code>sudo efibootmgr --verbose --disk /dev/nvme0n1 --part 1 --create --label &amp;quot;Arch Linux Security Boot&amp;quot; --loader /boot/EFI/systemd/PreLoader.efi&lt;/code>添加一个NVRAM启动条目&lt;/li>
+&lt;/ul>
+&lt;h3 id="安装gnome扩展程序">安装Gnome扩展程序&lt;/h3>
+&lt;ul>
+&lt;li>执行&lt;code>flatpak install com.mattjakeman.ExtensionManager&lt;/code>安装Gnome扩展程序管理器&lt;/li>
+&lt;li>在Gnome扩展程序管理器中搜索安装并配置下列扩展程序
+&lt;ul>
+&lt;li>TrayIcons: Reloaded(强烈推荐)&lt;/li>
+&lt;li>Blur My Shell&lt;/li>
+&lt;li>Gnome Clipboard&lt;/li>
+&lt;li>Compiz alike magic lamp effect&lt;/li>
+&lt;li>Dash to dock&lt;/li>
+&lt;li>No activities button&lt;/li>
+&lt;li>Open Weather&lt;/li>
+&lt;li>Privacy Quick Settings Menu&lt;/li>
+&lt;li>Vitals&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="其他问题">其他问题&lt;/h2>
+&lt;blockquote>
+&lt;p>下文会用到Aur软件源，可以在&lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>Aur - ArchLinux&lt;/a>中找到更多信息。&lt;br>
+&lt;code>paru&lt;/code>是一个Aur软件源的实用工具，可以自动获取安装Aur软件源内的程序，请访问&lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>Morganamilo/paru - Github&lt;/a>了解查看paru的安装和使用。&lt;/p>
+&lt;/blockquote>
+&lt;h3 id="gnome无法正常挂载ntfs外接磁盘">Gnome无法正常挂载NTFS外接磁盘&lt;/h3>
+&lt;blockquote>
+&lt;p>可能是Gnome中的gvfs需要使用ntfs-3g中的一些实用工具才可以正确挂载NTFS磁盘。Linux内核5.15版本之后将ntfs驱动内置，因此可以通过以上命令单独安装使用内核ntfs驱动的ntfs实用工具。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>paru ntfsprogs-ntfs3&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="没有声音">没有声音&lt;/h3>
+&lt;blockquote>
+&lt;p>本节参考：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>Problem summary of installing Ubuntu on AsusStrixScarG532 - MoeomuBlog&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>ASUS ROG G533QS - ArchWiki&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;p>有以上两个解决方式，具体使用哪个请根据自己的喜好&lt;/p>
+&lt;h3 id="gpg问题">GPG问题&lt;/h3>
+&lt;blockquote>
+&lt;p>本节参考：&lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>GnuPG - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;h4 id="ioctl错误">ioctl错误&lt;/h4>
+&lt;blockquote>
+&lt;p>指南：&lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG#Invalid_IPC_response_and_Inappropriate_ioctl_for_device" target="_blank" rel="noopener"
+>Invalid_IPC_response_and_Inappropriate_ioctl_for_device - ArchWiki&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>将&lt;code>export GPG_TTY=$(tty)&lt;/code>添加到环境变量中，例如&lt;code>.bashrc&lt;/code>，&lt;code>.zshrc&lt;/code>等文件中&lt;/li>
+&lt;/ul>
+&lt;h4 id="将pinentry配置为gnome3样式">将pinentry配置为Gnome3样式&lt;/h4>
+&lt;blockquote>
+&lt;p>不配置将会导致GPG无法找到图形界面的输入密码界面程序，进而导致更多的图形界面程序错误&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>echo pinentry-program /usr/bin/pinentry-gnome3 &amp;gt;&amp;gt; .gnupg/gpg-agent.conf&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="键盘灯光和电源控制">键盘灯光和电源控制&lt;/h3>
+&lt;blockquote>
+&lt;p>在&lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>ASUS Linux&lt;/a>阅读更多&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>执行&lt;code>paru asusctl&lt;/code>&lt;/li>
+&lt;li>执行&lt;code>paru rog-control-center&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>[HowTo] Use Wayland with proprietary NVIDIA drivers. (2022, February 10). Manjaro Linux Forum. &lt;a class="link" href="https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130" target="_blank" rel="noopener"
+>https://forum.manjaro.org/t/howto-use-wayland-with-proprietary-nvidia-drivers/36130&lt;/a>&lt;/li>
+&lt;li>Arch Linux - Downloads. (n.d.). Archlinux.org. &lt;a class="link" href="https://archlinux.org/download/" target="_blank" rel="noopener"
+>https://archlinux.org/download/&lt;/a>&lt;/li>
+&lt;li>Arch Linux 源使用帮助 — USTC Mirror Help 文档. (n.d.). Mirrors.ustc.edu.cn. Retrieved October 26, 2022, from &lt;a class="link" href="https://mirrors.ustc.edu.cn/help/archlinux.html" target="_blank" rel="noopener"
+>https://mirrors.ustc.edu.cn/help/archlinux.html&lt;/a>&lt;/li>
+&lt;li>ASUS NoteBook Linux. (n.d.). Asus-Linux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://asus-linux.org/" target="_blank" rel="noopener"
+>https://asus-linux.org/&lt;/a>&lt;/li>
+&lt;li>ASUS ROG G533QS - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/ASUS_ROG_G533QS" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/ASUS_ROG_G533QS&lt;/a>&lt;/li>
+&lt;li>AUR (en) - Home. (n.d.). Aur.archlinux.org. &lt;a class="link" href="https://aur.archlinux.org/" target="_blank" rel="noopener"
+>https://aur.archlinux.org/&lt;/a>&lt;/li>
+&lt;li>balenaEtcher - Home. (2020). BalenaEtcher. &lt;a class="link" href="https://www.balena.io/etcher/" target="_blank" rel="noopener"
+>https://www.balena.io/etcher/&lt;/a>&lt;/li>
+&lt;li>GnuPG - ArchWiki. (2018). Archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/GnuPG" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/GnuPG&lt;/a>&lt;/li>
+&lt;li>Installation guide - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Installation_guide" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Installation_guide&lt;/a>&lt;/li>
+&lt;li>iwd - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/Iwctl" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Iwctl&lt;/a>&lt;/li>
+&lt;li>Linux Foundation Secure Boot System Released | James Bottomley’s random Pages. (n.d.). Retrieved October 26, 2022, from &lt;a class="link" href="https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/" target="_blank" rel="noopener"
+>https://blog.hansenpartnership.com/linux-foundation-secure-boot-system-released/&lt;/a>&lt;/li>
+&lt;li>Lulu. (2022, October 26). Paru. GitHub. &lt;a class="link" href="https://github.com/Morganamilo/paru" target="_blank" rel="noopener"
+>https://github.com/Morganamilo/paru&lt;/a>&lt;/li>
+&lt;li>Misaka. (2022, October 20). Problem summary of installing Ubuntu on AsusStrixScarG532. Moeomu Blog. &lt;a class="link" href="https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems" target="_blank" rel="noopener"
+>https://blog.moeomu.com/posts/problem-summary-of-installing-ubuntu-on-asusstrixscarg532/#system-sound-problems&lt;/a>&lt;/li>
+&lt;li>NetworkManager - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/NetworkManager" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NetworkManager&lt;/a>&lt;/li>
+&lt;li>NVIDIA - ArchWiki. (n.d.). Wiki.archlinux.org. Retrieved October 26, 2022, from &lt;a class="link" href="https://wiki.archlinux.org/title/NVIDIA" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/NVIDIA&lt;/a>&lt;/li>
+&lt;li>Unified Extensible Firmware Interface/Secure Boot - ArchWiki. (n.d.). Wiki.archlinux.org. &lt;a class="link" href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot" target="_blank" rel="noopener"
+>https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>在ROG枪神4上安装Ubuntu遇到的问题和解决办法</title><link>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8rog%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85ubuntu%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link><pubDate>Thu, 20 Oct 2022 13:22:01 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/%E5%9C%A8rog%E6%9E%AA%E7%A5%9E4%E4%B8%8A%E5%AE%89%E8%A3%85ubuntu%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid><description>&lt;img src="https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp" alt="Featured image of post 在ROG枪神4上安装Ubuntu遇到的问题和解决办法" />&lt;p>本文来源: &lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/%e5%9c%a8rog%e6%9e%aa%e7%a5%9e4%e4%b8%8a%e5%ae%89%e8%a3%85ubuntu%e9%81%87%e5%88%b0%e7%9a%84%e9%97%ae%e9%a2%98%e5%92%8c%e8%a7%a3%e5%86%b3%e5%8a%9e%e6%b3%95/" >MoeomuBlog&lt;/a>&lt;/p>
+&lt;h2 id="声音的问题">声音的问题&lt;/h2>
+&lt;h3 id="问题一没有声音">问题一：没有声音&lt;/h3>
+&lt;ol>
+&lt;li>编辑文件：&lt;code>/etc/modprobe.d/alsa-base.conf&lt;/code>&lt;/li>
+&lt;li>在这个文件的末尾添加一行：&lt;code>options snd-hda-intel model=asus-zenbook&lt;/code>&lt;/li>
+&lt;li>重新启动系统&lt;/li>
+&lt;/ol>
+&lt;h3 id="问题二声音无法调整">问题二：声音无法调整&lt;/h3>
+&lt;blockquote>
+&lt;p>描述：主声音不可调整，只能是静音或者最大声音。&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>编辑文件：&lt;code>/usr/share/pulseaudio/alsa-mixer/paths/analog-output.conf.common&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>在&lt;code>[Element PCM]&lt;/code>的前面添加以下内容&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">[Element Master]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">switch = mute
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">volume = ignore
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>关闭pulse音频守护进程，它将被systemd自动重新启动：&lt;code>pulseaudio -k&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>注意：请勿以root身份运行pulseaudio，否则将无法正常关闭守护进程。&lt;/p>
+&lt;/blockquote>
+&lt;h2 id="睡眠问题">睡眠问题&lt;/h2>
+&lt;h3 id="锁定屏幕后无法再次唤醒">锁定屏幕后无法再次唤醒&lt;/h3>
+&lt;blockquote>
+&lt;p>描述：锁定屏幕后，计算机不能再次唤醒。硬盘和其他硬件工作正常，但屏幕全黑。&lt;/p>
+&lt;/blockquote>
+&lt;ol>
+&lt;li>安装laptop-mod-tools：&lt;code>sudo apt install laptop-mod-tools&lt;/code>&lt;/li>
+&lt;li>启动laptop-mod-tools：&lt;code>sudo laptop_mode start&lt;/code>&lt;/li>
+&lt;li>添加mutter debug环境变量，编辑文件：&lt;code>/etc/environment&lt;/code>
+&lt;ul>
+&lt;li>如果是Ubuntu 22.04: &lt;code>MUTTER_DEBUG_ENABLE_ATOMIC_KMS=0&lt;/code>&lt;/li>
+&lt;li>如果是Ubuntu 22.10及以后版本：&lt;code>MUTTER_DEBUG_FORCE_KMS_MODE=simple&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>重新启动系统&lt;/li>
+&lt;/ol>
+&lt;h2 id="参考文献">参考文献&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://askubuntu.com/questions/1288054/snd-hda-intel-model-for-ubuntu-20-04-installed-in-an-asus-rog-strix-g15-g512" target="_blank" rel="noopener"
+>snd-hda-intel model for UBUNTU 20.04 installed in an ASUS ROG STRIX G15 (G512) - AskUbuntu&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ubuntuforums.org/showthread.php?t=2414755" target="_blank" rel="noopener"
+>Volume either muted or maxed out, nothing in between - ubuntu forums&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://bugs.launchpad.net/ubuntu/&amp;#43;source/mutter/&amp;#43;bug/1968040" target="_blank" rel="noopener"
+>Blanked screen doesn&amp;rsquo;t wake up after locking - Launchpad&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Linux内核编程学习笔记-001-编译和启动内核</title><link>https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/</link><pubDate>Wed, 07 Jul 2021 11:20:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/</guid><description>&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/linux%e5%86%85%e6%a0%b8%e7%bc%96%e7%a8%8b%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0-001-%e7%bc%96%e8%af%91%e5%92%8c%e5%90%af%e5%8a%a8%e5%86%85%e6%a0%b8/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="准备环境">准备环境&lt;/h2>
+&lt;ul>
+&lt;li>Ubuntu 20.04 LTS&lt;/li>
+&lt;li>Linux 4.9.229&lt;/li>
+&lt;li>Busybox 1.33.0&lt;/li>
+&lt;li>qemu&lt;/li>
+&lt;/ul>
+&lt;h3 id="下载内核源代码和文件系统源代码">下载内核源代码和文件系统源代码&lt;/h3>
+&lt;ul>
+&lt;li>在站点&lt;a class="link" href="https://www.kernel.org" target="_blank" rel="noopener"
+>Kernel.org&lt;/a>下载&lt;code>linux-4.9.229.tar.gz&lt;/code>&lt;/li>
+&lt;li>在站点&lt;a class="link" href="https://www.busybox.net/downloads" target="_blank" rel="noopener"
+>Busybox.net&lt;/a>下载&lt;code>busybox-1.33.0.tar.bz2&lt;/code>&lt;/li>
+&lt;li>通过apt安装qemu：&lt;code>sudo apt install qemu-system-x86&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="编译">编译&lt;/h2>
+&lt;h3 id="编译内核">编译内核&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>export ARCH=x86&lt;/code>&lt;/li>
+&lt;li>&lt;code>make x86_64_defconfig&lt;/code>&lt;/li>
+&lt;li>&lt;code>make menuconfig&lt;/code>
+&lt;ul>
+&lt;li>选中&lt;code>General Setup -&amp;gt; Initial RAM filesystem and RAM disk(initramfs/initrd) support&lt;/code>&lt;/li>
+&lt;li>选中&lt;code>Device Drivers -&amp;gt; Block devices -&amp;gt; RAM block device support&lt;/code>&lt;/li>
+&lt;li>修改&lt;code>Device Drivers -&amp;gt; Block devices -&amp;gt; RAM block device support -&amp;gt; (65536)default RAM disk size (kbytes)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;blockquote>
+&lt;p>如果这一步报错&lt;code>fatal error: curses.h&lt;/code>，则安装一下&lt;code>sudo apt install libncurses5-dev&lt;/code>&lt;/p>
+&lt;/blockquote>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>make&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>编译好的内核被放置在目录&lt;code>arch/x86/boot&lt;/code>下，文件名&lt;code>bzImage&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="编译busybox">编译busybox&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>make menuconfig&lt;/code>
+&lt;ul>
+&lt;li>选中&lt;code>Settings -&amp;gt; Build Options -&amp;gt; [*] Build Busybox as a static binary (no shard libs)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>make &amp;amp;&amp;amp; make install&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="打包文件系统">打包文件系统&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>mkdir etc dev mnt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p proc sys tmp&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>mkdir -p etc/init.d&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/fstab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">proc /proc proc defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs /tmp tmpfs defaults 0 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sysfs /sys sysfs defaults 0 0
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Welcome to Moeomu Linux&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/bin/mount -a
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> -e &lt;span class="s2">&amp;#34;Remounting the root filesystem&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mount -o remount rw /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">moutn -t devpts devpts /dev/pts
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> /sbin/mdev &amp;gt; /proc/sys/kernel/hotplug
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mdev -s
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/init.d/rcS&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>vim etc/inittab&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-text" data-lang="text">&lt;span class="line">&lt;span class="cl">::sysinit:/etc/init.d/rcS
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::respawn:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::askfirst:-/bin/sh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">::cttlaltdel:/bin/umount -a -r
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>&lt;code>chmod 755 etc/inittab&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>cd dev&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod console c 5 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod null c 1 3&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;code>sudo mknod tty1 c 4 1&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>以下代码在busybox源码目录下逐行执行&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>rm -rf rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo rm -rf fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">dd &lt;span class="k">if&lt;/span>&lt;span class="o">=&lt;/span>/dev/zero &lt;span class="nv">of&lt;/span>&lt;span class="o">=&lt;/span>./rootfs.ext3 &lt;span class="nv">bs&lt;/span>&lt;span class="o">=&lt;/span>1M &lt;span class="nv">count&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkfs.ext3 rootfs.ext3
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -o loop rootfs.ext3 ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp -rf ./_install/* ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount ./fs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gzip --best -c rootfs.ext3 &amp;gt; rootfs.img.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>最终生成了文件系统：&lt;code>rootfs.img.gz&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="使用qemu运行系统">使用QEMU运行系统&lt;/h2>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>qemu-system-x86_64 -kernel ./linux-4.9.229/arch/x86_64/boot/bzImage -initrd ./busybox-1.33.1/rootfs.img.gz -append &amp;quot;root=/dev/ram init=/linuxrc&amp;quot; -serial file:output.txt&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>预览如下&lt;/p>
+&lt;p>&lt;img src="https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu.png"
+width="719"
+height="466"
+srcset="https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_480x0_resize_box_3.png 480w, https://blog.moeomu.com/zh-cn/posts/linux%E5%86%85%E6%A0%B8%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-001-%E7%BC%96%E8%AF%91%E5%92%8C%E5%90%AF%E5%8A%A8%E5%86%85%E6%A0%B8/qemu_hu14ac3ca9548264bec98d9a3082d3eff5_39919_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="RHildI.png"
+class="gallery-image"
+data-flex-grow="154"
+data-flex-basis="370px"
+>&lt;/p>
+&lt;/li>
+&lt;/ul></description></item><item><title>OhMyZsh安装指南</title><link>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</link><pubDate>Tue, 10 Nov 2020 19:43:00 +0800</pubDate><guid>https://blog.moeomu.com/zh-cn/posts/ohmyzsh%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97/</guid><description>&lt;p>zsh install and config&lt;/p>
+&lt;p>本文来源：&lt;a class="link" href="https://blog.moeomu.com/zh-cn/posts/ohmyzsh%e5%ae%89%e8%a3%85%e6%8c%87%e5%8d%97/" >Moeomu的博客&lt;/a>&lt;/p>
+&lt;h2 id="安装zsh">安装zsh&lt;/h2>
+&lt;ul>
+&lt;li>macOS: &lt;code>brew install zsh&lt;/code>&lt;/li>
+&lt;li>Linux
+&lt;ul>
+&lt;li>Arch Linux: &lt;code>sudo pacman -S zsh&lt;/code>&lt;/li>
+&lt;li>Ubuntu: &lt;code>sudo apt install zsh&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="克隆git仓库clone-git-repo">克隆Git仓库(clone git repo)&lt;/h2>
+&lt;ul>
+&lt;li>中国大陆: &lt;code>git clone https://gitee.com/mirrors/oh-my-zsh.git&lt;/code>&lt;/li>
+&lt;li>世界: &lt;code>git clone https://github.com/ohmyzsh/ohmyzsh.git&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h2 id="配置zshconfig">配置zsh(config)&lt;/h2>
+&lt;h3 id="设置为默认shellset-default-shell">设置为默认shell(set default shell)&lt;/h3>
+&lt;ul>
+&lt;li>Set default shell: &lt;code>chsh -s /usr/bin/zsh&lt;/code>&lt;/li>
+&lt;li>Rename: &lt;code>mv oh-my-zsh .oh-my-zsh&lt;/code>&lt;/li>
+&lt;li>Set user profile: &lt;code>cp .oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="自动补全插件auto-suggestions-plugin">自动补全插件(auto suggestions plugin)&lt;/h3>
+&lt;ul>
+&lt;li>&lt;code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions&lt;/code>&lt;/li>
+&lt;li>edit &lt;code>~/.zshrc&lt;/code>:
+&lt;ul>
+&lt;li>&lt;code>plugins=(git)&lt;/code>=&amp;gt;&lt;code>plugins=(git zsh-autosuggestions)&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul></description></item></channel></rss>
