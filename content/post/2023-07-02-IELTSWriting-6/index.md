@@ -7,7 +7,7 @@ categories:
 tags:
     - IELTS
     - Writing
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230702/IELTS-Writing-Course-Note-06-Diagram-Essay.6t45w80e8veo.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230702/IELTS-Writing-Course-Note-06-Diagram-Essay.6t45w80e8veo.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-06-diagram-essay/)

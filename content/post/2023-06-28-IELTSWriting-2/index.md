@@ -7,7 +7,7 @@ categories:
 tags:
     - IELTS
     - Writing
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-02-Opinion-Essay.3io6hcc5uji8.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-02-Opinion-Essay.3io6hcc5uji8.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-02-opinion-essay/)

@@ -7,7 +7,7 @@ categories:
 tags:
     - IELTS
     - Writing
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-01-Disadvantage-and-Advantage-Essay.1t76xiwq5tx.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-01-Disadvantage-and-Advantage-Essay.1t76xiwq5tx.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-01-disadvantage-and-advantage-essay/)

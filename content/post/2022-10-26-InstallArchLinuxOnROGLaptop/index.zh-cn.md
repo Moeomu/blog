@@ -7,7 +7,7 @@ categories:
 tags:
     - ArchLinux
     - Linux
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
 ---
 
 本文来源: [MoeomuBlog](/zh-cn/posts/在华硕玩家国度枪神4上安装archlinux/)

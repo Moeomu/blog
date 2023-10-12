@@ -7,7 +7,7 @@ categories:
 tags:
     - Ubuntu
     - Linux
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221020/1880882405-install-Problem,-Ubuntu,-webpage-head-image.g4gmdlq05jc.webp
 ---
 
 本文来源: [MoeomuBlog](/zh-cn/posts/在rog枪神4上安装ubuntu遇到的问题和解决办法/)

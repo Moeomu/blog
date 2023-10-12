@@ -7,7 +7,7 @@ categories:
 tags:
     - IELTS
     - Writing
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-04-Compare(Outweigh)-and-Report-Essay.3sgs2f8b61kw.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230630/IELTS-Writing-Course-Note-04-Compare(Outweigh)-and-Report-Essay.3sgs2f8b61kw.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-04-compareoutweigh-and-report-essay/)

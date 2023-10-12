@@ -7,7 +7,7 @@ categories:
 tags:
     - ArchLinux
     - Linux
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20221026/00002-1464201810-install-system,-webpage-head-image,-beautiful,-ArchLinux.6mm7o4tdu64g.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/installing-archlinux-on-asus-rog-strix-scar-g532/)

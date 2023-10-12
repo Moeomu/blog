@@ -7,7 +7,7 @@ categories:
 tags:
     - IELTS
     - Writing
-image: https://cdn.staticaly.com/gh/Misakaou/imagestorage@master/20230702/IELTS-Writing-Course-Note-07-FlowChart-and-Map-Essay.27ybe1oxgbk0.webp
+image: https://cdn.statically.io/gh/Misakaou/imagestorage@master/20230702/IELTS-Writing-Course-Note-07-FlowChart-and-Map-Essay.27ybe1oxgbk0.webp
 ---
 
 Source of this article: [MoeomuBlog](/posts/ielts-writing-course-note-07-flowchart-and-map-essay/)
