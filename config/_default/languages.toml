@@ -3,11 +3,11 @@
 [en]
 languageName = "English"
 languagedirection = "ltr"
-title = "Moeomu Blog"
+title = "Misaka's Secrect Garden"
 weight = 1
 
 [zh-cn]
 languageName = "中文"
 languagedirection = "ltr"
-title = "Moeomu博客"
+title = "Misaka的秘密花园"
 weight = 2
